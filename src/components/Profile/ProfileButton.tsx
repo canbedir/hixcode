@@ -1,20 +1,9 @@
 import React from "react";
 import { signIn, signOut, useSession } from "next-auth/react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import Image from "next/image";
 import {
   Sheet,
-  SheetClose,
   SheetContent,
-  SheetDescription,
-  SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
@@ -22,9 +11,17 @@ import {
 import { Button } from "../ui/button";
 import { RiUser3Line } from "react-icons/ri";
 import { MdExitToApp } from "react-icons/md";
+import { useRouter } from "next/navigation";
 
 const ProfileButton = () => {
   const { data: session } = useSession();
+  const router = useRouter();
+
+  const handleSignOut = () => {
+    signOut({ redirect: false, callbackUrl: "/" }).then(() => {
+      router.refresh();
+    });
+  };
 
   return (
     <Sheet>
@@ -50,7 +47,6 @@ const ProfileButton = () => {
             <h1 className="text-sm">{session?.user?.name}</h1>
           </SheetTitle>
         </SheetHeader>
-        <DropdownMenuSeparator />
         <div className="grid grid-cols-1 gap-1">
           <Button
             variant={"sheet"}
@@ -63,6 +59,7 @@ const ProfileButton = () => {
             variant={"sheet"}
             size={"sheet"}
             className="w-full flex items-center justify-start px-2 gap-2"
+            onClick={handleSignOut}
           >
             <MdExitToApp size={18} /> Sign out
           </Button>

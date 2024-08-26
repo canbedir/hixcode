@@ -4,15 +4,16 @@ import { Button } from "../ui/button";
 import ProfileButton from "./ProfileButton";
 
 export default function SignIn() {
-
   const { data: session } = useSession();
 
   return (
     <div>
       {session?.user ? (
-        <ProfileButton/>
+        <ProfileButton />
       ) : (
-        <Button onClick={() => signIn()}>Sign in</Button>
+        <Button onClick={() => signIn(undefined, { callbackUrl: '/' })}>
+          Sign in
+        </Button>
       )}
     </div>
   );
