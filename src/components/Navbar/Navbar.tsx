@@ -1,16 +1,19 @@
 import React from "react";
-import SignInButton from "../SignInButton";
+import SignInButton from "../Profile/SignInButton";
+import Link from "next/link";
 
 const Navbar = () => {
   return (
-    <div className="w-full h-[60px] fixed">
-      <div className="flex items-center justify-between container h-full text-2xl">
+    <div className="w-full h-[80px] border-b fixed">
+      <div className="flex items-center justify-between h-full text-2xl px-20">
         <div>
-          <span className="font-semibold">hix</span>
-          <span className="font-bold">Code</span>
+          <Link href={"/"}>
+            <span className="font-  ">hix</span>
+            <span className="font-bold">Code</span>
+          </Link>
         </div>
         <div>
-          <SignInButton/>
+          <SignInButton />
         </div>
       </div>
     </div>
