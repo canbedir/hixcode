@@ -4,6 +4,7 @@ import Image from "next/image";
 import {
   Sheet,
   SheetContent,
+  SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
@@ -12,6 +13,9 @@ import { Button } from "../ui/button";
 import { RiUser3Line } from "react-icons/ri";
 import { MdExitToApp } from "react-icons/md";
 import { useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
+import { Moon, Sun } from "lucide-react";
+import { ModeToggle } from "../mode-toggle";
 
 const ProfileButton = () => {
   const { data: session } = useSession();
@@ -22,6 +26,8 @@ const ProfileButton = () => {
       router.refresh();
     });
   };
+
+  const { setTheme } = useTheme();
 
   return (
     <Sheet>
@@ -64,6 +70,9 @@ const ProfileButton = () => {
             <MdExitToApp size={18} /> Sign out
           </Button>
         </div>
+        <SheetFooter className="absolute bottom-1.5 right-2">
+          <ModeToggle/>
+        </SheetFooter>
       </SheetContent>
     </Sheet>
   );

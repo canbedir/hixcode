@@ -3,6 +3,8 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar/Navbar";
 import SessionProviderWrapper from "@/components/SessionProviderWrapper";
+import { ThemeProvider } from "@/components/theme-provider";
+import { cn } from "@/lib/utils";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -21,11 +23,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={poppins.className}>
-        <SessionProviderWrapper>
-          <Navbar />
-          <main className="container mx-auto pt-[80px]">{children}</main>
-        </SessionProviderWrapper>
+      <body className={cn("", poppins.className)}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <SessionProviderWrapper>
+            <Navbar />
+            <main className="container mx-auto">{children}</main>
+          </SessionProviderWrapper>
+        </ThemeProvider>
       </body>
     </html>
   );
