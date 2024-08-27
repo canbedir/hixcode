@@ -13,25 +13,37 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async signIn({ user, account, profile }: { user: User; account: Account | null; profile?: Profile | undefined }) {
+    async signIn({
+      user,
+      account,
+      profile,
+    }: {
+      user: User;
+      account: Account | null;
+      profile?: Profile | undefined;
+    }) {
       try {
         const existingUser = await prisma.user.findUnique({
-          where: { email: user.email || undefined },
+          where: {
+            githubId: account?.providerAccountId,
+            email: user.email || undefined
+          },
         });
 
         if (!existingUser) {
           await prisma.user.create({
             data: {
-              name: user.name || '',
-              email: user.email || '',
-              image: user.image || '',
+              name: user.name || "",
+              email: user.email || "",
+              githubId: account?.providerAccountId || "",
+              image: user.image || "",
             },
           });
         }
 
         return true;
       } catch (error) {
-        console.error("Kullanıcı kaydedilemedi:", error);
+        console.error("Failed to save the user:", error);
         return false;
       }
     },
