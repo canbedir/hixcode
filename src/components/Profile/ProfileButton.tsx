@@ -1,5 +1,5 @@
 import React from "react";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import {
   Sheet,
@@ -9,13 +9,11 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Button } from "../ui/button";
+import { useRouter } from "next/navigation";
+import { ModeToggle } from "../mode-toggle";
+import AnimatedBackground from "@/components/animated-background";
 import { RiUser3Line } from "react-icons/ri";
 import { MdExitToApp } from "react-icons/md";
-import { useRouter } from "next/navigation";
-import { useTheme } from "next-themes";
-import { Moon, Sun } from "lucide-react";
-import { ModeToggle } from "../mode-toggle";
 
 const ProfileButton = () => {
   const { data: session } = useSession();
@@ -27,11 +25,22 @@ const ProfileButton = () => {
     });
   };
 
-  const { setTheme } = useTheme();
+  const TABS = [
+    {
+      label: "Profile",
+      icon: <RiUser3Line size={20} />,
+      onClick: () => router.push("/profile"),
+    },
+    {
+      label: "Sign out",
+      icon: <MdExitToApp size={20} />,
+      onClick: handleSignOut,
+    },
+  ];
 
   return (
     <Sheet>
-      <SheetTrigger className="flex items-center" asChild>
+      <SheetTrigger className="flex items-center">
         <Image
           src={session?.user?.image || "profile img"}
           alt={session?.user?.name || "profile name"}
@@ -53,25 +62,35 @@ const ProfileButton = () => {
             <h1 className="text-sm">{session?.user?.name}</h1>
           </SheetTitle>
         </SheetHeader>
-        <div className="grid grid-cols-1 gap-1">
-          <Button
-            variant={"sheet"}
-            size={"sheet"}
-            className="w-full flex items-center justify-start px-2 gap-2"
+        <div className="grid grid-cols-1">
+          <AnimatedBackground
+            defaultValue={TABS[0].label}
+            className="rounded-lg bg-zinc-100 dark:bg-zinc-800"
+            transition={{
+              type: "spring",
+              bounce: 0.2,
+              duration: 0.3,
+            }}
+            enableHover
           >
-            <RiUser3Line size={18} /> Profile
-          </Button>
-          <Button
-            variant={"sheet"}
-            size={"sheet"}
-            className="w-full flex items-center justify-start px-2 gap-2"
-            onClick={handleSignOut}
-          >
-            <MdExitToApp size={18} /> Sign out
-          </Button>
+            {TABS.map((tab, index) => (
+              <button
+                key={index}
+                data-id={tab.label}
+                type="button"
+                onClick={tab.onClick}
+                className="p-2 text-zinc-600 transition-colors duration-300 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-50 flex items-center"
+              >
+                <div className="flex items-center gap-2">
+                  {tab.icon}
+                  {tab.label}
+                </div>
+              </button>
+            ))}
+          </AnimatedBackground>
         </div>
         <SheetFooter className="absolute bottom-1.5 right-2">
-          <ModeToggle/>
+          <ModeToggle />
         </SheetFooter>
       </SheetContent>
     </Sheet>
