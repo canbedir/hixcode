@@ -2,8 +2,8 @@
 import React from "react";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
-import SignInButton from "../Profile/SignInButton";
 import { useSession } from "next-auth/react";
+import NavbarMenu from "./NavbarMenu";
 
 const Navbar = () => {
   const { status } = useSession();
@@ -25,7 +25,7 @@ const Navbar = () => {
           {status === "loading" ? (
             <Skeleton className="h-11 w-11 rounded-full" />
           ) : (
-            <SignInButton />
+            <NavbarMenu />
           )}
         </div>
       </div>

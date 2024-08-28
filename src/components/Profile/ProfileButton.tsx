@@ -10,7 +10,6 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { useRouter } from "next/navigation";
-import { ModeToggle } from "../mode-toggle";
 import AnimatedBackground from "@/components/animated-background";
 import { RiUser3Line } from "react-icons/ri";
 import { MdExitToApp } from "react-icons/md";
@@ -56,9 +55,9 @@ const ProfileButton = () => {
         <Image
           src={session?.user?.image || "profile img"}
           alt={session?.user?.name || "profile name"}
-          width={45}
-          height={45}
-          className="rounded-full cursor-pointer"
+          width={35}
+          height={35}
+          className="rounded-full cursor-pointer hover:scale-110 duration-300"
         />
       </SheetTrigger>
       <SheetContent className="flex flex-col">
