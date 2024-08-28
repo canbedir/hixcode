@@ -16,8 +16,8 @@ const Navbar = () => {
             <Skeleton className="w-28 h-10 rounded-md" />
           ) : (
             <Link href={"/"}>
-              <span className="font-">hix</span>
-              <span className="font-bold">Code</span>
+              <span>hix</span>
+              <span className="font-semibold">Code</span>
             </Link>
           )}
         </div>

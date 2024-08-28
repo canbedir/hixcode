@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import {
@@ -14,15 +14,22 @@ import { ModeToggle } from "../mode-toggle";
 import AnimatedBackground from "@/components/animated-background";
 import { RiUser3Line } from "react-icons/ri";
 import { MdExitToApp } from "react-icons/md";
+import { Settings } from "lucide-react";
 
 const ProfileButton = () => {
   const { data: session } = useSession();
   const router = useRouter();
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleSignOut = () => {
     signOut({ redirect: false, callbackUrl: "/" }).then(() => {
       router.refresh();
     });
+  };
+
+  const handleTabClick = (onClick: () => void) => {
+    onClick();
+    setIsOpen(false);
   };
 
   const TABS = [
@@ -32,6 +39,11 @@ const ProfileButton = () => {
       onClick: () => router.push("/profile"),
     },
     {
+      label: "Settings",
+      icon: <Settings size={20} />,
+      onClick: () => router.push("/settings"),
+    },
+    {
       label: "Sign out",
       icon: <MdExitToApp size={20} />,
       onClick: handleSignOut,
@@ -39,7 +51,7 @@ const ProfileButton = () => {
   ];
 
   return (
-    <Sheet>
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger className="flex items-center">
         <Image
           src={session?.user?.image || "profile img"}
@@ -78,7 +90,7 @@ const ProfileButton = () => {
                 key={index}
                 data-id={tab.label}
                 type="button"
-                onClick={tab.onClick}
+                onClick={() => handleTabClick(tab.onClick)}
                 className="p-2 text-zinc-600 transition-colors duration-300 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-50 flex items-center"
               >
                 <div className="flex items-center gap-2">
@@ -89,9 +101,6 @@ const ProfileButton = () => {
             ))}
           </AnimatedBackground>
         </div>
-        <SheetFooter className="absolute bottom-1.5 right-2">
-          <ModeToggle />
-        </SheetFooter>
       </SheetContent>
     </Sheet>
   );
