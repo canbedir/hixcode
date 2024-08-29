@@ -3,6 +3,7 @@ import Image from "next/image";
 import React from "react";
 import { IoColorPaletteOutline } from "react-icons/io5";
 import AnimatedBackground from "../animated-background";
+import { IoMdPerson } from "react-icons/io";
 
 const SettingsSidebar = ({
   setSelectedTab,
@@ -15,11 +16,11 @@ const SettingsSidebar = ({
 
   const TABS = [
     {
-      label: "Theme",
-      icon: <IoColorPaletteOutline size={20} />,
+      label: "Profile",
+      icon: <IoMdPerson size={20} />,
     },
     {
-      label: "Test",
+      label: "Theme",
       icon: <IoColorPaletteOutline size={20} />,
     },
   ];

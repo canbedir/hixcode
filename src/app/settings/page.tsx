@@ -1,6 +1,6 @@
 "use client";
+import ProfileSettings from "@/components/Settings/profile-settings";
 import SettingsSidebar from "@/components/Settings/settings-sidebar";
-import TestSettings from "@/components/Settings/test-settings";
 import ThemeSettings from "@/components/Settings/theme-settings";
 import { useSession } from "next-auth/react";
 import React, { useState } from "react";
@@ -8,7 +8,7 @@ import { ClipLoader } from "react-spinners";
 
 const SettingsPage = () => {
   const { data: session, status } = useSession();
-  const [selectedTab, setSelectedTab] = useState("Apperance");
+  const [selectedTab, setSelectedTab] = useState("Profile");
 
   if (status === "loading" || !session) {
     return (
@@ -25,12 +25,13 @@ const SettingsPage = () => {
 
   const renderContent = () => {
     switch (selectedTab) {
-      case "Appearance":
+      case "Profile":
+        return <ProfileSettings />;
+      case "Theme":
         return <ThemeSettings />;
-        case "Test":
-        return <TestSettings />;
+
       default:
-        return <ThemeSettings />;
+        return <ProfileSettings />;
     }
   };
 
