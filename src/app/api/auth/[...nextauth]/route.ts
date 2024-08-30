@@ -26,7 +26,7 @@ export const authOptions: NextAuthOptions = {
         const existingUser = await prisma.user.findUnique({
           where: {
             githubId: account?.providerAccountId,
-            email: user.email || undefined
+            email: user.email || undefined,
           },
         });
 
@@ -39,6 +39,17 @@ export const authOptions: NextAuthOptions = {
               image: user.image || "",
             },
           });
+        } else {
+          await prisma.user.update({
+            where: {
+              githubId: account?.providerAccountId,
+            },
+            data: {
+              name: user.name || "",
+              email: user.email || "",
+              image: user.image || "",
+            },
+          });
         }
 
         return true;
@@ -46,6 +57,23 @@ export const authOptions: NextAuthOptions = {
         console.error("Failed to save the user:", error);
         return false;
       }
+    },
+
+    async session({ session, token, user }) {
+      if (token) {
+        session.accessToken = token.accessToken as string;
+        if (session.user) {
+          (session.user as any).id = token.sub as string; // GitHub kullanıcı kimliğini ekleyin
+        }
+      }
+      return session;
+    },
+
+    async jwt({ token, account }) {
+      if (account) {
+        token.accessToken = account.access_token;
+      }
+      return token;
     },
   },
 };
