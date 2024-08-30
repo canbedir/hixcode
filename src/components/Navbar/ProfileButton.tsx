@@ -36,11 +36,6 @@ const ProfileButton = () => {
 
   const TABS = [
     {
-      label: "Upload Projects",
-      icon: <Upload size={20} />,
-      onClick: () => setIsUploadModalOpen(true),
-    },
-    {
       label: "Profile",
       icon: <RiUser3Line size={20} />,
       onClick: () => router.push("/profile"),
