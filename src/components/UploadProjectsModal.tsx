@@ -25,6 +25,7 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
   const [selectedRepos, setSelectedRepos] = useState<any[]>([]);
   const router = useRouter();
   const { toast } = useToast();
+  const [existingProjects, setExistingProjects] = useState<any[]>([]);
 
   useEffect(() => {
     if (!session?.accessToken) return;
@@ -34,11 +35,27 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
         `/api/github-repos?accessToken=${session?.accessToken}`
       );
       const data = await response.json();
-      setRepos(data);
+      const filteredRepos = data.filter((repo: any) => 
+        !existingProjects.some(project => project.githubUrl === repo.html_url)
+      );
+      setRepos(filteredRepos);
     }
 
     fetchRepos();
-  }, [session?.accessToken]);
+  }, [session?.accessToken, existingProjects]);
+
+  useEffect(() => {
+    if (!session?.user?.email) return;
+    async function fetchExistingProjects() {
+      if (session?.user?.email) {
+        const response = await fetch(`/api/user-projects?email=${session.user.email}`);
+        const data = await response.json();
+        setExistingProjects(data);
+      }
+    }
+
+    fetchExistingProjects();
+  }, [session?.user?.email]);
 
   const handleSelectRepo = (repo: any) => {
     if (selectedRepos.some((r) => r.id === repo.id)) {
