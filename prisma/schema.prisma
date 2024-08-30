@@ -35,22 +35,23 @@ model Session {
 }
 
 model User {
-  id        String    @id @default(cuid())
-  name      String?
-  email     String?   @unique
-  bio       String?   @unique
-  githubId  String?   @unique
-  image     String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  accounts  Account[]
-  sessions  Session[]
-  projects  Project[]
-  badges    Badge[]
-  supports  Support[]
+  id          String    @id @default(cuid())
+  name        String?
+  email       String?   @unique
+  bio         String?   @unique
+  githubId    String?   @unique
+  image       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  accounts    Account[]
+  sessions    Session[]
+  projects    Project[]
+  badges      Badge[]
+  supports    Support[]
   discussions Discussion[]
-
-  ratings   Rating[]
+  ratings     Rating[]
+  followers   Follow[] @relation("followers")
+  following   Follow[] @relation("following")
 }
 
 model Project {
@@ -107,4 +108,16 @@ model Badge {
   userId      String
   createdAt   DateTime @default(now())
   user        User     @relation(fields: [userId], references: [id])
+}
+
+model Follow {
+  id          String   @id @default(cuid())
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+  
+  follower    User     @relation("followers", fields: [followerId], references: [id])
+  following   User     @relation("following", fields: [followingId], references: [id])
+
+  @@unique([followerId, followingId])
 }

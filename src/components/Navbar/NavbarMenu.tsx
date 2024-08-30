@@ -2,7 +2,7 @@ import React from "react";
 import AnimatedBackground from "../animated-background";
 import { PiMailboxBold } from "react-icons/pi";
 import { TbUpload } from "react-icons/tb";
-import SignInButton from "../Profile/SignInButton";
+import SignInButton from "../Navbar/SignInButton";
 import { Input } from "../ui/input";
 import { Search } from "lucide-react";
 
@@ -18,10 +18,10 @@ const NavbarMenu = () => {
 
   return (
     <div className="flex items-center gap-3">
-        <div>
-            <Input className="hidden sm:flex" placeholder="Search..."/>
-            <Search className="flex sm:hidden"/>
-        </div>
+      <div>
+        <Input className="hidden sm:flex" placeholder="Search..." />
+        <Search className="flex sm:hidden" />
+      </div>
       <div>
         <AnimatedBackground
           className="rounded-lg bg-zinc-100 dark:bg-zinc-800"

@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar/Navbar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { cn } from "@/lib/utils";
 import SessionProviderWrapper from "@/components/session-provider-wrapper";
+import { Toaster } from "@/components/ui/toaster"
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -33,6 +34,7 @@ export default function RootLayout({
           <SessionProviderWrapper>
             <Navbar />
             <main className="container mx-auto">{children}</main>
+            <Toaster />
           </SessionProviderWrapper>
         </ThemeProvider>
       </body>

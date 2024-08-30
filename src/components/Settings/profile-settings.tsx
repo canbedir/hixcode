@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { useSession } from "next-auth/react";
@@ -7,24 +7,51 @@ import { ClipLoader } from "react-spinners";
 import Image from "next/image";
 import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
-import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";
 import {
   Dialog,
   DialogTrigger,
   DialogContent,
   DialogHeader,
-  DialogFooter,
   DialogTitle,
-  DialogDescription,
 } from "../ui/dialog";
+import axios from "axios";
+import { useToast } from "../ui/use-toast";
 
-const ProfileSettings = () => {
+const ProfileSettings: React.FC = () => {
   const { data: session, status } = useSession();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [bio, setBio] = useState("");
+  const { toast } = useToast();
 
-  const handleSave = () => {
-    // Implement save logic here
-    setIsDialogOpen(false);
+  useEffect(() => {
+    if (session) {
+      axios
+        .get("/api/profile")
+        .then((response) => {
+          setBio(response.data.bio || "");
+        })
+        .catch((error) => {
+          console.error("Failed to profile settings updated:", error);
+        });
+    }
+  }, [session]);
+
+  const handleSave = async () => {
+    try {
+      await axios.post("/api/profile", { bio });
+      toast({
+        title: "Profile settings updated successfully",
+        variant: "success",
+        duration: 3000,
+      });
+    } catch (error) {
+      console.error("Failed to update bio:", error);
+      toast({
+        title: "Failed to update bio",
+        variant: "destructive",
+        duration: 3000,
+      });
+    }
   };
 
   if (status === "loading" || !session) {
@@ -86,11 +113,15 @@ const ProfileSettings = () => {
 
       <div className="w-2/3">
         <Label htmlFor="Bio">Bio</Label>
-        <Textarea placeholder="Tell us a bit about yourself" />
+        <Textarea
+          placeholder={bio || "Tell us about yourself"}
+          value={bio}
+          onChange={(e) => setBio(e.target.value)}
+        />
       </div>
 
       <div>
-        <Button>Save Profile</Button>
+        <Button onClick={handleSave}>Save Profile</Button>
       </div>
     </div>
   );
