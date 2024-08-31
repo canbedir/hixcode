@@ -1,9 +1,10 @@
+import FilterProjects from "@/components/FilterProjects/filter-projects";
 import Image from "next/image";
 
 export default function Home() {
   return (
-    <div>
-      hix büyük dev olcak karşimmm!
+    <div className="mt-10">
+      <FilterProjects/>
     </div>
   );
 }
