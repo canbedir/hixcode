@@ -10,7 +10,7 @@ const Navbar = () => {
 
   return (
     <div className="w-full h-[80px] border-b shadow-md">
-      <div className="flex items-center justify-between h-full text-2xl px-20">
+      <div className="flex items-center justify-between h-full text-2xl px-5 md:px-10">
         <div>
           {status === "loading" ? (
             <Skeleton className="w-28 h-10 rounded-md" />
