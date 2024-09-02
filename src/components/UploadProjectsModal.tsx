@@ -9,9 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { Input } from "./ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Checkbox } from "@/components/ui/checkbox";
 
 interface UploadProjectsModalProps {
   isOpen: boolean;
@@ -29,69 +27,111 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
   const { toast } = useToast();
   const [existingProjects, setExistingProjects] = useState<any[]>([]);
 
+  // GitHub reposlarını çekme işlemi
   useEffect(() => {
     if (!session?.accessToken) return;
 
     async function fetchRepos() {
-      const response = await fetch(
-        `/api/github-repos?accessToken=${session?.accessToken}`
-      );
-      const data = await response.json();
-      const filteredRepos = data.filter(
-        (repo: any) =>
-          !existingProjects.some(
-            (project) => project.githubUrl === repo.html_url
-          )
-      );
-      setRepos(filteredRepos);
+      try {
+        const response = await fetch(
+          `/api/github-repos?accessToken=${session?.accessToken}`
+        );
+
+        if (!response.ok) {
+          throw new Error("GitHub repos verisi alınamadı.");
+        }
+
+        const data = await response.json();
+
+        if (!Array.isArray(data)) {
+          throw new Error("Beklenmedik veri formatı: bir dizi bekleniyordu.");
+        }
+
+        const filteredRepos = data.filter(
+          (repo: any) =>
+            !existingProjects.some(
+              (project) => project.githubUrl === repo.html_url
+            )
+        );
+        setRepos(filteredRepos);
+      } catch (error:any) {
+        console.error("GitHub reposları alınırken bir hata oluştu:", error);
+        toast({
+          title: "Error",
+          description: `Failed to fetch GitHub repositories: ${error.message}`,
+          variant: "destructive",
+        });
+      }
     }
 
     fetchRepos();
-  }, [session?.accessToken, existingProjects]);
+  }, [session?.accessToken, existingProjects, toast]);
 
+  // Mevcut projeleri çekme işlemi
   useEffect(() => {
     if (!session?.user?.email) return;
+
     async function fetchExistingProjects() {
-      if (session?.user?.email) {
+      try {
         const response = await fetch(
-          `/api/user-projects?email=${session.user.email}`
+          `/api/user-projects?email=${session?.user?.email}`
         );
+
+        if (!response.ok) {
+          throw new Error("Mevcut projeler alınamadı.");
+        }
+
         const data = await response.json();
+
+        if (!Array.isArray(data)) {
+          throw new Error("Beklenmedik veri formatı: bir dizi bekleniyordu.");
+        }
+
         setExistingProjects(data);
+      } catch (error:any) {
+        console.error("Mevcut projeler alınırken bir hata oluştu:", error);
+        toast({
+          title: "Error",
+          description: `Failed to fetch existing projects: ${error.message}`,
+          variant: "destructive",
+        });
       }
     }
 
     fetchExistingProjects();
-  }, [session?.user?.email]);
+  }, [session?.user?.email, toast]);
 
+  // Repo seçimi ve kaydetme işlemi
   const handleSelectRepo = async (repo: any) => {
-    const response = await fetch("/api/save-projects", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ repos: [repo] }),
-    });
-
-    const data = await response.json();
-
-    if (data.success) {
-      toast({
-        title: "Success",
-        description: "Project has been successfully uploaded!",
-        variant: "default",
+    try {
+      const response = await fetch("/api/save-projects", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ repos: [repo] }),
       });
-      setExistingProjects([
-        ...existingProjects,
-        { id: repo.id, title: repo.name, githubUrl: repo.html_url },
-      ]);
-      setRepos(repos.filter((r) => r.id !== repo.id));
-    } else {
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast({
+          title: "Success",
+          description: "Project has been successfully uploaded!",
+          variant: "default",
+        });
+        setExistingProjects([
+          ...existingProjects,
+          { id: repo.id, title: repo.name, githubUrl: repo.html_url },
+        ]);
+        setRepos(repos.filter((r) => r.id !== repo.id));
+      } else {
+        throw new Error(data.message || "Unknown error");
+      }
+    } catch (error:any) {
       toast({
         title: "Error",
-        description: `Failed to upload project: ${
-          data.message || "Unknown error"
-        }`,
+        description: `Failed to upload project: ${error.message}`,
         variant: "destructive",
       });
     }
@@ -108,64 +148,69 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
       return;
     }
 
-    const response = await fetch("/api/save-projects", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ repos: selectedRepos }),
-    });
-
-    const data = await response.json();
-
-    if (data.success) {
-      toast({
-        title: "Success",
-        description: "Projects have been successfully saved!",
-        variant: "default",
+    try {
+      const response = await fetch("/api/save-projects", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ repos: selectedRepos }),
       });
-      setIsOpen(false);
-      router.refresh();
-      router.push("/profile");
-    } else {
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast({
+          title: "Success",
+          description: "Projects have been successfully saved!",
+          variant: "default",
+        });
+        setIsOpen(false);
+        router.refresh();
+        router.push("/profile");
+      } else {
+        throw new Error(data.message || "Unknown error");
+      }
+    } catch (error:any) {
       toast({
         title: "Error",
-        description: `Failed to save projects: ${
-          data.message || "Unknown error"
-        }`,
+        description: `Failed to save projects: ${error.message}`,
         variant: "destructive",
       });
     }
   };
 
+  // Proje kaldırma işlemi
   const handleRemoveProject = async (project: any) => {
-    const response = await fetch("/api/remove-project", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ githubUrl: project.githubUrl }),
-    });
-
-    const data = await response.json();
-
-    if (data.success) {
-      toast({
-        title: "Success",
-        description: "Project has been successfully removed!",
-        variant: "default",
+    try {
+      const response = await fetch("/api/remove-project", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ githubUrl: project.githubUrl }),
       });
-      setExistingProjects(existingProjects.filter((p) => p.id !== project.id));
-      setRepos([
-        ...repos,
-        { id: project.id, name: project.title, html_url: project.githubUrl },
-      ]);
-    } else {
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast({
+          title: "Success",
+          description: "Project has been successfully removed!",
+          variant: "default",
+        });
+        setExistingProjects(existingProjects.filter((p) => p.id !== project.id));
+        setRepos([
+          ...repos,
+          { id: project.id, name: project.title, html_url: project.githubUrl },
+        ]);
+      } else {
+        throw new Error(data.message || "Unknown error");
+      }
+    } catch (error: any) {
       toast({
         title: "Error",
-        description: `Failed to remove project: ${
-          data.message || "Unknown error"
-        }`,
+        description: `Failed to remove project: ${error.message}`,
         variant: "destructive",
       });
     }

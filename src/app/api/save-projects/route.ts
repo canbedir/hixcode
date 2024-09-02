@@ -5,6 +5,55 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 const prisma = new PrismaClient();
 
+async function fetchRepoLanguages(repoUrl: string, accessToken: string) {
+  const response = await fetch(`${repoUrl}/languages`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch languages for repo: ${repoUrl}`);
+  }
+
+  const languages = await response.json();
+  return languages;
+}
+
+function getMostPopularLanguage(languages: Record<string, number>) {
+  let maxLanguage = '';
+  let maxSize = 0;
+
+  for (const [language, size] of Object.entries(languages)) {
+    if (size > maxSize) {
+      maxLanguage = language;
+      maxSize = size;
+    }
+  }
+
+  return maxLanguage;
+}
+
+
+
+async function fetchRepoDetails(repoUrl: string, accessToken: string) {
+  const response = await fetch(repoUrl, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch repo data: ${repoUrl}`);
+  }
+
+  const repoData = await response.json();
+  return {
+    stars: repoData.stargazers_count,
+    lastUpdated: repoData.pushed_at,
+  };
+}
+
 export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions);
@@ -27,14 +76,25 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'Kullanıcı bulunamadı', error: 'Geçersiz kullanıcı' }, { status: 404 });
     }
 
-    // Projeleri kaydet
+    const accessToken = session.accessToken as string;
+
     for (const repo of repos) {
+      const languages = await fetchRepoLanguages(repo.url, accessToken);
+      const mostPopularLanguage = getMostPopularLanguage(languages);
+      const stars = await fetchRepoDetails(repo.url, accessToken);
+      const lastUpdated = await fetchRepoDetails(repo.url, accessToken);
+
+
       await prisma.project.create({
         data: {
           title: repo.name,
           description: repo.description || '',
           githubUrl: repo.html_url,
+          image: repo.image || null,
           userId: user.id,
+          mostPopularLanguage,
+          stars: stars.stars,
+          lastUpdated: stars.lastUpdated,
         },
       });
     }

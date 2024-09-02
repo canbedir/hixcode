@@ -15,7 +15,12 @@ export async function GET(request: Request) {
 
     const user = await prisma.user.findUnique({
       where: { email: session.user?.email || undefined },
-      include: { projects: true },
+      include: {
+        projects: {
+          orderBy: { stars: 'desc' },
+          take: 5,
+        },
+      },
     });
 
     if (!user) {
