@@ -45,9 +45,9 @@ const PopularProjects = () => {
   }, []);
 
   return (
-    <div className="w-5/6">
-      <h1 className="text-2xl font-bold mb-4">Top 5 Projects</h1>
-      <Carousel className="w-full">
+    <div className="w-full">
+      <h1 className="text-2xl font-bold mb-4 px-2">Top 5 Projects</h1>
+      <Carousel className="">
         <CarouselContent>
           {projects.map((project) => (
             <CarouselItem key={project.id}>
