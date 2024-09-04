@@ -37,20 +37,28 @@ const RecentProjects = () => {
   useEffect(() => {
     const fetchRecentProjects = async () => {
       try {
-        const response = await fetch("/api/user-projects/last-updated"); // Yeni rota
+        const response = await fetch("/api/user-projects/last-updated", {
+          cache: "no-store",
+        });
         const data = await response.json();
 
         if (response.ok) {
           setProjects(data);
         } else {
-          console.error("Failed to fetch recent projects:", data.message);
+          console.error(
+            "Son güncellenen projeleri alma başarısız oldu:",
+            data.message
+          );
         }
       } catch (error) {
-        console.error("Error fetching recent projects:", error);
+        console.error("Son güncellenen projeleri alırken hata oluştu:", error);
       }
     };
 
     fetchRecentProjects();
+    const interval = setInterval(fetchRecentProjects, 60000);
+
+    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -87,7 +95,16 @@ const RecentProjects = () => {
                         </div>
                         <div className="text-sm text-gray-400">
                           Updated{" "}
-                          {new Date(project.lastUpdated).toLocaleDateString()}
+                          {new Date(project.lastUpdated).toLocaleString(
+                            "tr-TR",
+                            {
+                              year: "numeric",
+                              month: "short",
+                              day: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            }
+                          )}
                         </div>
                       </div>
                     </CardContent>

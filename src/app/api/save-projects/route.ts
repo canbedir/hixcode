@@ -34,8 +34,6 @@ function getMostPopularLanguage(languages: Record<string, number>) {
   return maxLanguage;
 }
 
-
-
 async function fetchRepoDetails(repoUrl: string, accessToken: string) {
   const response = await fetch(repoUrl, {
     headers: {
@@ -81,9 +79,7 @@ export async function POST(request: Request) {
     for (const repo of repos) {
       const languages = await fetchRepoLanguages(repo.url, accessToken);
       const mostPopularLanguage = getMostPopularLanguage(languages);
-      const stars = await fetchRepoDetails(repo.url, accessToken);
-      const lastUpdated = await fetchRepoDetails(repo.url, accessToken);
-
+      const repoDetails = await fetchRepoDetails(repo.url, accessToken);
 
       await prisma.project.create({
         data: {
@@ -93,8 +89,8 @@ export async function POST(request: Request) {
           image: repo.image || null,
           userId: user.id,
           mostPopularLanguage,
-          stars: stars.stars,
-          lastUpdated: stars.lastUpdated,
+          stars: repoDetails.stars,
+          lastUpdated: repoDetails.lastUpdated,
         },
       });
     }
