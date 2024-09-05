@@ -63,15 +63,15 @@ export async function POST(request: Request) {
     const { repos } = await request.json();
 
     if (!repos || repos.length === 0) {
-      return NextResponse.json({ message: 'Geçersiz veri', error: 'Repolar eksik' }, { status: 400 });
+      return NextResponse.json({ message: 'Invalid data', error: 'Repositories are missing' }, { status: 400 });
     }
 
     const user = await prisma.user.findUnique({
-      where: { email: session.user?.email || undefined },
+      where: { email: session.user?.email || '' },
     });
 
     if (!user) {
-      return NextResponse.json({ message: 'Kullanıcı bulunamadı', error: 'Geçersiz kullanıcı' }, { status: 404 });
+      return NextResponse.json({ message: 'User not found', error: 'Invalid user' }, { status: 404 });
     }
 
     const accessToken = session.accessToken as string;
@@ -95,12 +95,12 @@ export async function POST(request: Request) {
       });
     }
 
-    return NextResponse.json({ success: true, message: 'Projeler başarıyla kaydedildi' });
+    return NextResponse.json({ success: true, message: 'Projects successfully saved' });
   } catch (error) {
-    console.error('Projeleri kaydederken hata oluştu:', error);
+    console.error('Error occurred while saving projects:', error);
     if (error instanceof Error) {
-      return NextResponse.json({ success: false, message: 'Projeleri kaydetme başarısız oldu', error: error.message }, { status: 500 });
+      return NextResponse.json({ success: false, message: 'Failed to save projects', error: error.message }, { status: 500 });
     }
-    return NextResponse.json({ success: false, message: 'Projeleri kaydetme başarısız oldu', error: 'Bilinmeyen hata' }, { status: 500 });
+    return NextResponse.json({ success: false, message: 'Failed to save projects', error: 'Unknown error' }, { status: 500 });
   }
 }

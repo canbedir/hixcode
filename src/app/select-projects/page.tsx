@@ -32,7 +32,7 @@ export default function SelectProjectsPage() {
 
   const handleSubmit = async () => {
     if (selectedRepos.length === 0) {
-      alert("Lütfen en az bir repo seçin.");
+      alert("Please select at least one repository.");
       return;
     }
 
@@ -47,16 +47,16 @@ export default function SelectProjectsPage() {
     const data = await response.json();
 
     if (data.success) {
-      alert("Projeler başarıyla kaydedildi!");
+      alert("Projects successfully saved!");
       router.push('/profile');
     } else {
-      alert(`Hata: ${data.message}\nDetay: ${data.error || 'Bilinmeyen hata'}`);
+      alert(`Error: ${data.message}\nDetails: ${data.error || 'Unknown error'}`);
     }
   };
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">GitHub Repolarınızı Seçin</h1>
+      <h1 className="text-2xl font-bold mb-4">Select Your GitHub Repositories</h1>
       <ul className="space-y-2">
         {repos.map((repo) => (
           <li key={repo.id} className="flex items-center space-x-2">
@@ -71,7 +71,7 @@ export default function SelectProjectsPage() {
           </li>
         ))}
       </ul>
-      <Button onClick={handleSubmit} className="mt-4">Seçilen Projeleri Kaydet</Button>
+      <Button onClick={handleSubmit} className="mt-4">Save Selected Projects</Button>
     </div>
   );
 }

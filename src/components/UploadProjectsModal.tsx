@@ -27,7 +27,6 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
   const { toast } = useToast();
   const [existingProjects, setExistingProjects] = useState<any[]>([]);
 
-  // GitHub reposlarını çekme işlemi
   useEffect(() => {
     if (!session?.accessToken) return;
 
@@ -67,15 +66,10 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
     fetchRepos();
   }, [session?.accessToken, existingProjects, toast]);
 
-  // Mevcut projeleri çekme işlemi
   useEffect(() => {
-    if (!session?.user?.email) return;
-
     async function fetchExistingProjects() {
       try {
-        const response = await fetch(
-          `/api/user-projects?email=${session?.user?.email}`
-        );
+        const response = await fetch('/api/user-projects?limit=all');
 
         if (!response.ok) {
           throw new Error("Mevcut projeler alınamadı.");
@@ -99,9 +93,8 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
     }
 
     fetchExistingProjects();
-  }, [session?.user?.email, toast]);
+  }, [toast]);
 
-  // Repo seçimi ve kaydetme işlemi
   const handleSelectRepo = async (repo: any) => {
     try {
       const response = await fetch("/api/save-projects", {
@@ -180,7 +173,6 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
     }
   };
 
-  // Proje kaldırma işlemi
   const handleRemoveProject = async (project: any) => {
     try {
       const response = await fetch("/api/remove-project", {

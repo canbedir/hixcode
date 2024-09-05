@@ -8,9 +8,11 @@ import { Input } from "../ui/input";
 import { Search } from "lucide-react";
 import { useState } from "react";
 import UploadProjectsModal from "../UploadProjectsModal";
+import { useSession } from "next-auth/react";
 
 const NavbarMenu = () => {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const { data: session } = useSession();
 
   const TABS = [
     {
@@ -44,7 +46,7 @@ const NavbarMenu = () => {
               data-id={tab}
               type="button"
               onClick={tab.onClick}
-              className="p-2 text-zinc-600 transition-colors duration-300 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-50"
+              className={`p-2 text-zinc-600 transition-colors duration-300 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-50 ${!session ? "hidden" : ""}`}
             >
               {tab.icon}
             </button>

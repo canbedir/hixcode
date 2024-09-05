@@ -45,20 +45,14 @@ const RecentProjects = () => {
         if (response.ok) {
           setProjects(data);
         } else {
-          console.error(
-            "Son güncellenen projeleri alma başarısız oldu:",
-            data.message
-          );
+          console.error("Failed to fetch last updated projects:", data.message);
         }
       } catch (error) {
-        console.error("Son güncellenen projeleri alırken hata oluştu:", error);
+        console.error("Error fetching last updated projects:", error);
       }
     };
 
     fetchRecentProjects();
-    const interval = setInterval(fetchRecentProjects, 60000);
-
-    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -74,7 +68,7 @@ const RecentProjects = () => {
               {group.map((project) => (
                 <div key={project.id} className="w-1/3 p-1">
                   <Card>
-                    <CardContent className="flex flex-col h-[300px] p-6 justify-between">
+                    <CardContent className="flex flex-col h-[250px] p-6 justify-between">
                       <div>
                         <h2 className="text-xl font-semibold">
                           {project.title}
@@ -85,26 +79,28 @@ const RecentProjects = () => {
                         </p>
                       </div>
 
-                      <div className="flex justify-between items-center text-sm text-gray-300 mt-auto">
+                      <div className="flex justify-between items-center text-sm text-gray-400 mt-auto">
                         <div className="flex items-center gap-2">
                           <FaRegDotCircle size={10} />
                           {project.mostPopularLanguage}
                         </div>
-                        <div className="flex items-center gap-2 text-lg">
-                          <Star size={16} /> {project.stars}
+                      </div>
+
+                      <div className="flex justify-between items-center text-sm text-gray-400 mt-auto">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <Star size={16} /> {project.stars}
+                          </div>
                         </div>
-                        <div className="text-sm text-gray-400">
+                        <div>
                           Updated{" "}
-                          {new Date(project.lastUpdated).toLocaleString(
-                            "tr-TR",
-                            {
+                          {new Date(project.lastUpdated)
+                            .toLocaleDateString("en-GB", {
+                              day: "2-digit",
+                              month: "2-digit",
                               year: "numeric",
-                              month: "short",
-                              day: "numeric",
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            }
-                          )}
+                            })
+                            .replace(/\//g, ".")}
                         </div>
                       </div>
                     </CardContent>
