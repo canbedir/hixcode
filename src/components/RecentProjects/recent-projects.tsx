@@ -11,6 +11,7 @@ import { Card, CardContent } from "../ui/card";
 import { FaRegDotCircle } from "react-icons/fa";
 import { Star } from "lucide-react";
 import { Button } from "../ui/button";
+import Image from "next/image";
 
 interface Project {
   id: string;
@@ -21,6 +22,10 @@ interface Project {
   mostPopularLanguage: string;
   stars: number;
   lastUpdated: string;
+  user: {
+    name: string | null;
+    image: string | null;
+  };
 }
 
 const RecentProjects = () => {
@@ -64,49 +69,39 @@ const RecentProjects = () => {
       <Carousel>
         <CarouselContent className="flex">
           {chunkProjects(projects, 3).map((group, index) => (
-            <CarouselItem key={index} className="w-full flex">
-              {group.map((project) => (
-                <div key={project.id} className="w-1/3 p-1">
-                  <Card>
-                    <CardContent className="flex flex-col h-[250px] p-6 justify-between">
-                      <div>
-                        <h2 className="text-xl font-semibold">
-                          {project.title}
-                        </h2>
-                        <p className="text-gray-500">
-                          {project.description ||
-                            `${project.title} description`}
-                        </p>
+            <CarouselItem key={index} className="basis-full">
+              <div className="grid grid-cols-3 gap-4">
+                {group.map((project) => (
+                  <Card key={project.id} className="w-full h-[230px] flex flex-col">
+                    <CardContent className="p-4 flex flex-col h-full">
+                      <div className="flex items-center mb-2">
+                        {project.user.image && (
+                          <Image
+                            src={project.user.image}
+                            alt={project.user.name || "User"}
+                            width={24}
+                            height={24}
+                            className="rounded-full mr-2"
+                          />
+                        )}
+                        <span className="text-sm font-medium">{project.user.name}</span>
                       </div>
-
-                      <div className="flex justify-between items-center text-sm text-gray-400 mt-auto">
-                        <div className="flex items-center gap-2">
-                          <FaRegDotCircle size={10} />
-                          {project.mostPopularLanguage}
+                      <h3 className="text-xl font-semibold mb-2 line-clamp-1">{project.title}</h3>
+                      <p className="text-sm text-gray-500 mb-4 flex-grow line-clamp-2">{project.description}</p>
+                      <div className="flex items-center justify-between mt-auto">
+                        <div className="flex items-center">
+                          <FaRegDotCircle className="mr-1" />
+                          <span className="text-sm">{project.mostPopularLanguage}</span>
                         </div>
-                      </div>
-
-                      <div className="flex justify-between items-center text-sm text-gray-400 mt-auto">
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <Star size={16} /> {project.stars}
-                          </div>
-                        </div>
-                        <div>
-                          Updated{" "}
-                          {new Date(project.lastUpdated)
-                            .toLocaleDateString("en-GB", {
-                              day: "2-digit",
-                              month: "2-digit",
-                              year: "numeric",
-                            })
-                            .replace(/\//g, ".")}
+                        <div className="flex items-center">
+                          <Star className="w-4 h-4 mr-1" />
+                          <span className="text-sm">{project.stars}</span>
                         </div>
                       </div>
                     </CardContent>
                   </Card>
-                </div>
-              ))}
+                ))}
+              </div>
             </CarouselItem>
           ))}
         </CarouselContent>

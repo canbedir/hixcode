@@ -9,27 +9,20 @@ export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { email: session.user?.email || undefined },
+    const projects = await prisma.project.findMany({
+      orderBy: { lastUpdated: "desc" },
+      take: 6,
       include: {
-        projects: {
-          orderBy: { lastUpdated: "desc" },
-          take: 6,
+        user: {
+          select: {
+            name: true,
+            image: true,
+          },
         },
       },
     });
 
-    if (!user) {
-      return NextResponse.json({ message: "User not found" }, { status: 404 });
-    }
-
-    return NextResponse.json(user.projects);
+    return NextResponse.json(projects);
   } catch (error) {
     console.error("Error fetching user projects:", error);
     return NextResponse.json(
