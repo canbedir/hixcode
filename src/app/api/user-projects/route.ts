@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 const prisma = new PrismaClient();
 
@@ -19,7 +17,7 @@ export async function GET(request: Request) {
       projects = await prisma.project.findMany({
         orderBy: { stars: 'desc' },
         take: 5,
-      });
+      }); 
     }
 
     return NextResponse.json(projects);
