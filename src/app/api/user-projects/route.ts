@@ -5,20 +5,22 @@ const prisma = new PrismaClient();
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const limit = searchParams.get('limit');
+  const sort = searchParams.get('sort') || 'stars';
+  const limit = parseInt(searchParams.get('limit') || '0');
 
   try {
-    let projects;
-    if (limit === 'all') {
-      projects = await prisma.project.findMany({
-        orderBy: { stars: 'desc' },
-      });
-    } else {
-      projects = await prisma.project.findMany({
-        orderBy: { stars: 'desc' },
-        take: 5,
-      }); 
-    }
+    const projects = await prisma.project.findMany({
+      orderBy: sort === 'lastUpdated' ? { lastUpdated: 'desc' } : { stars: 'desc' },
+      take: limit > 0 ? limit : undefined,
+      include: {
+        user: {
+          select: {
+            name: true,
+            image: true,
+          },
+        },
+      },
+    });
 
     return NextResponse.json(projects);
   } catch (error) {

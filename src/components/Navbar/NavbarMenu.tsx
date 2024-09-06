@@ -9,12 +9,19 @@ import { Search } from "lucide-react";
 import { useState } from "react";
 import UploadProjectsModal from "../UploadProjectsModal";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
+import { IoCodeSlash } from "react-icons/io5";
+import { useRouter } from "next/navigation";
 
 const NavbarMenu = () => {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const { data: session } = useSession();
-
+  const router = useRouter();
   const TABS = [
+    {
+      icon: <IoCodeSlash />,
+      onClick: () => router.push("/projects?sort=stars"),
+    },
     {
       icon: <TbUpload />,
       onClick: () => setIsUploadModalOpen(true),
@@ -46,7 +53,9 @@ const NavbarMenu = () => {
               data-id={tab}
               type="button"
               onClick={tab.onClick}
-              className={`p-2 text-zinc-600 transition-colors duration-300 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-50 ${!session ? "hidden" : ""}`}
+              className={`p-2 text-zinc-600 transition-colors duration-300 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-50 ${
+                !session ? "hidden" : ""
+              }`}
             >
               {tab.icon}
             </button>
@@ -54,7 +63,10 @@ const NavbarMenu = () => {
         </AnimatedBackground>
       </div>
       <SignInButton />
-      <UploadProjectsModal isOpen={isUploadModalOpen} setIsOpen={setIsUploadModalOpen} />
+      <UploadProjectsModal
+        isOpen={isUploadModalOpen}
+        setIsOpen={setIsUploadModalOpen}
+      />
     </div>
   );
 };

@@ -13,6 +13,7 @@ import { Star } from "lucide-react";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { Button } from "../ui/button";
+import { useRouter } from "next/navigation";
 
 interface Project {
   id: string;
@@ -31,7 +32,9 @@ interface Project {
 
 const RecentProjects = () => {
   const [projects, setProjects] = useState<Project[]>([]);
+  const [showAll, setShowAll] = useState(false);
   const { data: session } = useSession();
+  const router = useRouter();
 
   const chunkProjects = (projects: Project[], size: number) => {
     const chunked = [];
@@ -62,11 +65,15 @@ const RecentProjects = () => {
     fetchRecentProjects();
   }, []);
 
+  const handleViewAll = () => {
+    router.push('/projects?sort=lastUpdated');
+  };
+
   return (
     <div className="w-full">
       <div className="flex items-center justify-between px-2 mb-4">
         <h1 className="text-2xl font-bold">Recently Updated Projects</h1>
-        <Button>View All</Button>
+        {!showAll && <Button onClick={handleViewAll}>View All</Button>}
       </div>
       <Carousel className="w-full">
         <CarouselContent className="-ml-2 md:-ml-4">

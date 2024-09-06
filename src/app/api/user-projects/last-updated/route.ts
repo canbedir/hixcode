@@ -8,19 +8,37 @@ const prisma = new PrismaClient();
 export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const limit = searchParams.get('limit');
+
   try {
-    const projects = await prisma.project.findMany({
-      orderBy: { lastUpdated: "desc" },
-      take: 6,
-      include: {
-        user: {
-          select: {
-            name: true,
-            image: true,
+    let projects;
+    if (limit === 'all') {
+      projects = await prisma.project.findMany({
+        orderBy: { lastUpdated: "desc" },
+        include: {
+          user: {
+            select: {
+              name: true,
+              image: true,
+            },
           },
         },
-      },
-    });
+      });
+    } else {
+      projects = await prisma.project.findMany({
+        orderBy: { lastUpdated: "desc" },
+        take: 6,
+        include: {
+          user: {
+            select: {
+              name: true,
+              image: true,
+            },
+          },
+        },
+      });
+    }
 
     return NextResponse.json(projects);
   } catch (error) {
