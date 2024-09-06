@@ -37,7 +37,7 @@ model Session {
 model User {
   id          String    @id @default(cuid())
   name        String?
-  username    String    @unique
+  username    String    @unique @map("username_lowercase")
   email       String?   @unique
   bio         String?   @unique
   githubId    String?   @unique

@@ -5,6 +5,7 @@ import { Button } from "../ui/button";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { useSession } from "next-auth/react";
 
 interface UserData {
   id: string;
@@ -23,6 +24,7 @@ interface UserData {
 const Profile = ({ username }: { username: string }) => {
   const router = useRouter();
   const [user, setUser] = useState<UserData | null>(null);
+  const { data: session } = useSession();
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -61,6 +63,8 @@ const Profile = ({ username }: { username: string }) => {
     return <div>Loading...</div>;
   }
 
+  const isOwnProfile = session?.user?.email === user.email;
+
   return (
     <div className="container mt-10 p-4">
       <div className="flex flex-col justify-between md:flex-row space-y-8 md:space-y-0 md:space-x-32">
@@ -85,9 +89,11 @@ const Profile = ({ username }: { username: string }) => {
               <p className="text-gray-700 dark:text-gray-300 mt-4">
                 {user.bio || ""}
               </p>
-              <Link href="/settings" className="mt-6 w-full">
-                <Button className="w-full">Edit Profile</Button>
-              </Link>
+              {isOwnProfile && (
+                <Link href="/settings" className="mt-6 w-full">
+                  <Button className="w-full">Edit Profile</Button>
+                </Link>
+              )}
             </div>
           </div>
         </div>

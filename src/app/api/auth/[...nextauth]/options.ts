@@ -36,7 +36,7 @@ export const authOptions: NextAuthOptions = {
               email: user.email || "",
               githubId: account?.providerAccountId || "",
               image: user.image || "",
-              username: (profile as any)?.login || "",
+              username: ((profile as any)?.login || "").toLowerCase(),
             },
           });
         } else {
@@ -48,7 +48,7 @@ export const authOptions: NextAuthOptions = {
               name: user.name || "",
               email: user.email || "",
               image: user.image || "",
-              username: (profile as any)?.login || "",
+              username: ((profile as any)?.login || "").toLowerCase(),
             },
           });
         }

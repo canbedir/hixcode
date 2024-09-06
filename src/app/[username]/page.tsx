@@ -6,7 +6,7 @@ const prisma = new PrismaClient()
 
 export default async function ProfilePage({ params }: { params: { username: string } }) {
   const user = await prisma.user.findUnique({
-    where: { username: params.username },
+    where: { username: params.username.toLowerCase() },
   })
 
   if (!user) {
@@ -15,7 +15,7 @@ export default async function ProfilePage({ params }: { params: { username: stri
 
   return (
     <div>
-      <Profile username={params.username} />
+      <Profile username={user.username} />
     </div>
   )
 }
