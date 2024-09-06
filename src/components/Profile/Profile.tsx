@@ -20,14 +20,14 @@ interface UserData {
   }>;
 }
 
-const Profile = () => {
+const Profile = ({ username }: { username: string }) => {
   const router = useRouter();
   const [user, setUser] = useState<UserData | null>(null);
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await fetch("/api/user");
+        const response = await fetch(`/api/user/${username}`);
         if (response.ok) {
           const userData: UserData = await response.json();
           setUser(userData);
@@ -40,7 +40,7 @@ const Profile = () => {
     };
 
     fetchUserData();
-  }, []);
+  }, [username]);
 
   const handleUpdateProject = async (projectId: string) => {
     try {

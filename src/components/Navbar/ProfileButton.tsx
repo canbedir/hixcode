@@ -38,7 +38,19 @@ const ProfileButton = () => {
     {
       label: "Profile",
       icon: <RiUser3Line size={20} />,
-      onClick: () => router.push("/profile"),
+      onClick: async () => {
+        try {
+          const response = await fetch('/api/user');
+          const userData = await response.json();
+          if (userData.username) {
+            router.push(`/${userData.username}`);
+          } else {
+            console.error('Username not found');
+          }
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+        }
+      },
     },
     {
       label: "Settings",

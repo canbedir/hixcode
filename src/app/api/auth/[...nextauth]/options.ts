@@ -26,7 +26,6 @@ export const authOptions: NextAuthOptions = {
         const existingUser = await prisma.user.findUnique({
           where: {
             githubId: account?.providerAccountId,
-            email: user.email || undefined,
           },
         });
 
@@ -37,6 +36,7 @@ export const authOptions: NextAuthOptions = {
               email: user.email || "",
               githubId: account?.providerAccountId || "",
               image: user.image || "",
+              username: (profile as any)?.login || "",
             },
           });
         } else {
@@ -48,6 +48,7 @@ export const authOptions: NextAuthOptions = {
               name: user.name || "",
               email: user.email || "",
               image: user.image || "",
+              username: (profile as any)?.login || "",
             },
           });
         }
