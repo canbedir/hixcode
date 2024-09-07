@@ -14,6 +14,7 @@ import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface Project {
   id: string;
@@ -66,7 +67,7 @@ const RecentProjects = () => {
   }, []);
 
   const handleViewAll = () => {
-    router.push('/projects?sort=lastUpdated');
+    router.push("/projects?sort=lastUpdated");
   };
 
   return (
@@ -81,54 +82,60 @@ const RecentProjects = () => {
             <CarouselItem key={index} className="pl-2 md:pl-4 md:basis-full">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {group.map((project) => (
-                  <Card key={project.id}>
-                    <CardContent className="flex flex-col h-[300px] p-6 justify-between">
-                      <div className="flex items-center mb-2">
-                        <div className="flex items-center justify-between w-full">
-                          <div className="flex items-center">
-                            {project.user.image && (
-                              <Image
-                                src={project.user.image}
-                                alt={project.user.name || "User"}
-                                width={24}
-                                height={24}
-                                className="rounded-full mr-2"
-                              />
-                            )}
-                            <span className="text-sm font-medium">
-                              {project.user.name || "Anonymous User"}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-2 text-lg">
-                            <Star size={16} /> {project.stars}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex flex-col gap-2">
-                        <h2 className="text-xl font-semibold">{project.title}</h2>
-                        <p className="text-muted-foreground line-clamp-2">
-                          {project.description || `${project.title} description`}
-                        </p>
-                      </div>
-
-                      <div className="flex justify-between items-center text-sm text-black mt-auto">
-                        <div className="flex items-center">
-                          {project.mostPopularLanguage && (
-                            <>
-                              <FaRegDotCircle className="mr-1" />
-                              <span className="text-sm">
-                                {project.mostPopularLanguage}
+                  <Link key={project.id} href={`/projects/${project.id}`}>
+                    <Card>
+                      <CardContent className="flex flex-col h-[300px] p-6 justify-between">
+                        <div className="flex items-center mb-2">
+                          <div className="flex items-center justify-between w-full">
+                            <div className="flex items-center">
+                              {project.user.image && (
+                                <Image
+                                  src={project.user.image}
+                                  alt={project.user.name || "User"}
+                                  width={24}
+                                  height={24}
+                                  className="rounded-full mr-2"
+                                />
+                              )}
+                              <span className="text-sm font-medium">
+                                {project.user.name || "Anonymous User"}
                               </span>
-                            </>
-                          )}
+                            </div>
+                            <div className="flex items-center gap-2 text-lg">
+                              <Star size={16} /> {project.stars}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex flex-col gap-2">
+                          <h2 className="text-xl font-semibold">
+                            {project.title}
+                          </h2>
+                          <p className="text-muted-foreground line-clamp-2">
+                            {project.description ||
+                              `${project.title} description`}
+                          </p>
                         </div>
 
-                        <div className="text-sm text-gray-400">
-                          Updated {new Date(project.lastUpdated).toLocaleDateString()}
+                        <div className="flex justify-between items-center text-sm text-black mt-auto">
+                          <div className="flex items-center">
+                            {project.mostPopularLanguage && (
+                              <>
+                                <FaRegDotCircle className="mr-1" />
+                                <span className="text-sm">
+                                  {project.mostPopularLanguage}
+                                </span>
+                              </>
+                            )}
+                          </div>
+
+                          <div className="text-sm text-gray-400">
+                            Updated{" "}
+                            {new Date(project.lastUpdated).toLocaleDateString()}
+                          </div>
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                      </CardContent>
+                    </Card>
+                  </Link>
                 ))}
               </div>
             </CarouselItem>

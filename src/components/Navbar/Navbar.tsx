@@ -15,9 +15,9 @@ const Navbar = () => {
           {status === "loading" ? (
             <Skeleton className="w-28 h-10 rounded-md" />
           ) : (
-            <Link href={"/"}>
+            <Link href={"/"} className="font-semibold">
               <span>hix</span>
-              <span className="font-semibold">Code</span>
+              <span>Code</span>
             </Link>
           )}
         </div>
