@@ -10,6 +10,9 @@ import { GoClock } from "react-icons/go";
 import { LuShare2 } from "react-icons/lu";
 import Link from "next/link";
 import { ClipLoader } from "react-spinners";
+import { FiMessageSquare, FiSend } from "react-icons/fi";
+import Image from "next/image";
+import { Textarea } from "@/components/ui/textarea";
 
 interface Project {
   id: string;
@@ -175,6 +178,105 @@ const ProjectDetailPage = () => {
                   <span className="h-12 w-12 flex items-center justify-center rounded-full bg-gray-100">
                     D
                   </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="flex justify-between gap-10">
+          <div className="p-10 min-h-[300px] w-2/3 border rounded-xl">
+            <div className="flex flex-col gap-10">
+              <h1 className="text-2xl font-semibold flex items-center gap-2">
+                <FiMessageSquare className="h-6 w-6" /> Comments
+              </h1>
+              <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-10">
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-start gap-3">
+                      <img
+                        src={project.user.image || "/avatar-placeholder.png"}
+                        alt={project.user.name || "Unknown"}
+                        className="w-10 h-10 rounded-full"
+                      />
+                      <div className="flex flex-col">
+                        <h1 className="font-semibold">
+                          {project.user.name || "Unknown"}
+                        </h1>
+                        <div>
+                          Lorem ipsum dolor sit amet consectetur adipisicing
+                          elit. Eveniet rerum autem ratione ullam sunt itaque
+                          neque quae, tempora dolor ducimus suscipit minus est
+                          amet dolorum! Sequi omnis illum neque incidunt.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-start gap-3">
+                      <img
+                        src={project.user.image || "/avatar-placeholder.png"}
+                        alt={project.user.name || "Unknown"}
+                        className="w-10 h-10 rounded-full"
+                      />
+                      <div className="flex flex-col">
+                        <h1 className="font-semibold">
+                          {project.user.name || "Unknown"}
+                        </h1>
+                        <div>
+                          Lorem ipsum dolor sit amet consectetur adipisicing
+                          elit. Eveniet rerum autem ratione ullam sunt itaque
+                          neque quae, tempora dolor ducimus suscipit minus est
+                          amet dolorum! Sequi omnis illum neque incidunt.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <DropdownMenuSeparator />
+              <div className="flex flex-col gap-3">
+                <Textarea
+                  placeholder="Add a comment..."
+                  className="min-h-[150px]"
+                />
+                <Button className="w-1/4 p-6 flex items-center gap-1">
+                  <FiSend className="h-6 w-6" /> Post Comment
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          <div className="w-1/3 border rounded-xl p-10 h-[400px]">
+            <div className="flex flex-col gap-10">
+              <h1 className="text-2xl font-semibold flex items-center gap-2">
+                Related Projects
+              </h1>
+              <div className="flex flex-col gap-6">
+                <div className="flex items-center gap-2">
+                  <img
+                    src={project.user.image || "s"}
+                    alt={project.user.name || "a"}
+                    className="rounded-full h-12 w-12"
+                  />
+                  <h2>Project A</h2>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <img
+                    src={project.user.image || "s"}
+                    alt={project.user.name || "a"}
+                    className="rounded-full h-12 w-12"
+                  />
+                  <h2>Project B</h2>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <img
+                    src={project.user.image || "s"}
+                    alt={project.user.name || "a"}
+                    className="rounded-full h-12 w-12"
+                  />
+                  <h2>Project C</h2>
                 </div>
               </div>
             </div>
