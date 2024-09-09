@@ -119,7 +119,7 @@ const ProjectDetailPage = () => {
                 </div>
 
                 <div>
-                  <span className="py-3 px-5 rounded-full bg-gradient-to-r from-black/20 to-black font-semibold text-white">
+                  <span className="py-3 px-5 rounded-full btn-hover color">
                     Project of the Month
                   </span>
                 </div>
