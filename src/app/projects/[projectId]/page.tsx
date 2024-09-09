@@ -59,7 +59,7 @@ const ProjectDetailPage = () => {
   return (
     <div className="py-12">
       <div className="flex flex-col gap-10">
-        <div className="p-10 w-full h-[400px] bg-gradient-to-b from-black/5 to-black rounded-xl text-white dark:text-black">
+        <div className="p-10 w-full h-[400px] bg-gradient-to-b from-black/5 to-black dark:bg-gradient-to-b dark:from-white/5 dark:to-white/80 rounded-xl text-white dark:text-black">
           <div className="h-full flex flex-col gap-4 justify-end">
             <h1 className="font-bold text-6xl">{project?.title}</h1>
             <h3 className="text-xl">
@@ -99,7 +99,7 @@ const ProjectDetailPage = () => {
                 incidunt.
               </div>
               <div className="flex items-center gap-2">
-                <span className="py-2 px-3 text-xs rounded-full bg-gray-100 dark:bg-black/80 font-semibold">
+                <span className="py-2 px-3 text-xs rounded-full bg-gray-100 dark:text-black font-semibold">
                   {project?.mostPopularLanguage}
                 </span>
               </div>
@@ -166,16 +166,16 @@ const ProjectDetailPage = () => {
               <div className="flex flex-col justify-between h-full">
                 <h1 className="text-2xl font-semibold">Contributors</h1>
                 <div className="flex items-center gap-5">
-                  <span className="h-12 w-12 flex items-center justify-center rounded-full bg-gray-100">
+                  <span className="h-12 w-12 flex items-center justify-center rounded-full bg-gray-100 dark:text-black">
                     A
                   </span>
-                  <span className="h-12 w-12 flex items-center justify-center rounded-full bg-gray-100">
+                  <span className="h-12 w-12 flex items-center justify-center rounded-full bg-gray-100 dark:text-black">
                     B
                   </span>
-                  <span className="h-12 w-12 flex items-center justify-center rounded-full bg-gray-100">
+                  <span className="h-12 w-12 flex items-center justify-center rounded-full bg-gray-100 dark:text-black">
                     C
                   </span>
-                  <span className="h-12 w-12 flex items-center justify-center rounded-full bg-gray-100">
+                  <span className="h-12 w-12 flex items-center justify-center rounded-full bg-gray-100 dark:text-black">
                     D
                   </span>
                 </div>
