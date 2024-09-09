@@ -59,10 +59,12 @@ model Project {
   title       String
   description String?
   githubUrl   String
+  likes              Int      @default(0)
+  dislikes           Int      @default(0)
   mostPopularLanguage String
   lastUpdated         DateTime
   image       String?
-  stars       Int           @default(0) // GitHub'dan alınacak yıldız sayısı
+  stars       Int           @default(0)
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   userId      String
@@ -75,6 +77,7 @@ model Support {
   id        String   @id @default(cuid())
   userId    String
   projectId String
+  type      String
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id])
   project   Project  @relation(fields: [projectId], references: [id])

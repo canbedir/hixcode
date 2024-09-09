@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { BiLike, BiDislike } from "react-icons/bi";
 import { Github, Star } from "lucide-react";
@@ -11,7 +11,6 @@ import { LuShare2 } from "react-icons/lu";
 import Link from "next/link";
 import { ClipLoader } from "react-spinners";
 import { FiMessageSquare, FiSend } from "react-icons/fi";
-import Image from "next/image";
 import { Textarea } from "@/components/ui/textarea";
 
 interface Project {
@@ -31,6 +30,36 @@ interface Project {
 const ProjectDetailPage = () => {
   const { projectId } = useParams();
   const [project, setProject] = useState<Project | null>(null);
+  const [likes, setLikes] = useState(0);
+  const [dislikes, setDislikes] = useState(0);
+
+  const router = useRouter()
+
+  const handleLike = async () => {
+    const res = await fetch(`/api/user-projects/${projectId}/like`, {
+      method: "POST",
+    });
+    if (res.ok) {
+      const data = await res.json();
+      setLikes(data.likes);
+      setDislikes(data.dislikes);
+    } else {
+      console.error("Like işlemi başarısız oldu.");
+    }
+  };
+  
+  const handleDislike = async () => {
+    const res = await fetch(`/api/user-projects/${projectId}/dislike`, {
+      method: "POST",
+    });
+    if (res.ok) {
+      const data = await res.json();
+      setDislikes(data.dislikes);
+      setLikes(data.likes);
+    } else {
+      console.error("Dislike işlemi başarısız oldu.");
+    }
+  };
 
   useEffect(() => {
     if (projectId) {
@@ -38,6 +67,22 @@ const ProjectDetailPage = () => {
         const response = await fetch(`/api/user-projects/${projectId}`);
         const data = await response.json();
         setProject(data);
+        setLikes(data.likes);
+        setDislikes(data.dislikes);
+      };
+  
+      fetchProject();
+    }
+  }, [projectId]);
+
+  useEffect(() => {
+    if (projectId) {
+      const fetchProject = async () => {
+        const response = await fetch(`/api/user-projects/${projectId}`);
+        const data = await response.json();
+        setProject(data);
+        setLikes(data.likes);
+        setDislikes(data.dislikes);
       };
 
       fetchProject();
@@ -105,15 +150,23 @@ const ProjectDetailPage = () => {
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <Button variant={"outline"} className="h-12 w-28">
+                  <Button
+                    onClick={handleLike}
+                    variant="outline"
+                    className="h-12 w-28"
+                  >
                     <span className="flex items-center gap-2">
-                      <BiLike className="h-6 w-6" /> <span>142</span>
+                      <BiLike className="h-6 w-6" /> <span>{likes > 0 ? likes : 0}</span>
                     </span>
                   </Button>
 
-                  <Button variant={"outline"} className="h-12 w-28">
+                  <Button
+                    onClick={handleDislike}
+                    variant="outline"
+                    className="h-12 w-28"
+                  >
                     <span className="flex items-center gap-2">
-                      <BiDislike className="h-6 w-6" /> <span>4</span>
+                      <BiDislike className="h-6 w-6" /> <span>{dislikes > 0 ? dislikes : 0}</span>
                     </span>
                   </Button>
                 </div>
