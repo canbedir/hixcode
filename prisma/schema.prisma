@@ -65,6 +65,7 @@ model Project {
   lastUpdated         DateTime
   image       String?
   stars       Int           @default(0)
+  views               Int   @default(0)
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   userId      String

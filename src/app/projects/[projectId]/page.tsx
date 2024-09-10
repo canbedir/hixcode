@@ -12,6 +12,7 @@ import Link from "next/link";
 import { ClipLoader } from "react-spinners";
 import { FiMessageSquare, FiSend } from "react-icons/fi";
 import { Textarea } from "@/components/ui/textarea";
+import { useSession } from "next-auth/react";
 
 interface Project {
   id: string;
@@ -21,6 +22,7 @@ interface Project {
   stars: number;
   lastUpdated: string;
   mostPopularLanguage: string;
+  views: number;
   user: {
     name: string | null;
     image: string | null;
@@ -32,8 +34,33 @@ const ProjectDetailPage = () => {
   const [project, setProject] = useState<Project | null>(null);
   const [likes, setLikes] = useState(0);
   const [dislikes, setDislikes] = useState(0);
+  const { data: session } = useSession();
 
-  const router = useRouter()
+  useEffect(() => {
+    if (!session?.user?.email) return;
+  
+    const viewedProjects = JSON.parse(localStorage.getItem("viewedProjects") || "[]");
+  
+    if (!viewedProjects.includes(projectId)) {
+      const updateViews = async () => {
+        const res = await fetch(`/api/user-projects/${projectId}/view`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "user-email": session.user?.email ?? "", // "user-id" yerine "user-email" kullan
+          },
+        });
+  
+        if (res.ok) {
+          localStorage.setItem("viewedProjects", JSON.stringify([...viewedProjects, projectId]));
+        } else {
+          console.error("View işlemi başarısız oldu.");
+        }
+      };
+  
+      updateViews();
+    }
+  }, [projectId, session?.user?.email]);
 
   const handleLike = async () => {
     const res = await fetch(`/api/user-projects/${projectId}/like`, {
@@ -47,7 +74,7 @@ const ProjectDetailPage = () => {
       console.error("Like işlemi başarısız oldu.");
     }
   };
-  
+
   const handleDislike = async () => {
     const res = await fetch(`/api/user-projects/${projectId}/dislike`, {
       method: "POST",
@@ -70,24 +97,11 @@ const ProjectDetailPage = () => {
         setLikes(data.likes);
         setDislikes(data.dislikes);
       };
-  
-      fetchProject();
-    }
-  }, [projectId]);
-
-  useEffect(() => {
-    if (projectId) {
-      const fetchProject = async () => {
-        const response = await fetch(`/api/user-projects/${projectId}`);
-        const data = await response.json();
-        setProject(data);
-        setLikes(data.likes);
-        setDislikes(data.dislikes);
-      };
 
       fetchProject();
     }
   }, [projectId]);
+
 
   if (!project)
     return (
@@ -108,7 +122,8 @@ const ProjectDetailPage = () => {
           <div className="h-full flex flex-col gap-4 justify-end">
             <h1 className="font-bold text-6xl">{project?.title}</h1>
             <h3 className="text-xl">
-              {project?.description || `${project.title} description`}
+              {project?.description ||
+                "Kolay, hızlı ve istediğiniz renk seçimi ile portfolyo sitenizi oluşturun."}
             </h3>
             <div className="flex items-center gap-3">
               <img
@@ -138,10 +153,12 @@ const ProjectDetailPage = () => {
           <div className="p-10 w-2/3 h-[400px] rounded-xl border">
             <div className="flex flex-col gap-8">
               <div>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Eveniet
-                rerum autem ratione ullam sunt itaque neque quae, tempora dolor
-                ducimus suscipit minus est amet dolorum! Sequi omnis illum neque
-                incidunt.
+                Kullanıcıların kişisel bilgilerini girerek özelleştirilebilir
+                portfolyo sitesi oluşturabileceği bir uygulama. Next.js,
+                Tailwind CSS, TypeScript ve shadcn/ui kullanılarak
+                geliştirilmiştir. Kullanıcılar, çok adımlı form ile
+                portfolyolarını kolayca oluşturup indirilebilir hale
+                getirebilir.
               </div>
               <div className="flex items-center gap-2">
                 <span className="py-2 px-3 text-xs rounded-full bg-gray-100 dark:text-black font-semibold">
@@ -156,7 +173,8 @@ const ProjectDetailPage = () => {
                     className="h-12 w-28"
                   >
                     <span className="flex items-center gap-2">
-                      <BiLike className="h-6 w-6" /> <span>{likes > 0 ? likes : 0}</span>
+                      <BiLike className="h-6 w-6" />{" "}
+                      <span>{likes > 0 ? likes : 0}</span>
                     </span>
                   </Button>
 
@@ -166,7 +184,8 @@ const ProjectDetailPage = () => {
                     className="h-12 w-28"
                   >
                     <span className="flex items-center gap-2">
-                      <BiDislike className="h-6 w-6" /> <span>{dislikes > 0 ? dislikes : 0}</span>
+                      <BiDislike className="h-6 w-6" />{" "}
+                      <span>{dislikes > 0 ? dislikes : 0}</span>
                     </span>
                   </Button>
                 </div>
@@ -181,7 +200,9 @@ const ProjectDetailPage = () => {
 
               <div className="flex justify-between items-center text-muted-foreground">
                 <span className="flex items-center gap-2 text-sm">
-                  <LuEye className="h-4 w-4" /> <span>1200 Views</span>
+                  <LuEye className="h-4 w-4" /> <span>
+                    {project.views} views
+                  </span>
                 </span>
 
                 <span className="flex items-center gap-2 text-sm">
@@ -219,18 +240,10 @@ const ProjectDetailPage = () => {
               <div className="flex flex-col justify-between h-full">
                 <h1 className="text-2xl font-semibold">Contributors</h1>
                 <div className="flex items-center gap-5">
-                  <span className="h-12 w-12 flex items-center justify-center rounded-full bg-gray-100 dark:text-black">
-                    A
-                  </span>
-                  <span className="h-12 w-12 flex items-center justify-center rounded-full bg-gray-100 dark:text-black">
-                    B
-                  </span>
-                  <span className="h-12 w-12 flex items-center justify-center rounded-full bg-gray-100 dark:text-black">
-                    C
-                  </span>
-                  <span className="h-12 w-12 flex items-center justify-center rounded-full bg-gray-100 dark:text-black">
-                    D
-                  </span>
+                  <img
+                    src={project.user.image || "sa"}
+                    className="h-12 w-12 rounded-full"
+                  />
                 </div>
               </div>
             </div>
@@ -301,8 +314,9 @@ const ProjectDetailPage = () => {
 
           <div className="w-1/3 border rounded-xl p-10 h-[400px]">
             <div className="flex flex-col gap-10">
-              <h1 className="text-2xl font-semibold flex items-center gap-2">
-                Related Projects
+              <h1 className="text-2xl flex items-center gap-2">
+                Other projects by
+                <span className="font-semibold">{project.user.name}</span>
               </h1>
               <div className="flex flex-col gap-6">
                 <div className="flex items-center gap-2">
@@ -311,25 +325,7 @@ const ProjectDetailPage = () => {
                     alt={project.user.name || "a"}
                     className="rounded-full h-12 w-12"
                   />
-                  <h2>Project A</h2>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <img
-                    src={project.user.image || "s"}
-                    alt={project.user.name || "a"}
-                    className="rounded-full h-12 w-12"
-                  />
-                  <h2>Project B</h2>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <img
-                    src={project.user.image || "s"}
-                    alt={project.user.name || "a"}
-                    className="rounded-full h-12 w-12"
-                  />
-                  <h2>Project C</h2>
+                  <h2>E-commerce</h2>
                 </div>
               </div>
             </div>
