@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Account {
@@ -35,43 +35,56 @@ model Session {
 }
 
 model User {
-  id          String    @id @default(cuid())
+  id          String       @id @default(cuid())
   name        String?
-  username    String    @unique @map("username_lowercase")
-  email       String?   @unique
-  bio         String?   @unique
-  githubId    String?   @unique
+  username    String       @unique @map("username_lowercase")
+  email       String?      @unique
+  bio         String?      @unique
+  githubId    String?      @unique
   image       String?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
   accounts    Account[]
   sessions    Session[]
   projects    Project[]
   badges      Badge[]
   supports    Support[]
   discussions Discussion[]
-  followers   Follow[] @relation("followers")
-  following   Follow[] @relation("following")
+  followers   Follow[]     @relation("followers")
+  following   Follow[]     @relation("following")
+  comments    Comment[]
 }
 
 model Project {
-  id          String        @id @default(cuid())
-  title       String
-  description String?
-  githubUrl   String
-  likes              Int      @default(0)
-  dislikes           Int      @default(0)
+  id                  String       @id @default(cuid())
+  title               String
+  description         String?
+  githubUrl           String
+  likes               Int          @default(0)
+  dislikes            Int          @default(0)
   mostPopularLanguage String
   lastUpdated         DateTime
-  image       String?
-  stars       Int           @default(0)
-  views               Int   @default(0)
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  userId      String
-  user        User          @relation(fields: [userId], references: [id])
-  supports    Support[]
-  discussions Discussion[]
+  image               String?
+  stars               Int          @default(0)
+  views               Int          @default(0)
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+  userId              String
+  user                User         @relation(fields: [userId], references: [id])
+  supports            Support[]
+  discussions         Discussion[]
+  comments            Comment[]
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model Support {
@@ -110,9 +123,9 @@ model Follow {
   followerId  String
   followingId String
   createdAt   DateTime @default(now())
-  
-  follower    User     @relation("followers", fields: [followerId], references: [id])
-  following   User     @relation("following", fields: [followingId], references: [id])
+
+  follower  User @relation("followers", fields: [followerId], references: [id])
+  following User @relation("following", fields: [followingId], references: [id])
 
   @@unique([followerId, followingId])
 }

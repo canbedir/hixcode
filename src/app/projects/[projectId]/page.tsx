@@ -29,35 +29,92 @@ interface Project {
   };
 }
 
+interface Comment {
+  id: string;
+  content: string;
+  createdAt: string;
+  user: {
+    name: string | null;
+    image: string | null;
+  };
+}
+
 const ProjectDetailPage = () => {
   const { projectId } = useParams();
   const [project, setProject] = useState<Project | null>(null);
   const [likes, setLikes] = useState(0);
   const [dislikes, setDislikes] = useState(0);
   const { data: session } = useSession();
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [newComment, setNewComment] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (projectId) {
+      const fetchComments = async () => {
+        const res = await fetch(`/api/user-projects/${projectId}/comments`);
+        const data = await res.json();
+        setComments(data);
+      };
+
+      fetchComments();
+    }
+  }, [projectId]);
+
+  const handleCommentSubmit = async () => {
+    if (!newComment.trim()) return;
+    setLoading(true);
+
+    const res = await fetch(`/api/user-projects/${projectId}/comments`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        content: newComment,
+        user: {
+          name: session?.user?.name || "Unknown",
+          image: session?.user?.image || "/avatar-placeholder.png",
+        },
+      }),
+    });
+
+    if (res.ok) {
+      const comment = await res.json();
+      setComments((prevComments) => [comment, ...prevComments]);
+      setNewComment("");
+    }
+
+    setLoading(false);
+  };
 
   useEffect(() => {
     if (!session?.user?.email) return;
-  
-    const viewedProjects = JSON.parse(localStorage.getItem("viewedProjects") || "[]");
-  
+
+    const viewedProjects = JSON.parse(
+      localStorage.getItem("viewedProjects") || "[]"
+    );
+
     if (!viewedProjects.includes(projectId)) {
       const updateViews = async () => {
         const res = await fetch(`/api/user-projects/${projectId}/view`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "user-email": session.user?.email ?? "", // "user-id" yerine "user-email" kullan
+            "user-email": session.user?.email ?? "",
           },
         });
-  
+
         if (res.ok) {
-          localStorage.setItem("viewedProjects", JSON.stringify([...viewedProjects, projectId]));
+          localStorage.setItem(
+            "viewedProjects",
+            JSON.stringify([...viewedProjects, projectId])
+          );
         } else {
           console.error("View işlemi başarısız oldu.");
         }
       };
-  
+
       updateViews();
     }
   }, [projectId, session?.user?.email]);
@@ -102,7 +159,6 @@ const ProjectDetailPage = () => {
     }
   }, [projectId]);
 
-
   if (!project)
     return (
       <div className="relative h-screen">
@@ -127,14 +183,14 @@ const ProjectDetailPage = () => {
             </h3>
             <div className="flex items-center gap-3">
               <img
-                src={project?.user.image || "/avatar-placeholder.png"}
-                alt={project?.user.name || "Unknown"}
+                src={project?.user?.image || "/avatar-placeholder.png"}
+                alt={project?.user?.name || "Unknown"}
                 className="w-12 h-12 rounded-full hover:scale-110 duration-300 cursor-pointer"
               />
               <div className="flex items-center justify-between w-full">
                 <div className="flex flex-col">
                   <h1 className="font-semibold">
-                    {project?.user.name || "Unknown"}
+                    {project?.user?.name || "Unknown"}
                   </h1>
                   <span className="text-sm text-white/80 dark:text-black/80">
                     Project Creator
@@ -200,9 +256,8 @@ const ProjectDetailPage = () => {
 
               <div className="flex justify-between items-center text-muted-foreground">
                 <span className="flex items-center gap-2 text-sm">
-                  <LuEye className="h-4 w-4" /> <span>
-                    {project.views} views
-                  </span>
+                  <LuEye className="h-4 w-4" />{" "}
+                  <span>{project.views} views</span>
                 </span>
 
                 <span className="flex items-center gap-2 text-sm">
@@ -241,7 +296,7 @@ const ProjectDetailPage = () => {
                 <h1 className="text-2xl font-semibold">Contributors</h1>
                 <div className="flex items-center gap-5">
                   <img
-                    src={project.user.image || "sa"}
+                    src={project.user?.image || "sa"}
                     className="h-12 w-12 rounded-full"
                   />
                 </div>
@@ -249,80 +304,89 @@ const ProjectDetailPage = () => {
             </div>
           </div>
         </div>
+
         <div className="flex justify-between gap-10">
           <div className="p-10 min-h-[300px] w-2/3 border rounded-xl">
             <div className="flex flex-col gap-10">
               <h1 className="text-2xl font-semibold flex items-center gap-2">
                 <FiMessageSquare className="h-6 w-6" /> Comments
               </h1>
-              <div className="flex flex-col gap-2">
-                <div className="flex flex-col gap-10">
-                  <div className="flex flex-col gap-2">
-                    <div className="flex items-start gap-3">
-                      <img
-                        src={project.user.image || "/avatar-placeholder.png"}
-                        alt={project.user.name || "Unknown"}
-                        className="w-10 h-10 rounded-full"
-                      />
-                      <div className="flex flex-col">
-                        <h1 className="font-semibold">
-                          {project.user.name || "Unknown"}
-                        </h1>
-                        <div>
-                          Lorem ipsum dolor sit amet consectetur adipisicing
-                          elit. Eveniet rerum autem ratione ullam sunt itaque
-                          neque quae, tempora dolor ducimus suscipit minus est
-                          amet dolorum! Sequi omnis illum neque incidunt.
+
+              {/* Display comments */}
+              <div className="flex flex-col gap-6">
+                {comments.length > 0 ? (
+                  comments.map((comment) => (
+                    <div
+                      key={comment.id}
+                      className="flex items-start gap-2"
+                    >
+                      <div className="flex gap-3 items-start">
+                        <img
+                          src={comment.user?.image || "/avatar-placeholder.png"}
+                          alt={comment.user?.name || "Unknown"}
+                          className="w-10 h-10 rounded-full"
+                        />
+                        <div className="flex flex-col">
+                          <div className="flex items-center gap-3">
+                          <h1 className="font-semibold">
+                            {comment.user?.name}
+                          </h1>
+                          <span className="text-xs text-gray-500">
+                        {new Date(comment.createdAt).toLocaleDateString()}{" "}
+                        {new Date(comment.createdAt).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                          </div>
+                          <p className="text-sm">{comment.content}</p>
                         </div>
                       </div>
+                      
                     </div>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <div className="flex items-start gap-3">
-                      <img
-                        src={project.user.image || "/avatar-placeholder.png"}
-                        alt={project.user.name || "Unknown"}
-                        className="w-10 h-10 rounded-full"
-                      />
-                      <div className="flex flex-col">
-                        <h1 className="font-semibold">
-                          {project.user.name || "Unknown"}
-                        </h1>
-                        <div>
-                          Lorem ipsum dolor sit amet consectetur adipisicing
-                          elit. Eveniet rerum autem ratione ullam sunt itaque
-                          neque quae, tempora dolor ducimus suscipit minus est
-                          amet dolorum! Sequi omnis illum neque incidunt.
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                  ))
+                ) : (
+                  <p>No comments yet. Be the first to comment!</p>
+                )}
               </div>
+
               <DropdownMenuSeparator />
+
+              {/* Add new comment */}
               <div className="flex flex-col gap-3">
                 <Textarea
                   placeholder="Add a comment..."
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
                   className="min-h-[150px]"
                 />
-                <Button className="w-1/4 p-6 flex items-center gap-1">
-                  <FiSend className="h-6 w-6" /> Post Comment
+                <Button
+                  onClick={handleCommentSubmit}
+                  disabled={loading || !newComment.trim()}
+                  className="w-1/4 p-6 flex items-center"
+                >
+                  {loading ? (
+                    "Submitting..."
+                  ) : (
+                    <div className="flex items-center gap-1">
+                      <FiSend className="h-6 w-6" /> Post Comment
+                    </div>
+                  )}
                 </Button>
               </div>
             </div>
           </div>
-
           <div className="w-1/3 border rounded-xl p-10 h-[400px]">
             <div className="flex flex-col gap-10">
               <h1 className="text-2xl flex items-center gap-2">
                 Other projects by
-                <span className="font-semibold">{project.user.name}</span>
+                <span className="font-semibold">{project.user?.name}</span>
               </h1>
               <div className="flex flex-col gap-6">
                 <div className="flex items-center gap-2">
                   <img
-                    src={project.user.image || "s"}
-                    alt={project.user.name || "a"}
+                    src={project.user?.image || "s"}
+                    alt={project.user?.name || "a"}
                     className="rounded-full h-12 w-12"
                   />
                   <h2>E-commerce</h2>
