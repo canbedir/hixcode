@@ -66,17 +66,17 @@ const PopularProjects = () => {
                       <div className="flex items-center mb-2">
                         <div className="flex items-center justify-between w-full">
                           <div className="flex items-center">
-                            {session?.user?.image && (
+                            {project?.user?.image && (
                               <Image
-                                src={session.user.image}
-                                alt={session.user.name || "User"}
+                                src={project.user.image || "unknown"}
+                                alt={project.user.name || "User"}
                                 width={24}
                                 height={24}
                                 className="rounded-full mr-2"
                               />
                             )}
                             <span className="text-sm font-medium">
-                              {session?.user?.name || "Anonymous User"}
+                              {project?.user?.name || "unknown name"}
                             </span>
                           </div>
                           <div className="flex items-center gap-2 text-lg">
