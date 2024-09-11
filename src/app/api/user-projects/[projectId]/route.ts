@@ -14,9 +14,10 @@ export async function GET(request: Request, { params }: { params: { projectId: s
           select: {
             name: true,
             image: true,
-          },
-        },
-      },
+            username: true
+          }
+        }
+      }
     });
 
     if (!project) {

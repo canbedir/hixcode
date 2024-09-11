@@ -24,9 +24,11 @@ interface Project {
   lastUpdated: string;
   mostPopularLanguage: string;
   views: number;
+  username: string;
   user: {
     name: string | null;
     image: string | null;
+    username: string | null;
   };
   technicalDetails: string;
   liveUrl: string;
@@ -37,6 +39,7 @@ interface Comment {
   content: string;
   createdAt: string;
   user: {
+    username: string | null;
     name: string | null;
     image: string | null;
   };
@@ -54,7 +57,6 @@ const ProjectDetailPage = () => {
   const [hasLiked, setHasLiked] = useState(false);
   const [hasDisliked, setHasDisliked] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-
   useEffect(() => {
     if (projectId) {
       const fetchComments = async () => {
@@ -161,6 +163,9 @@ const ProjectDetailPage = () => {
       const response = await fetch(`/api/user-projects/${projectId}`);
       const data = await response.json();
       console.log("Fetched project data:", data);
+      if (!data.user || !data.user.username) {
+        console.error("Username is missing in project data", data);
+      }
       setProject(data);
       setLikes(data.likes);
       setDislikes(data.dislikes);
@@ -201,20 +206,23 @@ const ProjectDetailPage = () => {
           <div className="h-full flex flex-col gap-4 justify-end">
             <h1 className="font-bold text-6xl">{project?.title}</h1>
             <h3 className="text-xl">
-              {project?.description ||
-                "Kolay, hızlı ve istediğiniz renk seçimi ile portfolyo sitenizi oluşturun."}
+              {project?.description || "Project description not provided."}
             </h3>
             <div className="flex items-center gap-3">
-              <img
-                src={project?.user?.image || "/avatar-placeholder.png"}
-                alt={project?.user?.name || "Unknown"}
-                className="w-12 h-12 rounded-full hover:scale-110 duration-300 cursor-pointer"
-              />
+              <Link href={`/${project.user?.username}`}>
+                <img
+                  src={project?.user?.image || "/avatar-placeholder.png"}
+                  alt={project?.user?.name || "Unknown"}
+                  className="w-10 h-10 rounded-full"
+                />
+              </Link>
               <div className="flex items-center justify-between w-full">
                 <div className="flex flex-col">
-                  <h1 className="font-semibold">
-                    {project?.user?.name || "Unknown"}
-                  </h1>
+                  <Link href={`/${project.user?.username}`}>
+                    <h1 className="font-semibold hover:underline">
+                      {project?.user?.name || "Unknown"}
+                    </h1>
+                  </Link>
                   <span className="text-sm text-white/80 dark:text-black/80">
                     Project Creator
                   </span>
