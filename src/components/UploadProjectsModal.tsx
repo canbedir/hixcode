@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import ProjectDetailsModal from "./ProjectDetailsModal";
 
 interface UploadProjectsModalProps {
   isOpen: boolean;
@@ -22,10 +23,12 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
 }) => {
   const { data: session } = useSession();
   const [repos, setRepos] = useState<any[]>([]);
-  const [selectedRepos, setSelectedRepos] = useState<any[]>([]);
   const router = useRouter();
   const { toast } = useToast();
   const [existingProjects, setExistingProjects] = useState<any[]>([]);
+  const [selectedRepo, setSelectedRepo] = useState<any | null>(null);
+  const [isProjectDetailsModalOpen, setIsProjectDetailsModalOpen] =
+    useState(false);
 
   useEffect(() => {
     if (!session?.accessToken) return;
@@ -53,7 +56,7 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
             )
         );
         setRepos(filteredRepos);
-      } catch (error:any) {
+      } catch (error: any) {
         console.error("GitHub reposları alınırken bir hata oluştu:", error);
         toast({
           title: "Error",
@@ -69,7 +72,7 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
   useEffect(() => {
     async function fetchExistingProjects() {
       try {
-        const response = await fetch('/api/user-projects?limit=all');
+        const response = await fetch("/api/user-projects?limit=all");
 
         if (!response.ok) {
           throw new Error("Mevcut projeler alınamadı.");
@@ -82,7 +85,7 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
         }
 
         setExistingProjects(data);
-      } catch (error:any) {
+      } catch (error: any) {
         console.error("Mevcut projeler alınırken bir hata oluştu:", error);
         toast({
           title: "Error",
@@ -95,14 +98,37 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
     fetchExistingProjects();
   }, [toast]);
 
-  const handleSelectRepo = async (repo: any) => {
+  const handleSelectRepo = (repo: any) => {
+    setSelectedRepo(repo);
+    setIsOpen(false);
+    setTimeout(() => {
+      setIsProjectDetailsModalOpen(true);
+    }, 100);
+  };
+
+  const handleProjectDetailsSave = async (
+    title: string,
+    description: string,
+    technicalDetails: string
+  ) => {
+    if (!selectedRepo) return;
+
     try {
       const response = await fetch("/api/save-projects", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ repos: [repo] }),
+        body: JSON.stringify({
+          repos: [
+            {
+              ...selectedRepo,
+              name: title,
+              description: description,
+              technicalDetails: technicalDetails,
+            },
+          ],
+        }),
       });
 
       const data = await response.json();
@@ -115,13 +141,19 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
         });
         setExistingProjects([
           ...existingProjects,
-          { id: repo.id, title: repo.name, githubUrl: repo.html_url },
+          {
+            id: selectedRepo.id,
+            title: title,
+            githubUrl: selectedRepo.html_url,
+          },
         ]);
-        setRepos(repos.filter((r) => r.id !== repo.id));
+        setRepos(repos.filter((r) => r.id !== selectedRepo.id));
+        setSelectedRepo(null);
+        setIsProjectDetailsModalOpen(false);
       } else {
         throw new Error(data.message || "Unknown error");
       }
-    } catch (error:any) {
+    } catch (error: any) {
       toast({
         title: "Error",
         description: `Failed to upload project: ${error.message}`,
@@ -129,48 +161,6 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
       });
     }
     router.refresh();
-  };
-
-  const handleSubmit = async () => {
-    if (selectedRepos.length === 0) {
-      toast({
-        title: "Error",
-        description: "Please select at least one repository.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      const response = await fetch("/api/save-projects", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ repos: selectedRepos }),
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        toast({
-          title: "Success",
-          description: "Projects have been successfully saved!",
-          variant: "default",
-        });
-        setIsOpen(false);
-        router.refresh();
-        router.push("/profile");
-      } else {
-        throw new Error(data.message || "Unknown error");
-      }
-    } catch (error:any) {
-      toast({
-        title: "Error",
-        description: `Failed to save projects: ${error.message}`,
-        variant: "destructive",
-      });
-    }
   };
 
   const handleRemoveProject = async (project: any) => {
@@ -191,7 +181,9 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
           description: "Project has been successfully removed!",
           variant: "default",
         });
-        setExistingProjects(existingProjects.filter((p) => p.id !== project.id));
+        setExistingProjects(
+          existingProjects.filter((p) => p.id !== project.id)
+        );
         setRepos([
           ...repos,
           { id: project.id, name: project.title, html_url: project.githubUrl },
@@ -209,74 +201,93 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
     router.refresh();
   };
 
+  const handleProjectDetailsCancel = () => {
+    setIsProjectDetailsModalOpen(false);
+    setTimeout(() => {
+      setIsOpen(true);
+      setSelectedRepo(null);
+    }, 100);
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-[425px] h-[500px] flex flex-col overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Manage Your Repositories</DialogTitle>
-        </DialogHeader>
-        <Tabs
-          defaultValue="available"
-          className="w-full flex-grow flex flex-col"
-        >
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="available">Available</TabsTrigger>
-            <TabsTrigger value="uploaded">Uploaded</TabsTrigger>
-          </TabsList>
-          <div className="flex-grow overflow-hidden">
-            <TabsContent value="available" className="h-full">
-              <div className="mt-4 h-full flex flex-col">
-                <h3 className="text-lg font-semibold mb-2">
-                  Available Repositories
-                </h3>
-                <ul className="space-y-2 flex-grow overflow-y-auto p-3">
-                  {repos.map((repo) => (
-                    <li
-                      key={repo.id}
-                      className="flex items-center justify-between space-x-2"
-                    >
-                      <span className="text-sm">{repo.name}</span>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="bg-green-600 hover:bg-green-70 text-white"
-                        onClick={() => handleSelectRepo(repo)}
+    <>
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogContent className="sm:max-w-[425px] h-[500px] flex flex-col overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Manage Your Repositories</DialogTitle>
+          </DialogHeader>
+          <Tabs
+            defaultValue="available"
+            className="w-full flex-grow flex flex-col"
+          >
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="available">Available</TabsTrigger>
+              <TabsTrigger value="uploaded">Uploaded</TabsTrigger>
+            </TabsList>
+            <div className="flex-grow overflow-hidden mt-5">
+              <TabsContent value="available" className="h-full">
+                <div className="mt-4 h-full flex flex-col">
+                  <h3 className="text-lg font-semibold mb-2">
+                    Available Repositories
+                  </h3>
+                  <ul className="space-y-2 flex-grow overflow-y-auto p-3">
+                    {repos.map((repo) => (
+                      <li
+                        key={repo.id}
+                        className="flex items-center justify-between space-x-2"
                       >
-                        Upload
-                      </Button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </TabsContent>
-            <TabsContent value="uploaded" className="h-full">
-              <div className="mt-4 h-full flex flex-col">
-                <h3 className="text-lg font-semibold mb-2">
-                  Uploaded Repositories
-                </h3>
-                <ul className="space-y-2 flex-grow overflow-y-auto p-3">
-                  {existingProjects.map((project) => (
-                    <li
-                      key={project.id}
-                      className="flex items-center justify-between space-x-2"
-                    >
-                      <span className="text-sm">{project.title}</span>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => handleRemoveProject(project)}
+                        <span className="text-sm">{repo.name}</span>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="bg-green-600 hover:bg-green-700 text-white hover:text-white"
+                          onClick={() => handleSelectRepo(repo)}
+                        >
+                          Select
+                        </Button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </TabsContent>
+              <TabsContent value="uploaded" className="h-full">
+                <div className="mt-4 h-full flex flex-col">
+                  <h3 className="text-lg font-semibold mb-2">
+                    Uploaded Repositories
+                  </h3>
+                  <ul className="space-y-2 flex-grow overflow-y-auto p-3">
+                    {existingProjects.map((project) => (
+                      <li
+                        key={project.id}
+                        className="flex items-center justify-between space-x-2"
                       >
-                        Remove
-                      </Button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </TabsContent>
-          </div>
-        </Tabs>
-      </DialogContent>
-    </Dialog>
+                        <span className="text-sm">{project.title}</span>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleRemoveProject(project)}
+                        >
+                          Remove
+                        </Button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </TabsContent>
+            </div>
+          </Tabs>
+        </DialogContent>
+      </Dialog>
+      <ProjectDetailsModal
+        isOpen={isProjectDetailsModalOpen}
+        setIsOpen={setIsProjectDetailsModalOpen}
+        onSave={handleProjectDetailsSave}
+        onCancel={handleProjectDetailsCancel}
+        initialTitle={selectedRepo?.name || ""}
+        initialDescription={selectedRepo?.description || ""}
+        initialTechnicalDetails={selectedRepo?.technicalDetails || ""}
+      />
+    </>
   );
 };
 

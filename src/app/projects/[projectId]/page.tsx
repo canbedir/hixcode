@@ -28,6 +28,7 @@ interface Project {
     name: string | null;
     image: string | null;
   };
+  technicalDetails: string;
 }
 
 interface Comment {
@@ -214,15 +215,10 @@ const ProjectDetailPage = () => {
         </div>
 
         <div className="flex justify-between items-center gap-10">
-          <div className="p-10 w-2/3 h-[400px] rounded-xl border">
+          <div className="p-10 w-2/3 h-[400px] rounded-xl border flex flex-col justify-center">
             <div className="flex flex-col gap-8">
               <div>
-                Kullanıcıların kişisel bilgilerini girerek özelleştirilebilir
-                portfolyo sitesi oluşturabileceği bir uygulama. Next.js,
-                Tailwind CSS, TypeScript ve shadcn/ui kullanılarak
-                geliştirilmiştir. Kullanıcılar, çok adımlı form ile
-                portfolyolarını kolayca oluşturup indirilebilir hale
-                getirebilir.
+                {project?.technicalDetails || "Technical details for this project have not been provided."}
               </div>
               <div className="flex items-center gap-2">
                 <span className="py-2 px-3 text-xs rounded-full bg-gray-100 dark:text-black font-semibold">

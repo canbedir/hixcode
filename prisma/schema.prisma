@@ -75,6 +75,7 @@ model Project {
   discussions         Discussion[]
   comments            Comment[]
   contributors        Contributor[]
+  technicalDetails    String?
 }
 
 model Contributor {
