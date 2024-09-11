@@ -109,7 +109,8 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
   const handleProjectDetailsSave = async (
     title: string,
     description: string,
-    technicalDetails: string
+    technicalDetails: string,
+    liveUrl: string
   ) => {
     if (!selectedRepo) return;
 
@@ -126,6 +127,7 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
               name: title,
               description: description,
               technicalDetails: technicalDetails,
+              liveUrl: liveUrl,
             },
           ],
         }),
@@ -150,6 +152,7 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
         setRepos(repos.filter((r) => r.id !== selectedRepo.id));
         setSelectedRepo(null);
         setIsProjectDetailsModalOpen(false);
+        setIsOpen(false); // Ana modalı da kapatıyoruz
       } else {
         throw new Error(data.message || "Unknown error");
       }
@@ -283,6 +286,7 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
         setIsOpen={setIsProjectDetailsModalOpen}
         onSave={handleProjectDetailsSave}
         onCancel={handleProjectDetailsCancel}
+        initialLiveUrl={selectedRepo?.liveUrl || ""}
         initialTitle={selectedRepo?.name || ""}
         initialDescription={selectedRepo?.description || ""}
         initialTechnicalDetails={selectedRepo?.technicalDetails || ""}

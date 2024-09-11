@@ -76,6 +76,7 @@ model Project {
   comments            Comment[]
   contributors        Contributor[]
   technicalDetails    String?
+  liveUrl             String?
 }
 
 model Contributor {

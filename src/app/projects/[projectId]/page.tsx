@@ -29,6 +29,7 @@ interface Project {
     image: string | null;
   };
   technicalDetails: string;
+  liveUrl: string;
 }
 
 interface Comment {
@@ -43,7 +44,6 @@ interface Comment {
 
 const ProjectDetailPage = () => {
   const { projectId } = useParams();
-  const { username } = useParams();
   const [project, setProject] = useState<Project | null>(null);
   const [likes, setLikes] = useState(0);
   const [dislikes, setDislikes] = useState(0);
@@ -53,6 +53,7 @@ const ProjectDetailPage = () => {
   const [loading, setLoading] = useState(false);
   const [hasLiked, setHasLiked] = useState(false);
   const [hasDisliked, setHasDisliked] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (projectId) {
@@ -154,21 +155,29 @@ const ProjectDetailPage = () => {
     }
   };
 
+  const fetchProject = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`/api/user-projects/${projectId}`);
+      const data = await response.json();
+      console.log("Fetched project data:", data);
+      setProject(data);
+      setLikes(data.likes);
+      setDislikes(data.dislikes);
+    } catch (error) {
+      console.error("Error fetching project:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (projectId) {
-      const fetchProject = async () => {
-        const response = await fetch(`/api/user-projects/${projectId}`);
-        const data = await response.json();
-        setProject(data);
-        setLikes(data.likes);
-        setDislikes(data.dislikes);
-      };
-
       fetchProject();
     }
   }, [projectId]);
 
-  if (!project)
+  if (isLoading) {
     return (
       <div className="relative h-screen">
         <div
@@ -179,6 +188,11 @@ const ProjectDetailPage = () => {
         </div>
       </div>
     );
+  }
+
+  if (!project) {
+    return <div>Project not found</div>;
+  }
 
   return (
     <div className="py-12">
@@ -218,7 +232,8 @@ const ProjectDetailPage = () => {
           <div className="p-10 w-2/3 h-[400px] rounded-xl border flex flex-col justify-center">
             <div className="flex flex-col gap-8">
               <div>
-                {project?.technicalDetails || "Technical details for this project have not been provided."}
+                {project?.technicalDetails ||
+                  "Technical details for this project have not been provided."}
               </div>
               <div className="flex items-center gap-2">
                 <span className="py-2 px-3 text-xs rounded-full bg-gray-100 dark:text-black font-semibold">
@@ -291,17 +306,22 @@ const ProjectDetailPage = () => {
                   target="_blank"
                 >
                   <Button className="w-full flex items-center gap-2 h-12 btn-github">
-                    <Github className="h-6 w-6" /> View on Github
+                    <Github className="h-6 w-6" /> View on GitHub
                   </Button>
                 </Link>
-
                 <Link
-                  className="w-full"
-                  href={project.githubUrl}
+                  className={`w-full ${
+                    !project.liveUrl ? "pointer-events-none" : ""
+                  }`}
+                  href={project.liveUrl || "#"}
                   target="_blank"
                 >
-                  <Button className="w-full flex items-center gap-2 h-12 btn-live">
-                    <GoArrowUpRight className="h-6 w-6" /> View Live
+                  <Button
+                    className="w-full flex items-center gap-2 h-12 btn-live"
+                    disabled={!project.liveUrl}
+                  >
+                    <GoArrowUpRight className="h-6 w-6" />
+                    {project.liveUrl ? "View Live" : "No Live URL"}
                   </Button>
                 </Link>
 

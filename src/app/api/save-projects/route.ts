@@ -92,6 +92,7 @@ export async function POST(request: Request) {
           title: repo.name,
           description: repo.description,
           technicalDetails: repo.technicalDetails,
+          liveUrl: repo.liveUrl,
           githubUrl: repo.html_url,
           image: repo.image || null,
           userId: user.id,
