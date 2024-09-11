@@ -115,3 +115,88 @@ body,
   );
   box-shadow: 0 4px 15px 0 rgba(65, 132, 234, 0.75);
 }
+
+.btn-github {
+  background-image: linear-gradient(
+    to right,
+    #485563 0%,
+    #29323c 51%,
+    #485563 100%
+  );
+  text-align: center;
+  text-transform: uppercase;
+  transition: 0.5s;
+  background-size: 200% auto;
+  color: white;
+  box-shadow: 0 0 20px #eee;
+}
+
+.btn-github:hover {
+  background-position: right center; /* change the direction of the change here */
+  color: #fff;
+  text-decoration: none;
+}
+
+.btn-live {
+  background-image: linear-gradient(
+    to right,
+    #2c3e50 0%,
+    #3498db 51%,
+    #2c3e50 100%
+  );
+  text-align: center;
+  text-transform: uppercase;
+  transition: 0.5s;
+  background-size: 200% auto;
+  color: white;
+  box-shadow: 0 0 20px #eee;
+}
+
+.btn-live:hover {
+  background-position: right center; /* change the direction of the change here */
+  color: #fff;
+  text-decoration: none;
+}
+
+.btn-share {
+  background-image: linear-gradient(
+    to right,
+    #757f9a 0%,
+    #d7dde8 51%,
+    #757f9a 100%
+  );
+  text-align: center;
+  text-transform: uppercase;
+  transition: 0.5s;
+  background-size: 200% auto;
+  color: white;
+  box-shadow: 0 0 20px #eee;
+}
+
+.btn-share:hover {
+  background-position: right center; /* change the direction of the change here */
+  color: #fff;
+  text-decoration: none;
+}
+
+
+@keyframes likeAnimation {
+  0% {
+    transform: scale(1);
+    color: initial;
+    color: green;
+  }
+  50% {
+    transform: scale(1.4);
+    color: green;
+  }
+  100% {
+    transform: scale(1);
+    color: initial;
+    color: green;
+  }
+}
+
+.like-animation {
+  animation: likeAnimation 1s ease-in-out;
+}

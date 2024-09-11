@@ -13,6 +13,7 @@ import { ClipLoader } from "react-spinners";
 import { FiMessageSquare, FiSend } from "react-icons/fi";
 import { Textarea } from "@/components/ui/textarea";
 import { useSession } from "next-auth/react";
+import { GoArrowUpRight } from "react-icons/go";
 
 interface Project {
   id: string;
@@ -41,6 +42,7 @@ interface Comment {
 
 const ProjectDetailPage = () => {
   const { projectId } = useParams();
+  const { username } = useParams();
   const [project, setProject] = useState<Project | null>(null);
   const [likes, setLikes] = useState(0);
   const [dislikes, setDislikes] = useState(0);
@@ -48,6 +50,8 @@ const ProjectDetailPage = () => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
   const [loading, setLoading] = useState(false);
+  const [hasLiked, setHasLiked] = useState(false);
+  const [hasDisliked, setHasDisliked] = useState(false);
 
   useEffect(() => {
     if (projectId) {
@@ -127,6 +131,8 @@ const ProjectDetailPage = () => {
       const data = await res.json();
       setLikes(data.likes);
       setDislikes(data.dislikes);
+      setHasLiked(true);
+      setHasDisliked(false);
     } else {
       console.error("Like işlemi başarısız oldu.");
     }
@@ -140,6 +146,8 @@ const ProjectDetailPage = () => {
       const data = await res.json();
       setDislikes(data.dislikes);
       setLikes(data.likes);
+      setHasDisliked(true);
+      setHasLiked(false);
     } else {
       console.error("Dislike işlemi başarısız oldu.");
     }
@@ -226,10 +234,14 @@ const ProjectDetailPage = () => {
                   <Button
                     onClick={handleLike}
                     variant="outline"
-                    className="h-12 w-28"
+                    className={`h-12 w-28 ${
+                      hasLiked
+                        ? "bg-blue-600 text-white hover:bg-blue-700 hover:text-white"
+                        : ""
+                    } border`}
                   >
                     <span className="flex items-center gap-2">
-                      <BiLike className="h-6 w-6" />{" "}
+                      <BiLike className="h-6 w-6" />
                       <span>{likes > 0 ? likes : 0}</span>
                     </span>
                   </Button>
@@ -237,10 +249,14 @@ const ProjectDetailPage = () => {
                   <Button
                     onClick={handleDislike}
                     variant="outline"
-                    className="h-12 w-28"
+                    className={`h-12 w-28 ${
+                      hasDisliked
+                        ? "bg-red-600 text-white hover:bg-red-700 hover:text-white"
+                        : ""
+                    } border`}
                   >
                     <span className="flex items-center gap-2">
-                      <BiDislike className="h-6 w-6" />{" "}
+                      <BiDislike className="h-6 w-6" />
                       <span>{dislikes > 0 ? dislikes : 0}</span>
                     </span>
                   </Button>
@@ -271,127 +287,102 @@ const ProjectDetailPage = () => {
           </div>
 
           <div className="flex flex-col gap-5 w-1/3">
-            <div className="p-10 h-[190px] border rounded-xl">
-              <div className="flex flex-col items-center justify-center gap-4">
+            <div className="p-10 h-[400px] border rounded-xl">
+              <div className="flex flex-col h-full items-center justify-around ">
                 <Link
                   className="w-full"
                   href={project.githubUrl}
                   target="_blank"
                 >
-                  <Button className="w-full flex items-center gap-2 h-12">
+                  <Button className="w-full flex items-center gap-2 h-12 btn-github">
                     <Github className="h-6 w-6" /> View on Github
                   </Button>
                 </Link>
 
-                <Button
-                  variant={"outline"}
-                  className="w-full flex items-center gap-2 h-12"
+                <Link
+                  className="w-full"
+                  href={project.githubUrl}
+                  target="_blank"
                 >
+                  <Button className="w-full flex items-center gap-2 h-12 btn-live">
+                    <GoArrowUpRight className="h-6 w-6" /> View Live
+                  </Button>
+                </Link>
+
+                <Button className="w-full flex items-center gap-2 h-12 btn-share">
                   <LuShare2 className="h-6 w-6" /> Share Project
                 </Button>
-              </div>
-            </div>
-            <div className="p-10 h-[190px] border rounded-xl">
-              <div className="flex flex-col justify-between h-full">
-                <h1 className="text-2xl font-semibold">Contributors</h1>
-                <div className="flex items-center gap-5">
-                  <img
-                    src={project.user?.image || "sa"}
-                    className="h-12 w-12 rounded-full"
-                  />
-                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="flex justify-between gap-10">
-          <div className="p-10 min-h-[300px] w-2/3 border rounded-xl">
-            <div className="flex flex-col gap-10">
-              <h1 className="text-2xl font-semibold flex items-center gap-2">
-                <FiMessageSquare className="h-6 w-6" /> Comments
-              </h1>
+        <div className="p-10 w-full border rounded-xl">
+          <div className="flex flex-col gap-10">
+            <h1 className="text-2xl font-semibold flex items-center gap-2">
+              <FiMessageSquare className="h-6 w-6" /> Comments
+            </h1>
 
-              {/* Display comments */}
-              <div className="flex flex-col gap-6">
-                {comments.length > 0 ? (
-                  comments.map((comment) => (
-                    <div
-                      key={comment.id}
-                      className="flex items-start gap-2"
-                    >
-                      <div className="flex gap-3 items-start">
-                        <img
-                          src={comment.user?.image || "/avatar-placeholder.png"}
-                          alt={comment.user?.name || "Unknown"}
-                          className="w-10 h-10 rounded-full"
-                        />
-                        <div className="flex flex-col">
-                          <div className="flex items-center gap-3">
+            {/* Display comments */}
+            <div className="flex flex-col gap-6">
+              {comments.length > 0 ? (
+                comments.map((comment) => (
+                  <div key={comment.id} className="flex items-start gap-2">
+                    <div className="flex gap-3 items-start">
+                      <img
+                        src={comment.user?.image || "/avatar-placeholder.png"}
+                        alt={comment.user?.name || "Unknown"}
+                        className="w-10 h-10 rounded-full"
+                      />
+                      <div className="flex flex-col">
+                        <div className="flex items-center gap-3">
                           <h1 className="font-semibold">
                             {comment.user?.name}
                           </h1>
                           <span className="text-xs text-gray-500">
-                        {new Date(comment.createdAt).toLocaleDateString()}{" "}
-                        {new Date(comment.createdAt).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </span>
-                          </div>
-                          <p className="text-sm">{comment.content}</p>
+                            {new Date(comment.createdAt).toLocaleDateString()}{" "}
+                            {new Date(comment.createdAt).toLocaleTimeString(
+                              [],
+                              {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              }
+                            )}
+                          </span>
                         </div>
+                        <p className="text-sm">{comment.content}</p>
                       </div>
-                      
                     </div>
-                  ))
-                ) : (
-                  <p>No comments yet. Be the first to comment!</p>
-                )}
-              </div>
-
-              <DropdownMenuSeparator />
-
-              {/* Add new comment */}
-              <div className="flex flex-col gap-3">
-                <Textarea
-                  placeholder="Add a comment..."
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  className="min-h-[150px]"
-                />
-                <Button
-                  onClick={handleCommentSubmit}
-                  disabled={loading || !newComment.trim()}
-                  className="w-1/4 p-6 flex items-center"
-                >
-                  {loading ? (
-                    "Submitting..."
-                  ) : (
-                    <div className="flex items-center gap-1">
-                      <FiSend className="h-6 w-6" /> Post Comment
-                    </div>
-                  )}
-                </Button>
-              </div>
+                  </div>
+                ))
+              ) : (
+                <p>No comments yet. Be the first to comment!</p>
+              )}
             </div>
-          </div>
-          <div className="w-1/3 border rounded-xl p-10 h-[400px]">
-            <div className="flex flex-col gap-10">
-              <h1 className="text-2xl flex items-center gap-2">
-                Other projects by
-                <span className="font-semibold">{project.user?.name}</span>
-              </h1>
-              <div className="flex flex-col gap-6">
-                <div className="flex items-center gap-2">
-                  <img
-                    src={project.user?.image || "s"}
-                    alt={project.user?.name || "a"}
-                    className="rounded-full h-12 w-12"
-                  />
-                  <h2>E-commerce</h2>
-                </div>
-              </div>
+
+            <DropdownMenuSeparator />
+
+            {/* Add new comment */}
+            <div className="flex flex-col gap-3">
+              <Textarea
+                placeholder="Add a comment..."
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                className="min-h-[150px] max-h-[300px]"
+              />
+              <Button
+                onClick={handleCommentSubmit}
+                disabled={loading || !newComment.trim()}
+                className="w-1/4 p-6 flex items-center"
+              >
+                {loading ? (
+                  "Submitting..."
+                ) : (
+                  <div className="flex items-center gap-1">
+                    <FiSend className="h-6 w-6" /> Post Comment
+                  </div>
+                )}
+              </Button>
             </div>
           </div>
         </div>
