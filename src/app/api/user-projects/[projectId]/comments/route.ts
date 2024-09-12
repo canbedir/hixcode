@@ -44,6 +44,7 @@ export async function POST(
         select: {
           name: true,
           image: true,
+          username: true,
         },
       },
     },
@@ -66,6 +67,7 @@ export async function GET(
           name: true,
           email: true,
           image: true,
+          username: true,
         },
       },
     },

@@ -28,7 +28,14 @@ export async function GET(
   const project = await prisma.project.findUnique({
     where: { id: projectId },
     include: {
-      user: true,
+      user: {
+        select: {
+          name: true,
+          email: true,
+          image: true,
+          username: true,
+        }
+      },
       supports: true,
     },
   });
@@ -48,5 +55,9 @@ export async function GET(
     likes,
     dislikes,
     userReaction,
+    user: {
+      ...projectWithoutSupports.user,
+      username: projectWithoutSupports.user.username || null,
+    },
   });
 }

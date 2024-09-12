@@ -48,7 +48,9 @@ interface Comment {
 const ProjectDetailPage = () => {
   const { projectId } = useParams();
   const [project, setProject] = useState<Project | null>(null);
-  const [userReaction, setUserReaction] = useState<'like' | 'dislike' | null>(null);
+  const [userReaction, setUserReaction] = useState<"like" | "dislike" | null>(
+    null
+  );
   const [likes, setLikes] = useState(0);
   const [dislikes, setDislikes] = useState(0);
   const [hasLiked, setHasLiked] = useState(false);
@@ -68,8 +70,8 @@ const ProjectDetailPage = () => {
 
   useEffect(() => {
     if (project) {
-      setHasLiked(userReaction === 'like');
-      setHasDisliked(userReaction === 'dislike');
+      setHasLiked(userReaction === "like");
+      setHasDisliked(userReaction === "dislike");
     }
   }, [project, userReaction]);
 
@@ -82,8 +84,8 @@ const ProjectDetailPage = () => {
       setLikes(data.likes);
       setDislikes(data.dislikes);
       setUserReaction(data.userReaction);
-      setHasLiked(data.userReaction === 'like');
-      setHasDisliked(data.userReaction === 'dislike');
+      setHasLiked(data.userReaction === "like");
+      setHasDisliked(data.userReaction === "dislike");
     } catch (error) {
       console.error("Error fetching project:", error);
     } finally {
@@ -108,10 +110,6 @@ const ProjectDetailPage = () => {
       },
       body: JSON.stringify({
         content: newComment,
-        user: {
-          name: session?.user?.name || "Unknown",
-          image: session?.user?.image || "/avatar-placeholder.png",
-        },
       }),
     });
 
@@ -119,6 +117,8 @@ const ProjectDetailPage = () => {
       const comment = await res.json();
       setComments((prevComments) => [comment, ...prevComments]);
       setNewComment("");
+    } else {
+      console.error("Failed to add comment");
     }
 
     setLoading(false);
@@ -155,53 +155,53 @@ const ProjectDetailPage = () => {
     }
   }, [projectId, session?.user?.email]);
 
-  const handleReaction = async (type: 'like' | 'dislike') => {
+  const handleReaction = async (type: "like" | "dislike") => {
     const newReaction = userReaction === type ? null : type;
-    
+
     const previousReaction = userReaction;
     const previousLikes = likes;
     const previousDislikes = dislikes;
 
     setUserReaction(newReaction);
-    setHasLiked(newReaction === 'like');
-    setHasDisliked(newReaction === 'dislike');
-    
-    if (type === 'like') {
-      setLikes(prev => newReaction === 'like' ? prev + 1 : prev - 1);
-      if (previousReaction === 'dislike') {
-        setDislikes(prev => prev - 1);
+    setHasLiked(newReaction === "like");
+    setHasDisliked(newReaction === "dislike");
+
+    if (type === "like") {
+      setLikes((prev) => (newReaction === "like" ? prev + 1 : prev - 1));
+      if (previousReaction === "dislike") {
+        setDislikes((prev) => prev - 1);
       }
     } else {
-      setDislikes(prev => newReaction === 'dislike' ? prev + 1 : prev - 1);
-      if (previousReaction === 'like') {
-        setLikes(prev => prev - 1);
+      setDislikes((prev) => (newReaction === "dislike" ? prev + 1 : prev - 1));
+      if (previousReaction === "like") {
+        setLikes((prev) => prev - 1);
       }
     }
 
     try {
       const res = await fetch(`/api/user-projects/${projectId}/reaction`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ type: newReaction }),
       });
-      
+
       if (!res.ok) {
-        throw new Error('Reaction update failed');
+        throw new Error("Reaction update failed");
       }
-      
+
       const data = await res.json();
       setLikes(data.likes);
       setDislikes(data.dislikes);
       setUserReaction(data.userReaction);
-      setHasLiked(data.userReaction === 'like');
-      setHasDisliked(data.userReaction === 'dislike');
+      setHasLiked(data.userReaction === "like");
+      setHasDisliked(data.userReaction === "dislike");
     } catch (error) {
-      console.error('Error updating reaction:', error);
+      console.error("Error updating reaction:", error);
       setUserReaction(previousReaction);
       setLikes(previousLikes);
       setDislikes(previousDislikes);
-      setHasLiked(previousReaction === 'like');
-      setHasDisliked(previousReaction === 'dislike');
+      setHasLiked(previousReaction === "like");
+      setHasDisliked(previousReaction === "dislike");
     }
   };
 
@@ -236,7 +236,7 @@ const ProjectDetailPage = () => {
                 <img
                   src={project?.user?.image || "/avatar-placeholder.png"}
                   alt={project?.user?.name || "Unknown"}
-                  className="w-10 h-10 rounded-full"
+                  className="w-10 h-10 rounded-full hover:scale-110 transition-all duration-300"
                 />
               </Link>
               <div className="flex items-center justify-between w-full">
@@ -274,7 +274,7 @@ const ProjectDetailPage = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <Button
-                    onClick={() => handleReaction('like')}
+                    onClick={() => handleReaction("like")}
                     variant="outline"
                     className={`like-button h-12 w-28 ${
                       hasLiked
@@ -289,7 +289,7 @@ const ProjectDetailPage = () => {
                   </Button>
 
                   <Button
-                    onClick={() => handleReaction('dislike')}
+                    onClick={() => handleReaction("dislike")}
                     variant="outline"
                     className={`dislike-button h-12 w-28 ${
                       hasDisliked
@@ -376,16 +376,20 @@ const ProjectDetailPage = () => {
                 comments.map((comment) => (
                   <div key={comment.id} className="flex items-start gap-2">
                     <div className="flex gap-3 items-start">
-                      <img
-                        src={comment.user?.image || "/avatar-placeholder.png"}
-                        alt={comment.user?.name || "Unknown"}
-                        className="w-10 h-10 rounded-full"
-                      />
+                      <Link href={`/${comment.user?.username || "#"}`}>
+                        <img
+                          src={comment.user?.image || "/avatar-placeholder.png"}
+                          alt={comment.user?.name || "Unknown"}
+                          className="w-10 h-10 rounded-full hover:scale-110 transition-all duration-300"
+                        />
+                      </Link>
                       <div className="flex flex-col">
                         <div className="flex items-center gap-3">
-                          <h1 className="font-semibold">
-                            {comment.user?.name}
-                          </h1>
+                          <Link href={`/${comment.user?.username || "#"}`}>
+                            <h1 className="font-semibold hover:underline">
+                              {comment.user?.name || "Unknown"}
+                            </h1>
+                          </Link>
                           <span className="text-xs text-gray-500">
                             {new Date(comment.createdAt).toLocaleDateString()}{" "}
                             {new Date(comment.createdAt).toLocaleTimeString(
