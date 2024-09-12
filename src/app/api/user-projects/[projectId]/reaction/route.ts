@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
+import { checkAndAssignBadges } from '@/lib/badgeUtils';
 
 export async function POST(
   req: Request,
@@ -17,6 +18,7 @@ export async function POST(
   const userEmail = session.user?.email;
   const user = await prisma.user.findUnique({
     where: { email: userEmail || "" },
+    include: { badges: true },
   });
 
   if (!user) {
@@ -64,6 +66,8 @@ export async function POST(
       },
     });
   }
+  console.log(user, "userrrrr");
+  console.log("User's current badges:", user.badges || []);
 
   const updatedProject = await prisma.project.findUnique({
     where: { id: projectId },
@@ -85,6 +89,22 @@ export async function POST(
     where: { id: projectId },
     data: { likes, dislikes },
   });
+
+  const totalLikes = await prisma.project.aggregate({
+    where: { userId: user.id },
+    _sum: { likes: true }
+  });
+
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { totalLikes: totalLikes._sum.likes || 0 },
+  });
+
+  const updatedUser = await prisma.user.findUnique({
+    where: { username: user.username },
+    include: { badges: true },
+  });
+  console.log("Updated user badges after assignment:", updatedUser?.badges);
 
   return NextResponse.json({
     likes,

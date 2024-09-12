@@ -46,7 +46,7 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
         const data = await response.json();
 
         if (!Array.isArray(data)) {
-          throw new Error("Unexpected data format: expected an array.");
+          throw new Error("Beklenmedik veri formatı: bir dizi bekleniyordu.");
         }
 
         const filteredRepos = data.filter(
@@ -75,18 +75,18 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
         const response = await fetch("/api/user-projects?limit=all");
 
         if (!response.ok) {
-          throw new Error("Failed to fetch existing projects.");
+          throw new Error("Mevcut projeler alınamadı.");
         }
 
         const data = await response.json();
 
         if (!Array.isArray(data)) {
-          throw new Error("Unexpected data format: expected an array.");
+          throw new Error("Beklenmedik veri formatı: bir dizi bekleniyordu.");
         }
 
         setExistingProjects(data);
       } catch (error: any) {
-        console.error("An error occurred while fetching existing projects:", error);
+        console.error("Mevcut projeler alınırken bir hata oluştu:", error);
         toast({
           title: "Error",
           description: `Failed to fetch existing projects: ${error.message}`,

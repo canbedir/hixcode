@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "./ui/label";
+import { useSession } from "next-auth/react";
+import { useToast } from "@/components/ui/use-toast";
 
 interface ProjectDetailsModalProps {
   isOpen: boolean;
@@ -42,6 +44,8 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
     initialTechnicalDetails
   );
   const [liveUrl, setLiveUrl] = useState(initialLiveUrl);
+  const { data: session } = useSession();
+  const { toast } = useToast();
 
   useEffect(() => {
     setTitle(initialTitle);
@@ -55,9 +59,32 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
     initialLiveUrl,
   ]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (title.trim() && description.trim() && technicalDetails.trim()) {
       onSave(title, description, technicalDetails, liveUrl);
+
+      // Rozet kontrolünü tetikle
+      try {
+        const badgeResponse = await fetch("/api/check-badges", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email: session?.user?.email }),
+        });
+
+        const badgeData = await badgeResponse.json();
+
+        if (badgeData.newBadges && badgeData.newBadges.length > 0) {
+          toast({
+            title: "New Badge Earned!",
+            description: `You've earned the ${badgeData.newBadges[0].name} badge!`,
+            variant: "default",
+          });
+        }
+      } catch (error) {
+        console.error("Error checking badges:", error);
+      }
     }
   };
 

@@ -30,7 +30,10 @@ export const authOptions: NextAuthOptions = {
         });
 
         if (!existingUser) {
-          await prisma.user.create({
+          const totalUsers = await prisma.user.count();
+          const isEarlyAdopter = totalUsers < 100;
+
+          const newUser = await prisma.user.create({
             data: {
               name: user.name || "",
               email: user.email || "",
@@ -39,6 +42,23 @@ export const authOptions: NextAuthOptions = {
               username: ((profile as any)?.login || "").toLowerCase(),
             },
           });
+
+          if (isEarlyAdopter) {
+            const earlyAdopterBadge = await prisma.badge.findFirst({
+              where: { name: "Early Adopter" },
+            });
+
+            if (earlyAdopterBadge) {
+              await prisma.user.update({
+                where: { id: newUser.id },
+                data: {
+                  badges: {
+                    connect: { id: earlyAdopterBadge.id },
+                  },
+                },
+              });
+            }
+          }
         } else {
           await prisma.user.update({
             where: {

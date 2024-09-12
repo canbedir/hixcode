@@ -12,12 +12,15 @@ export async function GET(
       where: { username: params.username.toLowerCase() },
       include: {
         projects: true,
+        badges: true,
       },
     });
 
     if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
+
+    console.log("User badges:", user.badges);
 
     return NextResponse.json(user);
   } catch (error) {

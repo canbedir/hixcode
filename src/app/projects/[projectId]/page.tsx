@@ -14,6 +14,7 @@ import { FiMessageSquare, FiSend } from "react-icons/fi";
 import { Textarea } from "@/components/ui/textarea";
 import { useSession } from "next-auth/react";
 import { GoArrowUpRight } from "react-icons/go";
+import { useToast } from "@/components/ui/use-toast";
 
 interface Project {
   id: string;
@@ -32,6 +33,12 @@ interface Project {
   };
   technicalDetails: string;
   liveUrl: string;
+  badges: {
+    id: string;
+    name: string;
+    description: string;
+    icon: string;
+  }[];
 }
 
 interface Comment {
@@ -60,6 +67,7 @@ const ProjectDetailPage = () => {
   const [newComment, setNewComment] = useState("");
   const [loading, setLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (projectId) {
@@ -195,6 +203,11 @@ const ProjectDetailPage = () => {
       setUserReaction(data.userReaction);
       setHasLiked(data.userReaction === "like");
       setHasDisliked(data.userReaction === "dislike");
+
+      if (data.updatedBadges) {
+        console.log("Updated badges:", data.updatedBadges);
+        // showNewBadges(data.updatedBadges); // Bu satırı kaldırın veya yorum satırına alın
+      }
     } catch (error) {
       console.error("Error updating reaction:", error);
       setUserReaction(previousReaction);
@@ -441,5 +454,6 @@ const ProjectDetailPage = () => {
     </div>
   );
 };
+
 
 export default ProjectDetailPage;

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
+import { Trophy, Rocket, Heart } from 'lucide-react';
 
 interface UserData {
   id: string;
@@ -19,6 +20,12 @@ interface UserData {
     description: string;
     githubUrl: string;
   }>;
+  badges: Array<{
+    id: string;
+    name: string;
+    description: string;
+    icon: string;
+  }>;
 }
 
 const Profile = ({ username }: { username: string }) => {
@@ -29,9 +36,12 @@ const Profile = ({ username }: { username: string }) => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
+        console.log("Fetching user data for username:", username);
         const response = await fetch(`/api/user/${username}`);
         if (response.ok) {
           const userData: UserData = await response.json();
+          console.log("Fetched user data:", userData);
+          console.log("User badges:", userData.badges);
           setUser(userData);
         } else {
           console.error("Failed to fetch user data");
@@ -129,6 +139,28 @@ const Profile = ({ username }: { username: string }) => {
               </div>
             ))}
           </div>
+        </div>
+      </div>
+
+      <div className="mt-4">
+        <h3 className="text-xl font-semibold mb-2">Badges</h3>
+        <div className="flex flex-wrap gap-2">
+          {user.badges && user.badges.length > 0 ? (
+            user.badges.map((badge) => (
+              <span
+                key={badge.id}
+                className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                title={badge.description}
+              >
+                {badge.name === "First Project" && <Trophy className="w-4 h-4 mr-1" />}
+                {badge.name === "Early Adopter" && <Rocket className="w-4 h-4 mr-1" />}
+                {badge.name.includes("Likes") && <Heart className="w-4 h-4 mr-1" />}
+                {badge.name}
+              </span>
+            ))
+          ) : (
+            <p>No badges yet. Keep contributing to earn badges!</p>
+          )}
         </div>
       </div>
     </div>

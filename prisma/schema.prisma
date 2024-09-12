@@ -53,6 +53,9 @@ model User {
   followers   Follow[]     @relation("followers")
   following   Follow[]     @relation("following")
   comments    Comment[]
+
+  totalLikes   Int @default(0)
+  commentCount Int @default(0)
 }
 
 model Project {
@@ -77,6 +80,7 @@ model Project {
   contributors        Contributor[]
   technicalDetails    String?
   liveUrl             String?
+  badges              Badge[]
 }
 
 model Contributor {
@@ -122,12 +126,12 @@ model Discussion {
 }
 
 model Badge {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   name        String
-  description String?
-  userId      String
-  createdAt   DateTime @default(now())
-  user        User     @relation(fields: [userId], references: [id])
+  description String
+  icon        String
+  projects    Project[]
+  users       User[]
 }
 
 model Follow {
