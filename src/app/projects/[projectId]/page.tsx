@@ -48,26 +48,54 @@ interface Comment {
 const ProjectDetailPage = () => {
   const { projectId } = useParams();
   const [project, setProject] = useState<Project | null>(null);
+  const [userReaction, setUserReaction] = useState<'like' | 'dislike' | null>(null);
   const [likes, setLikes] = useState(0);
   const [dislikes, setDislikes] = useState(0);
+  const [hasLiked, setHasLiked] = useState(false);
+  const [hasDisliked, setHasDisliked] = useState(false);
   const { data: session } = useSession();
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
   const [loading, setLoading] = useState(false);
-  const [hasLiked, setHasLiked] = useState(false);
-  const [hasDisliked, setHasDisliked] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
     if (projectId) {
-      const fetchComments = async () => {
-        const res = await fetch(`/api/user-projects/${projectId}/comments`);
-        const data = await res.json();
-        setComments(data);
-      };
-
+      fetchProject();
       fetchComments();
     }
   }, [projectId]);
+
+  useEffect(() => {
+    if (project) {
+      setHasLiked(userReaction === 'like');
+      setHasDisliked(userReaction === 'dislike');
+    }
+  }, [project, userReaction]);
+
+  const fetchProject = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`/api/user-projects/${projectId}`);
+      const data = await response.json();
+      setProject(data);
+      setLikes(data.likes);
+      setDislikes(data.dislikes);
+      setUserReaction(data.userReaction);
+      setHasLiked(data.userReaction === 'like');
+      setHasDisliked(data.userReaction === 'dislike');
+    } catch (error) {
+      console.error("Error fetching project:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchComments = async () => {
+    const res = await fetch(`/api/user-projects/${projectId}/comments`);
+    const data = await res.json();
+    setComments(data);
+  };
 
   const handleCommentSubmit = async () => {
     if (!newComment.trim()) return;
@@ -119,7 +147,7 @@ const ProjectDetailPage = () => {
             JSON.stringify([...viewedProjects, projectId])
           );
         } else {
-          console.error("View işlemi başarısız oldu.");
+          console.error("View update failed.");
         }
       };
 
@@ -127,60 +155,55 @@ const ProjectDetailPage = () => {
     }
   }, [projectId, session?.user?.email]);
 
-  const handleLike = async () => {
-    const res = await fetch(`/api/user-projects/${projectId}/like`, {
-      method: "POST",
-    });
-    if (res.ok) {
-      const data = await res.json();
-      setLikes(data.likes);
-      setDislikes(data.dislikes);
-      setHasLiked(true);
-      setHasDisliked(false);
-    } else {
-      console.error("Like işlemi başarısız oldu.");
-    }
-  };
+  const handleReaction = async (type: 'like' | 'dislike') => {
+    const newReaction = userReaction === type ? null : type;
+    
+    const previousReaction = userReaction;
+    const previousLikes = likes;
+    const previousDislikes = dislikes;
 
-  const handleDislike = async () => {
-    const res = await fetch(`/api/user-projects/${projectId}/dislike`, {
-      method: "POST",
-    });
-    if (res.ok) {
-      const data = await res.json();
-      setDislikes(data.dislikes);
-      setLikes(data.likes);
-      setHasDisliked(true);
-      setHasLiked(false);
-    } else {
-      console.error("Dislike işlemi başarısız oldu.");
-    }
-  };
-
-  const fetchProject = async () => {
-    setIsLoading(true);
-    try {
-      const response = await fetch(`/api/user-projects/${projectId}`);
-      const data = await response.json();
-      console.log("Fetched project data:", data);
-      if (!data.user || !data.user.username) {
-        console.error("Username is missing in project data", data);
+    setUserReaction(newReaction);
+    setHasLiked(newReaction === 'like');
+    setHasDisliked(newReaction === 'dislike');
+    
+    if (type === 'like') {
+      setLikes(prev => newReaction === 'like' ? prev + 1 : prev - 1);
+      if (previousReaction === 'dislike') {
+        setDislikes(prev => prev - 1);
       }
-      setProject(data);
+    } else {
+      setDislikes(prev => newReaction === 'dislike' ? prev + 1 : prev - 1);
+      if (previousReaction === 'like') {
+        setLikes(prev => prev - 1);
+      }
+    }
+
+    try {
+      const res = await fetch(`/api/user-projects/${projectId}/reaction`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: newReaction }),
+      });
+      
+      if (!res.ok) {
+        throw new Error('Reaction update failed');
+      }
+      
+      const data = await res.json();
       setLikes(data.likes);
       setDislikes(data.dislikes);
+      setUserReaction(data.userReaction);
+      setHasLiked(data.userReaction === 'like');
+      setHasDisliked(data.userReaction === 'dislike');
     } catch (error) {
-      console.error("Error fetching project:", error);
-    } finally {
-      setIsLoading(false);
+      console.error('Error updating reaction:', error);
+      setUserReaction(previousReaction);
+      setLikes(previousLikes);
+      setDislikes(previousDislikes);
+      setHasLiked(previousReaction === 'like');
+      setHasDisliked(previousReaction === 'dislike');
     }
   };
-
-  useEffect(() => {
-    if (projectId) {
-      fetchProject();
-    }
-  }, [projectId]);
 
   if (isLoading) {
     return (
@@ -251,32 +274,32 @@ const ProjectDetailPage = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <Button
-                    onClick={handleLike}
+                    onClick={() => handleReaction('like')}
                     variant="outline"
-                    className={`h-12 w-28 ${
+                    className={`like-button h-12 w-28 ${
                       hasLiked
                         ? "bg-blue-600 text-white hover:bg-blue-700 hover:text-white"
                         : ""
-                    } border`}
+                    } border transition-colors duration-300`}
                   >
                     <span className="flex items-center gap-2">
                       <BiLike className="h-6 w-6" />
-                      <span>{likes > 0 ? likes : 0}</span>
+                      <span>{likes}</span>
                     </span>
                   </Button>
 
                   <Button
-                    onClick={handleDislike}
+                    onClick={() => handleReaction('dislike')}
                     variant="outline"
-                    className={`h-12 w-28 ${
+                    className={`dislike-button h-12 w-28 ${
                       hasDisliked
                         ? "bg-red-600 text-white hover:bg-red-700 hover:text-white"
                         : ""
-                    } border`}
+                    } border transition-colors duration-300`}
                   >
                     <span className="flex items-center gap-2">
                       <BiDislike className="h-6 w-6" />
-                      <span>{dislikes > 0 ? dislikes : 0}</span>
+                      <span>{dislikes}</span>
                     </span>
                   </Button>
                 </div>

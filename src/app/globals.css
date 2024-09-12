@@ -178,25 +178,3 @@ body,
   color: #fff;
   text-decoration: none;
 }
-
-
-@keyframes likeAnimation {
-  0% {
-    transform: scale(1);
-    color: initial;
-    color: green;
-  }
-  50% {
-    transform: scale(1.4);
-    color: green;
-  }
-  100% {
-    transform: scale(1);
-    color: initial;
-    color: green;
-  }
-}
-
-.like-animation {
-  animation: likeAnimation 1s ease-in-out;
-}

@@ -1,32 +1,52 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { authOptions } from '../../auth/[...nextauth]/options';
+import { getServerSession } from 'next-auth';
 
 const prisma = new PrismaClient();
 
-export async function GET(request: Request, { params }: { params: { projectId: string } }) {
+export async function GET(
+  req: Request,
+  { params }: { params: { projectId: string } }
+) {
   const { projectId } = params;
+  const session = await getServerSession(authOptions);
 
-  try {
-    const project = await prisma.project.findUnique({
-      where: { id: projectId },
-      include: {
-        user: {
-          select: {
-            name: true,
-            image: true,
-            username: true
-          }
-        }
-      }
-    });
-
-    if (!project) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 });
-    }
-
-    return NextResponse.json(project);
-  } catch (error) {
-    console.error("Error fetching project:", error);
-    return NextResponse.json({ error: "Failed to fetch project" }, { status: 500 });
+  if (!session) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
+
+  const userEmail = session.user?.email;
+  const user = await prisma.user.findUnique({
+    where: { email: userEmail || "" },
+  });
+
+  if (!user) {
+    return NextResponse.json({ message: "User not found" }, { status: 404 });
+  }
+
+  const project = await prisma.project.findUnique({
+    where: { id: projectId },
+    include: {
+      user: true,
+      supports: true,
+    },
+  });
+
+  if (!project) {
+    return NextResponse.json({ message: "Project not found" }, { status: 404 });
+  }
+
+  const userReaction = project.supports.find(s => s.userId === user.id)?.type || null;
+
+  const { supports, ...projectWithoutSupports } = project;
+  const likes = supports.filter(s => s.type === 'like').length;
+  const dislikes = supports.filter(s => s.type === 'dislike').length;
+
+  return NextResponse.json({
+    ...projectWithoutSupports,
+    likes,
+    dislikes,
+    userReaction,
+  });
 }
