@@ -6,7 +6,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
-import { Trophy, Rocket, Heart } from 'lucide-react';
+import { Trophy, Rocket, Heart } from "lucide-react";
+import { AnimatedTooltip } from "../ui/animated-tooltip";
 
 interface UserData {
   id: string;
@@ -28,10 +29,18 @@ interface UserData {
   }>;
 }
 
+interface FormattedBadge {
+  id: number; // string yerine number olarak değiştirildi
+  name: string;
+  designation: string;
+  image: string;
+}
+
 const Profile = ({ username }: { username: string }) => {
   const router = useRouter();
   const [user, setUser] = useState<UserData | null>(null);
   const { data: session } = useSession();
+  const [formattedBadges, setFormattedBadges] = useState<FormattedBadge[]>([]);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -43,6 +52,17 @@ const Profile = ({ username }: { username: string }) => {
           console.log("Fetched user data:", userData);
           console.log("User badges:", userData.badges);
           setUser(userData);
+
+          // Format badges for AnimatedTooltip
+          const formatted = userData.badges.map((badge) => ({
+            id: parseInt(badge.id), // string id'yi number'a çevir
+            name: badge.name,
+            designation: badge.description,
+            image: badge.icon.startsWith("/")
+              ? badge.icon
+              : `/badges/${badge.name.toLowerCase().replace(" ", "-")}.svg`,
+          }));
+          setFormattedBadges(formatted);
         } else {
           console.error("Failed to fetch user data");
         }
@@ -53,6 +73,20 @@ const Profile = ({ username }: { username: string }) => {
 
     fetchUserData();
   }, [username]);
+
+  useEffect(() => {
+    if (user && user.badges) {
+      const formatted = user.badges.map((badge) => ({
+        id: parseInt(badge.id), // string id'yi number'a çevir
+        name: badge.name,
+        designation: badge.description,
+        image: badge.icon.startsWith("/")
+          ? badge.icon
+          : `/${badge.name.toLowerCase().replace(" ", "-")}.svg`,
+      }));
+      setFormattedBadges(formatted);
+    }
+  }, [user]);
 
   const handleUpdateProject = async (projectId: string) => {
     try {
@@ -90,9 +124,28 @@ const Profile = ({ username }: { username: string }) => {
                   className="rounded-full mb-4 hover:scale-105 transition-all duration-300"
                 />
               </div>
-              <h1 className="text-2xl font-semibold">
-                {user.name || "Anonymous"}
-              </h1>
+              <div className="flex items-center gap-3">
+                <h1 className="text-2xl font-semibold">
+                  {user.name || "Anonymous"}
+                </h1>
+                {formattedBadges ? (
+                  <div className="flex items-center gap-2 max-w-full h-6 p-1 rounded-sm border">
+                    {formattedBadges.map((badge) => (
+                      <div key={badge.id} className="relative group">
+                        <Image
+                          src={badge.image}
+                          alt={badge.name}
+                          width={20}
+                          height={24}
+                        />
+                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          {badge.name}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : ""}
+              </div>
               <p className="text-gray-600 dark:text-gray-400 text-sm">
                 {user.email || "No email provided"}
               </p>
@@ -139,28 +192,6 @@ const Profile = ({ username }: { username: string }) => {
               </div>
             ))}
           </div>
-        </div>
-      </div>
-
-      <div className="mt-4">
-        <h3 className="text-xl font-semibold mb-2">Badges</h3>
-        <div className="flex flex-wrap gap-2">
-          {user.badges && user.badges.length > 0 ? (
-            user.badges.map((badge) => (
-              <span
-                key={badge.id}
-                className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
-                title={badge.description}
-              >
-                {badge.name === "First Project" && <Trophy className="w-4 h-4 mr-1" />}
-                {badge.name === "Early Adopter" && <Rocket className="w-4 h-4 mr-1" />}
-                {badge.name.includes("Likes") && <Heart className="w-4 h-4 mr-1" />}
-                {badge.name}
-              </span>
-            ))
-          ) : (
-            <p>No badges yet. Keep contributing to earn badges!</p>
-          )}
         </div>
       </div>
     </div>

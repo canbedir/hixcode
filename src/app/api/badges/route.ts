@@ -48,11 +48,10 @@ export async function GET() {
   console.log("All badges:", badges);
 
   if (badges.length === 0) {
-    // Eğer rozet yoksa, varsayılan rozetleri oluştur
     const defaultBadges = [
-      { name: "First Project", description: "İlk projenizi oluşturdunuz!", icon: "🏆" },
-      { name: "Early Adopter", description: "İlk 100 kullanıcıdan birisiniz!", icon: "🚀" },
-      { name: "100 Likes", description: "Projeleriniz toplamda 100 beğeni aldı!", icon: "💯" },
+      { name: "First Project", description: "İlk projenizi oluşturdunuz!", icon: "/first-project.svg" },
+      { name: "Early Adopter", description: "İlk 100 kullanıcıdan birisiniz!", icon: "/star.svg" },
+      { name: "100 Likes", description: "Projeleriniz toplamda 100 beğeni aldı!", icon: "/like-gold.svg" },
     ];
 
     for (const badge of defaultBadges) {

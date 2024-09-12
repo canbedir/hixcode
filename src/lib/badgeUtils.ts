@@ -15,28 +15,36 @@ export async function checkAndAssignBadges(username: string) {
     return [];
   }
 
-  // Toplam beğeni sayısına göre rozetler
-  const likeMilestones = [100, 200, 300, 400, 500, 1000];
   const newBadges = [];
 
-  for (const milestone of likeMilestones) {
-    if (user.totalLikes >= milestone) {
-      const badgeName = `${milestone} Likes`;
-      const badge = await prisma.badge.findFirst({
-        where: { name: badgeName },
-      });
-      if (badge && !user.badges.some((b) => b.id === badge.id)) {
-        await prisma.user.update({
-          where: { username },
-          data: {
-            badges: {
-              connect: { id: badge.id },
-            },
-          },
-        });
-        newBadges.push(badge);
-      }
-    }
+  // First Project badge
+  const firstProjectBadge = await prisma.badge.findFirst({ where: { name: "First Project" } });
+  if (user.projects.length > 0 && firstProjectBadge && !user.badges.some(b => b.id === firstProjectBadge.id)) {
+    newBadges.push(firstProjectBadge);
+  }
+
+  // Early Adopter badge
+  const earlyAdopterBadge = await prisma.badge.findFirst({ where: { name: "Early Adopter" } });
+  const userCount = await prisma.user.count();
+  if (userCount <= 100 && earlyAdopterBadge && !user.badges.some(b => b.id === earlyAdopterBadge.id)) {
+    newBadges.push(earlyAdopterBadge);
+  }
+
+  // 100 Likes badge
+  const likesGoldBadge = await prisma.badge.findFirst({ where: { name: "100 Likes" } });
+  if (user.totalLikes >= 100 && likesGoldBadge && !user.badges.some(b => b.id === likesGoldBadge.id)) {
+    newBadges.push(likesGoldBadge);
+  }
+
+  if (newBadges.length > 0) {
+    await prisma.user.update({
+      where: { username },
+      data: {
+        badges: {
+          connect: newBadges.map(badge => ({ id: badge.id })),
+        },
+      },
+    });
   }
 
   console.log("Finished checkAndAssignBadges for user:", username, "New badges:", newBadges);
