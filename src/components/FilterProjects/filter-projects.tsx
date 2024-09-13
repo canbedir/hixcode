@@ -14,7 +14,7 @@ import { Button } from "../ui/button";
 
 const FilterProjects = () => {
   return (
-    <div className="h-[300px] w-[300px]">
+    <div className="h-[300px]">
       <h1 className="text-2xl font-semibold">Filter Projects</h1>
       <div className="flex flex-col rounded-lg gap-3 mt-5 border p-5">
         <div className="flex flex-row gap-3 justify-center">

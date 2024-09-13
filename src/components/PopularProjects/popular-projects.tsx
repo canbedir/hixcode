@@ -53,7 +53,7 @@ const PopularProjects = () => {
   }, []);
 
   return (
-    <div className="w-5/6">
+    <div>
       <h1 className="text-2xl font-bold mb-4 px-2">Top 5 Projects</h1>
       <Carousel className="">
         <CarouselContent>
@@ -94,7 +94,7 @@ const PopularProjects = () => {
                         </p>
                       </div>
 
-                      <div className="flex justify-between items-center text-sm text-black mt-auto">
+                      <div className="flex justify-between items-center text-sm mt-auto">
                         <div className="flex items-center">
                           {project.mostPopularLanguage ? (
                             <>

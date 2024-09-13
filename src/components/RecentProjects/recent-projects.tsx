@@ -71,7 +71,7 @@ const RecentProjects = () => {
   };
 
   return (
-    <div className="w-5/6">
+    <div>
       <div className="flex items-center justify-between px-2 mb-4">
         <h1 className="text-2xl font-bold">Recently Updated Projects</h1>
         {!showAll && <Button onClick={handleViewAll}>View All</Button>}
@@ -116,7 +116,7 @@ const RecentProjects = () => {
                           </p>
                         </div>
 
-                        <div className="flex justify-between items-center text-sm text-black mt-auto">
+                        <div className="flex justify-between items-center text-sm mt-auto">
                           <div className="flex items-center">
                             {project.mostPopularLanguage && (
                               <>

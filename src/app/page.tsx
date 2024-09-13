@@ -7,7 +7,7 @@ export default function Home() {
     <div className="mt-10">
       <div className="flex items-start gap-20">
         <FilterProjects />
-        <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-8 w-full">
           <PopularProjects />
           <RecentProjects />
         </div>
