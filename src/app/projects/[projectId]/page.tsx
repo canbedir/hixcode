@@ -15,6 +15,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { useSession } from "next-auth/react";
 import { GoArrowUpRight } from "react-icons/go";
 import { useToast } from "@/components/ui/use-toast";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import Image from "next/image";
 
 interface Project {
   id: string;
@@ -30,6 +37,12 @@ interface Project {
     name: string | null;
     image: string | null;
     username: string | null;
+    badges: {
+      id: string;
+      name: string;
+      description: string;
+      icon: string;
+    }[];
   };
   technicalDetails: string;
   liveUrl: string;
@@ -94,6 +107,8 @@ const ProjectDetailPage = () => {
       setUserReaction(data.userReaction);
       setHasLiked(data.userReaction === "like");
       setHasDisliked(data.userReaction === "dislike");
+      console.log("Fetched project:", data);
+      console.log("User badges:", data.user?.badges);
     } catch (error) {
       console.error("Error fetching project:", error);
     } finally {
@@ -206,7 +221,6 @@ const ProjectDetailPage = () => {
 
       if (data.updatedBadges) {
         console.log("Updated badges:", data.updatedBadges);
-        // showNewBadges(data.updatedBadges); // Bu satırı kaldırın veya yorum satırına alın
       }
     } catch (error) {
       console.error("Error updating reaction:", error);
@@ -254,11 +268,57 @@ const ProjectDetailPage = () => {
               </Link>
               <div className="flex items-center justify-between w-full">
                 <div className="flex flex-col">
-                  <Link href={`/${project.user?.username}`}>
-                    <h1 className="font-semibold hover:underline">
-                      {project?.user?.name || "Unknown"}
-                    </h1>
-                  </Link>
+                  <div className="flex items-center gap-2">
+                    <Link href={`/${project.user?.username}`}>
+                      <h1 className="font-semibold hover:underline">
+                        {project?.user?.name || "Unknown"}
+                      </h1>
+                    </Link>
+                    {project.user?.badges && (
+                      <div className="h-5 border rounded-sm flex items-center p-0.5">
+                        <div className="flex items-center gap-1">
+                          {project.user.badges.map((badge) => (
+                            <HoverCard key={badge.id}>
+                              <HoverCardTrigger asChild>
+                                <div className="relative cursor-pointer">
+                                  <Image
+                                    src={
+                                      badge.icon.startsWith("/")
+                                        ? badge.icon
+                                        : `/badges/${badge.name
+                                            .toLowerCase()
+                                            .replace(" ", "-")}.svg`
+                                    }
+                                    alt={badge.name}
+                                    width={16}
+                                    height={16}
+                                  />
+                                </div>
+                              </HoverCardTrigger>
+                              <HoverCardContent className="w-64" side="top">
+                                <div className="flex items-center space-x-2">
+                                  <Avatar className="h-10 w-10">
+                                    <AvatarImage src={badge.icon} />
+                                    <AvatarFallback>
+                                      {badge.name.charAt(0)}
+                                    </AvatarFallback>
+                                  </Avatar>
+                                  <div>
+                                    <h4 className="text-sm font-semibold">
+                                      {badge.name}
+                                    </h4>
+                                    <p className="text-xs text-muted-foreground">
+                                      {badge.description}
+                                    </p>
+                                  </div>
+                                </div>
+                              </HoverCardContent>
+                            </HoverCard>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                   <span className="text-sm text-white/80 dark:text-black/80">
                     Project Creator
                   </span>
@@ -454,6 +514,5 @@ const ProjectDetailPage = () => {
     </div>
   );
 };
-
 
 export default ProjectDetailPage;

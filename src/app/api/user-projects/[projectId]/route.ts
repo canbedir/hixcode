@@ -34,7 +34,8 @@ export async function GET(
           email: true,
           image: true,
           username: true,
-        }
+          badges: true,
+        },
       },
       supports: true,
     },
