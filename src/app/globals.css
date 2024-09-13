@@ -128,7 +128,6 @@ body,
   transition: 0.5s;
   background-size: 200% auto;
   color: white;
-  box-shadow: 0 0 20px #eee;
 }
 
 .btn-github:hover {
@@ -149,7 +148,6 @@ body,
   transition: 0.5s;
   background-size: 200% auto;
   color: white;
-  box-shadow: 0 0 20px #eee;
 }
 
 .btn-live:hover {
@@ -170,7 +168,6 @@ body,
   transition: 0.5s;
   background-size: 200% auto;
   color: white;
-  box-shadow: 0 0 20px #eee;
 }
 
 .btn-share:hover {
