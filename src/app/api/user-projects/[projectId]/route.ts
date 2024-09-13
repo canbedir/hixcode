@@ -19,6 +19,7 @@ export async function GET(
   const userEmail = session.user?.email;
   const user = await prisma.user.findUnique({
     where: { email: userEmail || "" },
+    include: { badges: true },
   });
 
   if (!user) {
@@ -51,11 +52,16 @@ export async function GET(
   const likes = supports.filter(s => s.type === 'like').length;
   const dislikes = supports.filter(s => s.type === 'dislike').length;
 
+  const isEarlyAdopter = user.badges.some(badge => badge.name === "Early Adopter");
+  const isFirstProject = await prisma.project.count({ where: { userId: user.id } }) === 1;
+  const isEarlyAdopterProject = isEarlyAdopter && isFirstProject;
+
   return NextResponse.json({
     ...projectWithoutSupports,
     likes,
     dislikes,
     userReaction,
+    isEarlyAdopterProject,
     user: {
       ...projectWithoutSupports.user,
       username: projectWithoutSupports.user.username || null,

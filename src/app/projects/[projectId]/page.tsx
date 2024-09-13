@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { BiLike, BiDislike } from "react-icons/bi";
 import { Github, Star } from "lucide-react";
@@ -14,7 +14,6 @@ import { FiMessageSquare, FiSend } from "react-icons/fi";
 import { Textarea } from "@/components/ui/textarea";
 import { useSession } from "next-auth/react";
 import { GoArrowUpRight } from "react-icons/go";
-import { useToast } from "@/components/ui/use-toast";
 import {
   HoverCard,
   HoverCardContent,
@@ -52,6 +51,7 @@ interface Project {
     description: string;
     icon: string;
   }[];
+  isEarlyAdopterProject: boolean;
 }
 
 interface Comment {
@@ -80,7 +80,6 @@ const ProjectDetailPage = () => {
   const [newComment, setNewComment] = useState("");
   const [loading, setLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const { toast } = useToast();
 
   useEffect(() => {
     if (projectId) {
@@ -95,6 +94,18 @@ const ProjectDetailPage = () => {
       setHasDisliked(userReaction === "dislike");
     }
   }, [project, userReaction]);
+
+  useEffect(() => {
+    if (project) {
+      const isEarlyAdopter = project.user.badges.some(
+        (badge) => badge.name === "Early Adopter"
+      );
+      setProject((prevProject) => ({
+        ...prevProject!,
+        isEarlyAdopterProject: isEarlyAdopter,
+      }));
+    }
+  }, [project]);
 
   const fetchProject = async () => {
     setIsLoading(true);
@@ -377,11 +388,13 @@ const ProjectDetailPage = () => {
                   </Button>
                 </div>
 
-                <div>
-                  <span className="py-3 px-5 rounded-full btn-hover color">
-                    Project of the Month
-                  </span>
-                </div>
+                {project.isEarlyAdopterProject && (
+                  <div>
+                    <span className="py-3 px-5 rounded-full btn-hover color">
+                      Early Adopter&apos;s Project
+                    </span>
+                  </div>
+                )}
               </div>
               <DropdownMenuSeparator className="bg-gray-200" />
 
