@@ -16,31 +16,19 @@ export async function POST(req: Request) {
 }
 
 export async function PUT(req: Request) {
-  const { badgeId, projectId, userId } = await req.json();
+  const { id, name, description, icon } = await req.json();
 
-  if (projectId) {
-    await prisma.project.update({
-      where: { id: projectId },
-      data: {
-        badges: {
-          connect: { id: badgeId },
-        },
-      },
+  try {
+    const updatedBadge = await prisma.badge.update({
+      where: { id },
+      data: { name, description, icon },
     });
-  }
 
-  if (userId) {
-    await prisma.user.update({
-      where: { id: userId },
-      data: {
-        badges: {
-          connect: { id: badgeId },
-        },
-      },
-    });
+    return NextResponse.json(updatedBadge);
+  } catch (error) {
+    console.error('Error updating badge:', error);
+    return NextResponse.json({ error: 'Failed to update badge' }, { status: 500 });
   }
-
-  return NextResponse.json({ success: true });
 }
 
 export async function GET() {
@@ -49,9 +37,9 @@ export async function GET() {
 
   if (badges.length === 0) {
     const defaultBadges = [
-      { name: "First Project", description: "İlk projenizi oluşturdunuz!", icon: "/first-project.svg" },
-      { name: "Early Adopter", description: "İlk 100 kullanıcıdan birisiniz!", icon: "/star.svg" },
-      { name: "100 Likes", description: "Projeleriniz toplamda 100 beğeni aldı!", icon: "/like-gold.svg" },
+      { name: "Early Adopter", description: "You're one of the first 100 users!", icon: "/early-adopter.svg" },
+      { name: "First Project", description: "You've created your first project!", icon: "/first-project.svg" },
+      { name: "100 Likes", description: "Your projects have received a total of 100 likes!", icon: "/100-likes.svg" },
     ];
 
     for (const badge of defaultBadges) {

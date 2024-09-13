@@ -8,6 +8,12 @@ import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { Trophy, Rocket, Heart } from "lucide-react";
 import { AnimatedTooltip } from "../ui/animated-tooltip";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface UserData {
   id: string;
@@ -131,17 +137,30 @@ const Profile = ({ username }: { username: string }) => {
                 {formattedBadges ? (
                   <div className="flex items-center gap-2 max-w-full h-6 p-1 rounded-sm border">
                     {formattedBadges.map((badge) => (
-                      <div key={badge.id} className="relative group">
-                        <Image
-                          src={badge.image}
-                          alt={badge.name}
-                          width={20}
-                          height={24}
-                        />
-                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                          {badge.name}
-                        </div>
-                      </div>
+                      <HoverCard key={badge.id}>
+                        <HoverCardTrigger asChild>
+                          <div className="relative cursor-pointer">
+                            <Image
+                              src={badge.image}
+                              alt={badge.name}
+                              width={20}
+                              height={24}
+                            />
+                          </div>
+                        </HoverCardTrigger>
+                        <HoverCardContent className="w-64" side="top">
+                          <div className="flex items-center space-x-2">
+                            <Avatar className="h-10 w-10">
+                              <AvatarImage src={badge.image} />
+                              <AvatarFallback>{badge.name.charAt(0)}</AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <h4 className="text-sm font-semibold">{badge.name}</h4>
+                              <p className="text-xs text-muted-foreground">{badge.designation}</p>
+                            </div>
+                          </div>
+                        </HoverCardContent>
+                      </HoverCard>
                     ))}
                   </div>
                 ) : ""}
