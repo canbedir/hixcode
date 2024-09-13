@@ -51,7 +51,6 @@ interface Project {
     description: string;
     icon: string;
   }[];
-  isEarlyAdopterProject: boolean;
 }
 
 interface Comment {
@@ -80,6 +79,7 @@ const ProjectDetailPage = () => {
   const [newComment, setNewComment] = useState("");
   const [loading, setLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isEarlyAdopterProject, setIsEarlyAdopterProject] = useState(false);
 
   useEffect(() => {
     if (projectId) {
@@ -96,14 +96,11 @@ const ProjectDetailPage = () => {
   }, [project, userReaction]);
 
   useEffect(() => {
-    if (project) {
+    if (project && project.user && project.user.badges) {
       const isEarlyAdopter = project.user.badges.some(
         (badge) => badge.name === "Early Adopter"
       );
-      setProject((prevProject) => ({
-        ...prevProject!,
-        isEarlyAdopterProject: isEarlyAdopter,
-      }));
+      setIsEarlyAdopterProject(isEarlyAdopter);
     }
   }, [project]);
 
@@ -388,7 +385,7 @@ const ProjectDetailPage = () => {
                   </Button>
                 </div>
 
-                {project.isEarlyAdopterProject && (
+                {isEarlyAdopterProject && (
                   <div>
                     <span className="py-3 px-5 rounded-full btn-hover color">
                       Early Adopter&apos;s Project
