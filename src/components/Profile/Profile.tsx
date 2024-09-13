@@ -6,14 +6,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
-import { Trophy, Rocket, Heart } from "lucide-react";
-import { AnimatedTooltip } from "../ui/animated-tooltip";
 import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import ProjectCard from "./ProjectCard";
 
 interface UserData {
   id: string;
@@ -26,6 +25,9 @@ interface UserData {
     title: string;
     description: string;
     githubUrl: string;
+    stars: number;
+    mostPopularLanguage: string;
+    technicalDetails: string;
   }>;
   badges: Array<{
     id: string;
@@ -36,7 +38,7 @@ interface UserData {
 }
 
 interface FormattedBadge {
-  id: number; // string yerine number olarak değiştirildi
+  id: number;
   name: string;
   designation: string;
   image: string;
@@ -59,9 +61,8 @@ const Profile = ({ username }: { username: string }) => {
           console.log("User badges:", userData.badges);
           setUser(userData);
 
-          // Format badges for AnimatedTooltip
           const formatted = userData.badges.map((badge) => ({
-            id: parseInt(badge.id), // string id'yi number'a çevir
+            id: parseInt(badge.id),
             name: badge.name,
             designation: badge.description,
             image: badge.icon.startsWith("/")
@@ -83,7 +84,7 @@ const Profile = ({ username }: { username: string }) => {
   useEffect(() => {
     if (user && user.badges) {
       const formatted = user.badges.map((badge) => ({
-        id: parseInt(badge.id), // string id'yi number'a çevir
+        id: parseInt(badge.id),
         name: badge.name,
         designation: badge.description,
         image: badge.icon.startsWith("/")
@@ -152,18 +153,26 @@ const Profile = ({ username }: { username: string }) => {
                           <div className="flex items-center space-x-2">
                             <Avatar className="h-10 w-10">
                               <AvatarImage src={badge.image} />
-                              <AvatarFallback>{badge.name.charAt(0)}</AvatarFallback>
+                              <AvatarFallback>
+                                {badge.name.charAt(0)}
+                              </AvatarFallback>
                             </Avatar>
                             <div>
-                              <h4 className="text-sm font-semibold">{badge.name}</h4>
-                              <p className="text-xs text-muted-foreground">{badge.designation}</p>
+                              <h4 className="text-sm font-semibold">
+                                {badge.name}
+                              </h4>
+                              <p className="text-xs text-muted-foreground">
+                                {badge.designation}
+                              </p>
                             </div>
                           </div>
                         </HoverCardContent>
                       </HoverCard>
                     ))}
                   </div>
-                ) : ""}
+                ) : (
+                  ""
+                )}
               </div>
               <p className="text-gray-600 dark:text-gray-400 text-sm">
                 {user.email || "No email provided"}
@@ -184,31 +193,7 @@ const Profile = ({ username }: { username: string }) => {
           <h2 className="text-3xl font-bold mb-6">Projects</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {user.projects.map((project) => (
-              <div
-                key={project.id}
-                className="flex flex-col h-full shadow-md shadow-dark/50 dark:shadow-white/50 rounded-lg p-6"
-              >
-                <h3 className="text-xl font-semibold mb-2">{project.title}</h3>
-                <p className="text-gray-600 dark:text-gray-400 mb-4 flex-grow">
-                  {project.description}
-                </p>
-                <div className="flex justify-between items-center mt-auto">
-                  <a
-                    href={project.githubUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-indigo-600 hover:underline"
-                  >
-                    GitHub Repository
-                  </a>
-                  <Button
-                    onClick={() => handleUpdateProject(project.id)}
-                    size="sm"
-                  >
-                    Update
-                  </Button>
-                </div>
-              </div>
+              <ProjectCard key={project.id} project={project} />
             ))}
           </div>
         </div>
