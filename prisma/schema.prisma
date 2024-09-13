@@ -81,6 +81,7 @@ model Project {
   technicalDetails    String?
   liveUrl             String?
   badges              Badge[]
+  isPinned            Boolean       @default(false)
 }
 
 model Contributor {

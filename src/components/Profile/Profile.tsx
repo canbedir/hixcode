@@ -15,6 +15,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import ProjectCard from "./ProjectCard";
 import { useToast } from "../ui/use-toast";
 import { ClipLoader } from "react-spinners";
+import { Project } from "@prisma/client";
 
 interface UserData {
   id: string;
@@ -22,15 +23,7 @@ interface UserData {
   email: string | null;
   image: string | null;
   bio: string | null;
-  projects: Array<{
-    id: string;
-    title: string;
-    description: string;
-    githubUrl: string;
-    stars: number;
-    mostPopularLanguage: string;
-    technicalDetails: string;
-  }>;
+  projects: Project[];
   badges: Array<{
     id: string;
     name: string;
@@ -52,6 +45,9 @@ const Profile = ({ username }: { username: string }) => {
   const { data: session } = useSession();
   const [formattedBadges, setFormattedBadges] = useState<FormattedBadge[]>([]);
   const { toast } = useToast();
+  const [pinnedProjects, setPinnedProjects] = useState<Project[]>([]);
+  const [displayedProjects, setDisplayedProjects] = useState<Project[]>([]);
+  const [showAllProjects, setShowAllProjects] = useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -61,7 +57,6 @@ const Profile = ({ username }: { username: string }) => {
         if (response.ok) {
           const userData: UserData = await response.json();
           console.log("Fetched user data:", userData);
-          console.log("User badges:", userData.badges);
           setUser(userData);
 
           const formatted = userData.badges.map((badge) => ({
@@ -73,6 +68,11 @@ const Profile = ({ username }: { username: string }) => {
               : `/badges/${badge.name.toLowerCase().replace(" ", "-")}.svg`,
           }));
           setFormattedBadges(formatted);
+
+          const pinned = userData.projects.filter(project => project.isPinned);
+          setPinnedProjects(pinned);
+
+          setDisplayedProjects(showAllProjects ? userData.projects : (pinned.length > 0 ? pinned.slice(0, 4) : userData.projects.slice(-4).reverse()));
         } else {
           console.error("Failed to fetch user data");
         }
@@ -82,21 +82,13 @@ const Profile = ({ username }: { username: string }) => {
     };
 
     fetchUserData();
-  }, [username]);
+  }, [username, showAllProjects]);
 
   useEffect(() => {
-    if (user && user.badges) {
-      const formatted = user.badges.map((badge) => ({
-        id: parseInt(badge.id),
-        name: badge.name,
-        designation: badge.description,
-        image: badge.icon.startsWith("/")
-          ? badge.icon
-          : `/${badge.name.toLowerCase().replace(" ", "-")}.svg`,
-      }));
-      setFormattedBadges(formatted);
+    if (user) {
+      setDisplayedProjects(showAllProjects ? user.projects : (pinnedProjects.length > 0 ? pinnedProjects.slice(0, 4) : user.projects.slice(-4).reverse()));
     }
-  }, [user]);
+  }, [showAllProjects, user, pinnedProjects]);
 
   const handleUpdateProject = async (projectId: string) => {
     try {
@@ -138,6 +130,55 @@ const Profile = ({ username }: { username: string }) => {
     }
   };
 
+  const handlePinProject = async (projectId: string) => {
+    try {
+      const response = await fetch(`/api/projects/${projectId}/pin`, {
+        method: 'POST',
+      });
+      if (response.ok) {
+        const data = await response.json();
+        
+        setUser((prevUser) => {
+          if (!prevUser) return null;
+          const updatedProjects = prevUser.projects.map(project => 
+            project.id === projectId ? {...project, isPinned: data.isPinned} : project
+          );
+          const newUser = {...prevUser, projects: updatedProjects};
+          
+          const newPinnedProjects = newUser.projects.filter(project => project.isPinned);
+          setPinnedProjects(newPinnedProjects);
+          
+          setDisplayedProjects(prev => {
+            if (showAllProjects) {
+              return updatedProjects;
+            } else {
+              return newPinnedProjects.length > 0 
+                ? newPinnedProjects.slice(0, 4) 
+                : updatedProjects.slice(-4).reverse();
+            }
+          });
+          
+          return newUser;
+        });
+
+        toast({
+          title: "Success",
+          description: data.message,
+          variant: "default",
+        });
+      } else {
+        throw new Error("Failed to pin/unpin project");
+      }
+    } catch (error) {
+      console.error('Error pinning/unpinning project:', error);
+      toast({
+        title: "Error",
+        description: "Failed to pin/unpin project. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (!user) {
     return (
       <div className="relative h-screen">
@@ -155,80 +196,94 @@ const Profile = ({ username }: { username: string }) => {
 
   return (
     <div className="container mt-10 p-4">
-      <div className="flex flex-col justify-between md:flex-row space-y-8 md:space-y-0 md:space-x-32">
-        <div className="md:w-1/5">
-          <div>
-            <div className="flex flex-col">
-              <div className="flex items-center justify-center">
-                <Image
-                  src={user.image || "/default-profile-image.jpg"}
-                  alt="profile"
-                  width={300}
-                  height={300}
-                  className="rounded-full mb-4 hover:scale-105 transition-all duration-300"
-                />
-              </div>
-              <div className="flex items-center gap-3">
-                <h1 className="text-2xl font-semibold">
-                  {user.name || "Anonymous"}
-                </h1>
-                {formattedBadges ? (
-                  <div className="flex items-center gap-2 max-w-full h-6 p-1 rounded-sm border">
-                    {formattedBadges.map((badge) => (
-                      <HoverCard key={badge.id}>
-                        <HoverCardTrigger asChild>
-                          <div className="relative cursor-pointer">
-                            <Image
-                              src={badge.image}
-                              alt={badge.name}
-                              width={20}
-                              height={24}
-                            />
-                          </div>
-                        </HoverCardTrigger>
-                        <HoverCardContent className="w-64" side="top">
-                          <div className="flex items-center space-x-2">
-                            <Avatar className="h-10 w-10">
-                              <AvatarImage src={badge.image} />
-                              <AvatarFallback>
-                                {badge.name.charAt(0)}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <h4 className="text-sm font-semibold">
-                                {badge.name}
-                              </h4>
-                              <p className="text-xs text-muted-foreground">
-                                {badge.designation}
-                              </p>
+      <div
+        className={`flex ${
+          showAllProjects ? "flex-col" : "flex-row"
+        } justify-between space-y-8 md:space-y-0 md:space-x-32`}
+      >
+        {!showAllProjects && (
+          <div className="md:w-1/5">
+            <div>
+              <div className="flex flex-col">
+                <div className="flex items-center justify-center">
+                  <Image
+                    src={user.image || "/default-profile-image.jpg"}
+                    alt="profile"
+                    width={300}
+                    height={300}
+                    className="rounded-full mb-4 hover:scale-105 transition-all duration-300"
+                  />
+                </div>
+                <div className="flex items-center gap-3">
+                  <h1 className="text-2xl font-semibold">
+                    {user.name || "Anonymous"}
+                  </h1>
+                  {formattedBadges ? (
+                    <div className="flex items-center gap-2 max-w-full h-6 p-1 rounded-sm border">
+                      {formattedBadges.map((badge) => (
+                        <HoverCard key={badge.id}>
+                          <HoverCardTrigger asChild>
+                            <div className="relative cursor-pointer">
+                              <Image
+                                src={badge.image}
+                                alt={badge.name}
+                                width={20}
+                                height={24}
+                              />
                             </div>
-                          </div>
-                        </HoverCardContent>
-                      </HoverCard>
-                    ))}
-                  </div>
-                ) : (
-                  ""
+                          </HoverCardTrigger>
+                          <HoverCardContent className="w-64" side="top">
+                            <div className="flex items-center space-x-2">
+                              <Avatar className="h-10 w-10">
+                                <AvatarImage src={badge.image} />
+                                <AvatarFallback>
+                                  {badge.name.charAt(0)}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <h4 className="text-sm font-semibold">
+                                  {badge.name}
+                                </h4>
+                                <p className="text-xs text-muted-foreground">
+                                  {badge.designation}
+                                </p>
+                              </div>
+                            </div>
+                          </HoverCardContent>
+                        </HoverCard>
+                      ))}
+                    </div>
+                  ) : (
+                    ""
+                  )}
+                </div>
+                <p className="text-gray-600 dark:text-gray-400 text-sm">
+                  {user.email || "No email provided"}
+                </p>
+                <p className="text-gray-700 dark:text-gray-300 mt-4">
+                  {user.bio || ""}
+                </p>
+                {isOwnProfile && (
+                  <Link href="/settings" className="mt-6 w-full">
+                    <Button className="w-full">Edit Profile</Button>
+                  </Link>
                 )}
               </div>
-              <p className="text-gray-600 dark:text-gray-400 text-sm">
-                {user.email || "No email provided"}
-              </p>
-              <p className="text-gray-700 dark:text-gray-300 mt-4">
-                {user.bio || ""}
-              </p>
-              {isOwnProfile && (
-                <Link href="/settings" className="mt-6 w-full">
-                  <Button className="w-full">Edit Profile</Button>
-                </Link>
-              )}
             </div>
           </div>
-        </div>
+        )}
 
-        <div className="md:w-2/3">
+        <div className={showAllProjects ? "w-full" : "md:w-2/3"}>
           <div className="flex justify-between items-center">
-            <h2 className="text-3xl font-bold mb-6">Projects</h2>
+            <h2
+              className="text-3xl font-bold mb-6 cursor-pointer"
+              onClick={() => setShowAllProjects(!showAllProjects)}
+            >
+              Projects
+              <span className="text-sm text-gray-500 ml-2">
+                ({showAllProjects ? user.projects.length : displayedProjects.length}/{user.projects.length})
+              </span>
+            </h2>
             {isOwnProfile && (
               <Button onClick={handleUpdateAllProjects} className="mb-4">
                 Update All Projects
@@ -236,8 +291,13 @@ const Profile = ({ username }: { username: string }) => {
             )}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {user.projects.map((project) => (
-              <ProjectCard key={project.id} project={project} />
+            {displayedProjects.map((project) => (
+              <ProjectCard
+                key={project.id}
+                project={project}
+                onPin={handlePinProject}
+                isPinDisabled={pinnedProjects.length >= 4}
+              />
             ))}
           </div>
         </div>
