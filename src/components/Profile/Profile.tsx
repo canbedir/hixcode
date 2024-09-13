@@ -13,6 +13,8 @@ import {
 } from "@/components/ui/hover-card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import ProjectCard from "./ProjectCard";
+import { useToast } from "../ui/use-toast";
+import { ClipLoader } from "react-spinners";
 
 interface UserData {
   id: string;
@@ -49,6 +51,7 @@ const Profile = ({ username }: { username: string }) => {
   const [user, setUser] = useState<UserData | null>(null);
   const { data: session } = useSession();
   const [formattedBadges, setFormattedBadges] = useState<FormattedBadge[]>([]);
+  const { toast } = useToast();
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -110,8 +113,42 @@ const Profile = ({ username }: { username: string }) => {
     }
   };
 
+  const handleUpdateAllProjects = async () => {
+    try {
+      const response = await fetch("/api/update-all-projects", {
+        method: "POST",
+      });
+      if (response.ok) {
+        toast({
+          title: "Success",
+          description: "All projects have been updated.",
+          variant: "default",
+        });
+        router.refresh();
+      } else {
+        throw new Error("An error occurred while updating projects");
+      }
+    } catch (error) {
+      console.error("An error occurred while updating projects:", error);
+      toast({
+        title: "Error",
+        description: "An error occurred while updating projects.",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (!user) {
-    return <div>Loading...</div>;
+    return (
+      <div className="relative h-screen">
+        <div
+          className="flex justify-center items-center"
+          style={{ height: "calc(100% - 160px)" }}
+        >
+          <ClipLoader color="#b5b5b5" size={100} />
+        </div>
+      </div>
+    );
   }
 
   const isOwnProfile = session?.user?.email === user.email;
@@ -120,7 +157,7 @@ const Profile = ({ username }: { username: string }) => {
     <div className="container mt-10 p-4">
       <div className="flex flex-col justify-between md:flex-row space-y-8 md:space-y-0 md:space-x-32">
         <div className="md:w-1/5">
-          <div className="">
+          <div>
             <div className="flex flex-col">
               <div className="flex items-center justify-center">
                 <Image
@@ -190,7 +227,14 @@ const Profile = ({ username }: { username: string }) => {
         </div>
 
         <div className="md:w-2/3">
-          <h2 className="text-3xl font-bold mb-6">Projects</h2>
+          <div className="flex justify-between items-center">
+            <h2 className="text-3xl font-bold mb-6">Projects</h2>
+            {isOwnProfile && (
+              <Button onClick={handleUpdateAllProjects} className="mb-4">
+                Update All Projects
+              </Button>
+            )}
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {user.projects.map((project) => (
               <ProjectCard key={project.id} project={project} />
