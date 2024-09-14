@@ -51,6 +51,7 @@ interface Project {
     description: string;
     icon: string;
   }[];
+  technologies: string[];
 }
 
 interface Comment {
@@ -117,6 +118,7 @@ const ProjectDetailPage = () => {
       setHasDisliked(data.userReaction === "dislike");
       console.log("Fetched project:", data);
       console.log("User badges:", data.user?.badges);
+      console.log("Project technologies:", data.technologies);
     } catch (error) {
       console.error("Error fetching project:", error);
     } finally {
@@ -348,9 +350,18 @@ const ProjectDetailPage = () => {
                   "Technical details for this project have not been provided."}
               </div>
               <div className="flex items-center gap-2">
-                <span className="py-2 px-3 text-xs rounded-full bg-gray-100 dark:text-black font-semibold">
-                  {project?.mostPopularLanguage}
-                </span>
+                {project?.technologies && project.technologies.length > 0 ? (
+                  project.technologies.map((tech, index) => (
+                    <span
+                      key={index}
+                      className="py-2 px-3 text-xs rounded-full bg-gray-200 dark:text-black font-semibold"
+                    >
+                      {tech}
+                    </span>
+                  ))
+                ) : (
+                  <span>No technologies specified</span>
+                )}
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, KeyboardEvent } from "react";
 import {
   Dialog,
   DialogContent,
@@ -19,13 +19,16 @@ interface ProjectDetailsModalProps {
     title: string,
     description: string,
     technicalDetails: string,
-    liveUrl: string
+    liveUrl: string,
+    technologies: string[]
   ) => void;
   onCancel: () => void;
   initialTitle: string;
   initialDescription: string;
   initialTechnicalDetails: string;
   initialLiveUrl: string;
+  initialTechnologies: string[];
+  initialMostPopularLanguage: string;
 }
 
 const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
@@ -37,6 +40,8 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
   initialDescription,
   initialTechnicalDetails,
   initialLiveUrl,
+  initialTechnologies,
+  initialMostPopularLanguage,
 }) => {
   const [title, setTitle] = useState(initialTitle);
   const [description, setDescription] = useState(initialDescription);
@@ -46,24 +51,73 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
   const [liveUrl, setLiveUrl] = useState(initialLiveUrl);
   const { data: session } = useSession();
   const { toast } = useToast();
+  const [technologies, setTechnologies] = useState<string[]>(
+    [initialMostPopularLanguage, ...(initialTechnologies || [])].slice(0, 6)
+  );
+  const [currentTech, setCurrentTech] = useState("");
 
   useEffect(() => {
-    setTitle(initialTitle);
-    setDescription(initialDescription);
-    setTechnicalDetails(initialTechnicalDetails);
-    setLiveUrl(initialLiveUrl);
+    if (isOpen) {
+      setTitle(initialTitle);
+      setDescription(initialDescription);
+      setTechnicalDetails(initialTechnicalDetails);
+      setLiveUrl(initialLiveUrl);
+      setTechnologies(
+        [initialMostPopularLanguage, ...(initialTechnologies || [])].slice(0, 6)
+      );
+      setCurrentTech("");
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setTitle(initialTitle);
+      setDescription(initialDescription);
+      setTechnicalDetails(initialTechnicalDetails);
+      setLiveUrl(initialLiveUrl);
+      setTechnologies(
+        [initialMostPopularLanguage, ...(initialTechnologies || [])].slice(0, 6)
+      );
+    }
   }, [
     initialTitle,
     initialDescription,
     initialTechnicalDetails,
     initialLiveUrl,
+    initialTechnologies,
+    initialMostPopularLanguage,
   ]);
+
+  const handleTechKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === " " && currentTech.trim() && technologies.length < 6) {
+      e.preventDefault();
+      const trimmedTech = currentTech.trim();
+      if (!technologies.includes(trimmedTech)) {
+        setTechnologies([...technologies, trimmedTech]);
+        setCurrentTech("");
+      }
+    } else if (e.key === " " && technologies.length >= 6) {
+      e.preventDefault();
+    } else if (
+      e.key === "Backspace" &&
+      currentTech === "" &&
+      technologies.length > 1
+    ) {
+      e.preventDefault();
+      const newTechnologies = [...technologies];
+      newTechnologies.pop();
+      setTechnologies(newTechnologies);
+    }
+  };
+
+  const handleTechChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCurrentTech(e.target.value.trimStart());
+  };
 
   const handleSave = async () => {
     if (title.trim() && description.trim() && technicalDetails.trim()) {
-      onSave(title, description, technicalDetails, liveUrl);
+      onSave(title, description, technicalDetails, liveUrl, technologies);
 
-      // Rozet kontrolünü tetikle
       try {
         const badgeResponse = await fetch("/api/check-badges", {
           method: "POST",
@@ -118,7 +172,7 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
             />
           </div>
           <div className="flex flex-col gap-1">
-            <Label>Technical Details</Label>
+            <Label>Technical Details Description</Label>
             <Textarea
               id="technicalDetails"
               value={technicalDetails}
@@ -136,6 +190,42 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
               onChange={(e) => setLiveUrl(e.target.value)}
               className="col-span-4"
               placeholder="https://hixcode.vercel.app"
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label>Technologies Used (Max 6)</Label>
+            <div className="flex flex-wrap gap-2 mb-2">
+              {technologies.map((tech, index) => (
+                <span
+                  key={index}
+                  className={`bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-full text-sm ${
+                    index === 0 ? "opacity-60" : ""
+                  }`}
+                >
+                  {tech}
+                  {index !== 0 && (
+                    <button
+                      onClick={() => {
+                        const newTechnologies = technologies.filter(
+                          (_, i) => i !== index
+                        );
+                        setTechnologies(newTechnologies);
+                      }}
+                      className="ml-2 text-red-500 hover:text-red-700"
+                    >
+                      ×
+                    </button>
+                  )}
+                </span>
+              ))}
+            </div>
+            <Input
+              id="technologies"
+              value={currentTech}
+              onChange={handleTechChange}
+              onKeyDown={handleTechKeyDown}
+              className="col-span-4"
+              placeholder="Add technologies (press space to add)"
             />
           </div>
         </div>

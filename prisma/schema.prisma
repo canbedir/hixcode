@@ -82,6 +82,7 @@ model Project {
   liveUrl             String?
   badges              Badge[]
   isPinned            Boolean       @default(false)
+  technologies        String[]
 }
 
 model Contributor {

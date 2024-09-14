@@ -110,7 +110,8 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
     title: string,
     description: string,
     technicalDetails: string,
-    liveUrl: string
+    liveUrl: string,
+    technologies: string[]
   ) => {
     if (!selectedRepo) return;
 
@@ -128,6 +129,7 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
               description: description,
               technicalDetails: technicalDetails,
               liveUrl: liveUrl,
+              technologies: technologies,
             },
           ],
         }),
@@ -152,7 +154,7 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
         setRepos(repos.filter((r) => r.id !== selectedRepo.id));
         setSelectedRepo(null);
         setIsProjectDetailsModalOpen(false);
-        setIsOpen(false); // Ana modalı da kapatıyoruz
+        setIsOpen(false);
       } else {
         throw new Error(data.message || "Unknown error");
       }
@@ -284,12 +286,22 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
       <ProjectDetailsModal
         isOpen={isProjectDetailsModalOpen}
         setIsOpen={setIsProjectDetailsModalOpen}
-        onSave={handleProjectDetailsSave}
+        onSave={(title, description, technicalDetails, liveUrl, technologies) =>
+          handleProjectDetailsSave(
+            title,
+            description,
+            technicalDetails,
+            liveUrl,
+            technologies
+          )
+        }
         onCancel={handleProjectDetailsCancel}
         initialLiveUrl={selectedRepo?.liveUrl || ""}
         initialTitle={selectedRepo?.name || ""}
         initialDescription={selectedRepo?.description || ""}
         initialTechnicalDetails={selectedRepo?.technicalDetails || ""}
+        initialTechnologies={selectedRepo?.technologies || []}
+        initialMostPopularLanguage={selectedRepo?.language || "Unknown"}
       />
     </>
   );

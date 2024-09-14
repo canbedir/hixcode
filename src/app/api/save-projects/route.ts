@@ -99,6 +99,7 @@ export async function POST(request: Request) {
           mostPopularLanguage,
           stars: repoDetails.stars,
           lastUpdated: repoDetails.lastUpdated,
+          technologies: repo.technologies,
         },
       });
     }
