@@ -10,6 +10,7 @@ import { DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
 import { ClipLoader } from "react-spinners";
 import { useSession } from "next-auth/react";
+import FilterProjects from "@/components/FilterProjects/filter-projects";
 
 interface Project {
   id: string;
@@ -35,19 +36,41 @@ export default function ProjectsContent() {
   const [sortBy, setSortBy] = useState<"lastUpdated" | "stars">(initialSortBy);
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [filters, setFilters] = useState({
+    language: "",
+    topic: "",
+    minStars: 0,
+  });
 
   useEffect(() => {
     const sortParam = searchParams.get("sort") as "lastUpdated" | "stars";
-    if (sortParam) {
-      setSortBy(sortParam);
-    }
+    const languageParam = searchParams.get("language");
+    const topicParam = searchParams.get("topic");
+    const minStarsParam = searchParams.get("minStars");
+
+    if (sortParam) setSortBy(sortParam);
+    if (languageParam)
+      setFilters((prev) => ({ ...prev, language: languageParam }));
+    if (topicParam) setFilters((prev) => ({ ...prev, topic: topicParam }));
+    if (minStarsParam)
+      setFilters((prev) => ({ ...prev, minStars: parseInt(minStarsParam) }));
   }, [searchParams]);
 
   useEffect(() => {
     const fetchAllProjects = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`/api/user-projects?sort=${sortBy}`);
+        const searchParams = new URLSearchParams();
+        searchParams.set("sort", sortBy);
+        if (filters.language !== "all")
+          searchParams.set("language", filters.language);
+        if (filters.topic !== "all") searchParams.set("topic", filters.topic);
+        if (filters.minStars > 0)
+          searchParams.set("minStars", filters.minStars.toString());
+
+        const response = await fetch(
+          `/api/user-projects?${searchParams.toString()}`
+        );
         const data = await response.json();
 
         if (response.ok) {
@@ -63,11 +86,25 @@ export default function ProjectsContent() {
     };
 
     fetchAllProjects();
-  }, [sortBy]);
+  }, [sortBy, filters]);
 
   const handleSort = (newSortBy: "lastUpdated" | "stars") => {
     setLoading(true);
     router.push(`/projects?sort=${newSortBy}`);
+  };
+
+  const handleFilter = (newFilters: typeof filters) => {
+    setFilters(newFilters);
+    const searchParams = new URLSearchParams(window.location.search);
+    if (newFilters.language !== "all")
+      searchParams.set("language", newFilters.language);
+    else searchParams.delete("language");
+    if (newFilters.topic !== "all") searchParams.set("topic", newFilters.topic);
+    else searchParams.delete("topic");
+    if (newFilters.minStars > 0)
+      searchParams.set("minStars", newFilters.minStars.toString());
+    else searchParams.delete("minStars");
+    router.push(`/projects?${searchParams.toString()}`, { scroll: false });
   };
 
   if (status === "loading" || !session || loading) {
@@ -84,8 +121,11 @@ export default function ProjectsContent() {
   }
 
   return (
-    <div className="container mx-auto mt-10 py-4">
-      <div className="flex justify-between items-center mb-6">
+    <div className="mt-10 py-4">
+      <div className="mb-6 border-b">
+        <FilterProjects onFilter={handleFilter} initialFilters={filters} />
+      </div>
+      <div className="flex justify-between items-center mb-6 mt-6">
         <h1 className="text-3xl font-bold">All Projects</h1>
         <div>
           <button

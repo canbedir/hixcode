@@ -222,7 +222,7 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
             <Input
               id="technologies"
               value={currentTech}
-              onChange={handleTechChange}
+              onChange={(e) => setCurrentTech(e.target.value.toLowerCase())}
               onKeyDown={handleTechKeyDown}
               className="col-span-4"
               placeholder="Add technologies (press space to add)"

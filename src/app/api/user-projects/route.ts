@@ -7,9 +7,23 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const sort = searchParams.get('sort') || 'stars';
   const limit = parseInt(searchParams.get('limit') || '0');
+  const language = searchParams.get('language');
+  const topic = searchParams.get('topic');
+  const minStars = parseInt(searchParams.get('minStars') || '0');
 
   try {
     const projects = await prisma.project.findMany({
+      where: {
+        AND: [
+          language && language !== 'all'
+            ? { mostPopularLanguage: { equals: language, mode: 'insensitive' } }
+            : {},
+          topic && topic !== 'all'
+            ? { technologies: { has: topic.toLowerCase() } }
+            : {},
+          { stars: { gte: minStars } },
+        ],
+      },
       orderBy: sort === 'lastUpdated' ? { lastUpdated: 'desc' } : { stars: 'desc' },
       take: limit > 0 ? limit : undefined,
       include: {
@@ -47,10 +61,10 @@ export async function POST(req: Request) {
         description,
         githubUrl,
         userId: user.id,
-        mostPopularLanguage: 'Unknown', // Varsayılan bir değer
-        lastUpdated: new Date(), // Şu anki tarih
-        stars: 0, // Varsayılan değer
-        views: 0, // Varsayılan değer
+        mostPopularLanguage: 'Unknown', 
+        lastUpdated: new Date(),
+        stars: 0,
+        views: 0, 
       },
     });
 

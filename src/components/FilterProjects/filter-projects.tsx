@@ -1,4 +1,5 @@
-import React from "react";
+"use client";
+import React, { useState } from "react";
 import {
   Select,
   SelectContent,
@@ -9,63 +10,100 @@ import {
   SelectValue,
 } from "../ui/select";
 import { Label } from "../ui/label";
-import { Slider } from "../ui/slider";
 import { Button } from "../ui/button";
+import { Slider } from "../ui/slider";
 
-const FilterProjects = () => {
+interface FilterProjectsProps {
+  onFilter: (filters: {
+    language: string;
+    topic: string;
+    minStars: number;
+  }) => void;
+  initialFilters: {
+    language: string;
+    topic: string;
+    minStars: number;
+  };
+}
+
+const FilterProjects: React.FC<FilterProjectsProps> = ({
+  onFilter,
+  initialFilters,
+}) => {
+  const [language, setLanguage] = useState(initialFilters.language || "all");
+  const [topic, setTopic] = useState(initialFilters.topic || "all");
+  const [minStars, setMinStars] = useState(initialFilters.minStars || 0);
+
+  const handleApply = () => {
+    onFilter({ language, topic, minStars });
+  };
+
+  const handleReset = () => {
+    setLanguage("all");
+    setTopic("all");
+    setMinStars(0);
+    onFilter({ language: "all", topic: "all", minStars: 0 });
+  };
+
   return (
-    <div className="h-[300px]">
-      <h1 className="text-2xl font-semibold">Filter Projects</h1>
-      <div className="flex flex-col rounded-lg gap-3 mt-5 border p-5">
-        <div className="flex flex-row gap-3 justify-center">
-          <div className="flex items-start flex-col gap-3">
-            <Select defaultValue="all">
-              <Label>Language</Label>
-              <SelectTrigger className="w-[130px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectItem value="all">All</SelectItem>
-                  <SelectItem value="banana">Banana</SelectItem>
-                  <SelectItem value="blueberry">Blueberry</SelectItem>
-                  <SelectItem value="grapes">Grapes</SelectItem>
-                  <SelectItem value="pineapple">Pineapple</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex items-start flex-col gap-3">
-            <Select defaultValue="all">
-              <Label>Topic</Label>
-              <SelectTrigger className="w-[130px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectItem value="all">All</SelectItem>
-                  <SelectItem value="react">React</SelectItem>
-                  <SelectItem value="vue">Vue</SelectItem>
-                  <SelectItem value="angular">Angular</SelectItem>
-                  <SelectItem value="svelte">Svelte</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
+    <div className="w-full mb-6">
+      <h1 className="text-2xl font-semibold mb-4">Filter Projects</h1>
+      <div className="flex flex-wrap items-end gap-4">
+        <div className="flex-1 min-w-[200px]">
+          <Label>Language</Label>
+          <Select value={language} onValueChange={setLanguage}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="javascript">JavaScript</SelectItem>
+              <SelectItem value="python">Python</SelectItem>
+              <SelectItem value="java">Java</SelectItem>
+              <SelectItem value="typescript">TypeScript</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-        <div className="flex justify-center mt-2">
-          <div className="flex flex-col w-full gap-3">
-            <Label>Min Stars</Label>
-            <Slider defaultValue={[0]} max={5} />
-          </div>
+        <div className="flex-1 min-w-[200px]">
+          <Label>Topic</Label>
+          <Select value={topic} onValueChange={setTopic}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="react">React</SelectItem>
+              <SelectItem value="vue">Vue</SelectItem>
+              <SelectItem value="angular">Angular</SelectItem>
+              <SelectItem value="svelte">Svelte</SelectItem>
+              <SelectItem value="nodejs">Node.js</SelectItem>
+              <SelectItem value="express">Express</SelectItem>
+              <SelectItem value="nextjs">Next.js</SelectItem>
+              <SelectItem value="django">Django</SelectItem>
+              <SelectItem value="flask">Flask</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-        <div className="mt-2">
-          <div className="flex flex-row w-full gap-3">
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-md p-2 w-full">
-              Apply
-            </Button>
-            <Button className="bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-md p-2 w-full">
+        <div className="flex-1 min-w-[200px] flex flex-col justify-end">
+          <Label className="mb-2">Min Stars: {minStars}</Label>
+          <Slider
+            value={[minStars]}
+            onValueChange={(value) => setMinStars(value[0])}
+            max={1000}
+            step={50}
+            className="mb-2"
+          />
+        </div>
+        <div className="flex-1 min-w-[200px] flex flex-col justify-end">
+          <div className="flex gap-2">
+            <Button onClick={handleReset} variant="outline" className="flex-1">
               Reset
+            </Button>
+            <Button
+              onClick={handleApply}
+              className="bg-blue-600 hover:bg-blue-700 text-white flex-1"
+            >
+              Apply
             </Button>
           </div>
         </div>
