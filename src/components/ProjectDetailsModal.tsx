@@ -20,7 +20,8 @@ interface ProjectDetailsModalProps {
     description: string,
     technicalDetails: string,
     liveUrl: string,
-    technologies: string[]
+    technologies: string[],
+    contributors: { name: string; githubUrl: string; image: string }[]
   ) => void;
   onCancel: () => void;
   initialTitle: string;
@@ -29,6 +30,7 @@ interface ProjectDetailsModalProps {
   initialLiveUrl: string;
   initialTechnologies: string[];
   initialMostPopularLanguage: string;
+  initialContributors: { name: string; githubUrl: string; image: string }[];
 }
 
 const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
@@ -42,6 +44,7 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
   initialLiveUrl,
   initialTechnologies,
   initialMostPopularLanguage,
+  initialContributors,
 }) => {
   const [title, setTitle] = useState(initialTitle);
   const [description, setDescription] = useState(initialDescription);
@@ -55,6 +58,10 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
     [initialMostPopularLanguage, ...(initialTechnologies || [])].slice(0, 6)
   );
   const [currentTech, setCurrentTech] = useState("");
+  const [contributors, setContributors] =
+    useState<{ name: string; githubUrl: string; image: string }[]>(
+      initialContributors
+    );
 
   useEffect(() => {
     if (isOpen) {
@@ -66,8 +73,9 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
         [initialMostPopularLanguage, ...(initialTechnologies || [])].slice(0, 6)
       );
       setCurrentTech("");
+      setContributors(initialContributors);
     }
-  }, [isOpen]);
+  }, [isOpen, initialContributors]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -116,7 +124,14 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
 
   const handleSave = async () => {
     if (title.trim() && description.trim() && technicalDetails.trim()) {
-      onSave(title, description, technicalDetails, liveUrl, technologies);
+      onSave(
+        title,
+        description,
+        technicalDetails,
+        liveUrl,
+        technologies,
+        contributors
+      );
 
       try {
         const badgeResponse = await fetch("/api/check-badges", {
@@ -227,6 +242,24 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
               className="col-span-4"
               placeholder="Add technologies (press space to add)"
             />
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label>Contributors</Label>
+            <div className="flex flex-wrap gap-2">
+              {contributors.map((contributor, index) => (
+                <div
+                  key={index}
+                  className="flex items-center gap-2 bg-gray-100 dark:bg-gray-700 p-2 rounded-full"
+                >
+                  <img
+                    src={contributor.image}
+                    alt={contributor.name}
+                    className="w-6 h-6 rounded-full"
+                  />
+                  <span>{contributor.name}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
         <div className="flex justify-between mt-4">

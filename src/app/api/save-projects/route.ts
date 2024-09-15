@@ -100,6 +100,16 @@ export async function POST(request: Request) {
           stars: repoDetails.stars,
           lastUpdated: repoDetails.lastUpdated,
           technologies: repo.technologies,
+          contributors: {
+            create: repo.contributors.map((contributor: any) => ({
+              name: contributor.login,
+              githubUrl: contributor.html_url,
+              image: contributor.avatar_url,
+            })),
+          },
+        },
+        include: {
+          contributors: true,
         },
       });
     }

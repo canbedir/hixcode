@@ -40,13 +40,13 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
         );
 
         if (!response.ok) {
-          throw new Error("GitHub repos verisi alınamadı.");
+          throw new Error("Failed to fetch GitHub repository data.");
         }
 
         const data = await response.json();
 
         if (!Array.isArray(data)) {
-          throw new Error("Beklenmedik veri formatı: bir dizi bekleniyordu.");
+          throw new Error("Unexpected data format: an array was expected.");
         }
 
         const filteredRepos = data.filter(
@@ -57,7 +57,7 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
         );
         setRepos(filteredRepos);
       } catch (error: any) {
-        console.error("GitHub reposları alınırken bir hata oluştu:", error);
+        console.error("Failed to fetch GitHub repositories:", error);
         toast({
           title: "Error",
           description: `Failed to fetch GitHub repositories: ${error.message}`,
@@ -86,7 +86,7 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
 
         setExistingProjects(data);
       } catch (error: any) {
-        console.error("Mevcut projeler alınırken bir hata oluştu:", error);
+        console.error("An error occurred while fetching existing projects:", error);
         toast({
           title: "Error",
           description: `Failed to fetch existing projects: ${error.message}`,
@@ -98,8 +98,28 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
     fetchExistingProjects();
   }, [toast]);
 
-  const handleSelectRepo = (repo: any) => {
+  const handleSelectRepo = async (repo: any) => {
     setSelectedRepo(repo);
+
+    // Fetch contributors
+    try {
+      const response = await fetch(
+        `https://api.github.com/repos/${repo.full_name}/contributors`
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch contributors");
+      }
+      const contributors = await response.json();
+      setSelectedRepo({ ...repo, contributors });
+    } catch (error) {
+      console.error("Error fetching contributors:", error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch contributors",
+        variant: "destructive",
+      });
+    }
+
     setIsOpen(false);
     setTimeout(() => {
       setIsProjectDetailsModalOpen(true);
@@ -111,7 +131,8 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
     description: string,
     technicalDetails: string,
     liveUrl: string,
-    technologies: string[]
+    technologies: string[],
+    contributors: { name: string; githubUrl: string; image: string }[]
   ) => {
     if (!selectedRepo) return;
 
@@ -130,6 +151,7 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
               technicalDetails: technicalDetails,
               liveUrl: liveUrl,
               technologies: technologies,
+              contributors: contributors,
             },
           ],
         }),
@@ -286,13 +308,21 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
       <ProjectDetailsModal
         isOpen={isProjectDetailsModalOpen}
         setIsOpen={setIsProjectDetailsModalOpen}
-        onSave={(title, description, technicalDetails, liveUrl, technologies) =>
+        onSave={(
+          title,
+          description,
+          technicalDetails,
+          liveUrl,
+          technologies,
+          contributors
+        ) =>
           handleProjectDetailsSave(
             title,
             description,
             technicalDetails,
             liveUrl,
-            technologies
+            technologies,
+            contributors
           )
         }
         onCancel={handleProjectDetailsCancel}
@@ -302,6 +332,7 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
         initialTechnicalDetails={selectedRepo?.technicalDetails || ""}
         initialTechnologies={selectedRepo?.technologies || []}
         initialMostPopularLanguage={selectedRepo?.language || "Unknown"}
+        initialContributors={selectedRepo?.contributors || []}
       />
     </>
   );

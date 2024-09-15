@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/hover-card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
+import Contributors from "@/components/Contributors/contributors";
 
 interface Project {
   id: string;
@@ -52,6 +53,7 @@ interface Project {
     icon: string;
   }[];
   technologies: string[];
+  contributors: Contributor[];
 }
 
 interface Comment {
@@ -63,6 +65,13 @@ interface Comment {
     name: string | null;
     image: string | null;
   };
+}
+
+interface Contributor {
+  id: string;
+  name: string;
+  githubUrl: string;
+  image: string;
 }
 
 const ProjectDetailPage = () => {
@@ -81,11 +90,13 @@ const ProjectDetailPage = () => {
   const [loading, setLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isEarlyAdopterProject, setIsEarlyAdopterProject] = useState(false);
+  const [contributors, setContributors] = useState<Contributor[]>([]);
 
   useEffect(() => {
     if (projectId) {
       fetchProject();
       fetchComments();
+      fetchContributors();
     }
   }, [projectId]);
 
@@ -116,9 +127,6 @@ const ProjectDetailPage = () => {
       setUserReaction(data.userReaction);
       setHasLiked(data.userReaction === "like");
       setHasDisliked(data.userReaction === "dislike");
-      console.log("Fetched project:", data);
-      console.log("User badges:", data.user?.badges);
-      console.log("Project technologies:", data.technologies);
     } catch (error) {
       console.error("Error fetching project:", error);
     } finally {
@@ -130,6 +138,21 @@ const ProjectDetailPage = () => {
     const res = await fetch(`/api/user-projects/${projectId}/comments`);
     const data = await res.json();
     setComments(data);
+  };
+
+  const fetchContributors = async () => {
+    try {
+      const response = await fetch(
+        `/api/user-projects/${projectId}/contributors`
+      );
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      setContributors(data);
+    } catch (error) {
+      console.error("Error fetching contributors:", error);
+    }
   };
 
   const handleCommentSubmit = async () => {
@@ -229,9 +252,6 @@ const ProjectDetailPage = () => {
       setHasLiked(data.userReaction === "like");
       setHasDisliked(data.userReaction === "dislike");
 
-      if (data.updatedBadges) {
-        console.log("Updated badges:", data.updatedBadges);
-      }
     } catch (error) {
       console.error("Error updating reaction:", error);
       setUserReaction(previousReaction);
@@ -458,78 +478,84 @@ const ProjectDetailPage = () => {
           </div>
         </div>
 
-        <div className="p-10 w-full border rounded-xl">
-          <div className="flex flex-col gap-10">
-            <h1 className="text-2xl font-semibold flex items-center gap-2">
-              <FiMessageSquare className="h-6 w-6" /> Comments
-            </h1>
+        <div className="flex gap-6">
+          <div className="w-2/3 p-10 border rounded-xl">
+            <div className="flex flex-col gap-10">
+              <h1 className="text-2xl font-semibold flex items-center gap-2">
+                <FiMessageSquare className="h-6 w-6" /> Comments
+              </h1>
 
-            {/* Display comments */}
-            <div className="flex flex-col gap-6">
-              {comments.length > 0 ? (
-                comments.map((comment) => (
-                  <div key={comment.id} className="flex items-start gap-2">
-                    <div className="flex gap-3 items-start">
-                      <Link href={`/${comment.user?.username || "#"}`}>
-                        <img
-                          src={comment.user?.image || "/avatar-placeholder.png"}
-                          alt={comment.user?.name || "Unknown"}
-                          className="w-10 h-10 rounded-full hover:scale-110 transition-all duration-300"
-                        />
-                      </Link>
-                      <div className="flex flex-col">
-                        <div className="flex items-center gap-3">
-                          <Link href={`/${comment.user?.username || "#"}`}>
-                            <h1 className="font-semibold hover:underline">
-                              {comment.user?.name || "Unknown"}
-                            </h1>
-                          </Link>
-                          <span className="text-xs text-gray-500">
-                            {new Date(comment.createdAt).toLocaleDateString()}{" "}
-                            {new Date(comment.createdAt).toLocaleTimeString(
-                              [],
-                              {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              }
-                            )}
-                          </span>
+              {/* Display comments */}
+              <div className="flex flex-col gap-6">
+                {comments.length > 0 ? (
+                  comments.map((comment) => (
+                    <div key={comment.id} className="flex items-start gap-2">
+                      <div className="flex gap-3 items-start">
+                        <Link href={`/${comment.user?.username || "#"}`}>
+                          <img
+                            src={
+                              comment.user?.image || "/avatar-placeholder.png"
+                            }
+                            alt={comment.user?.name || "Unknown"}
+                            className="w-10 h-10 rounded-full hover:scale-110 transition-all duration-300"
+                          />
+                        </Link>
+                        <div className="flex flex-col">
+                          <div className="flex items-center gap-3">
+                            <Link href={`/${comment.user?.username || "#"}`}>
+                              <h1 className="font-semibold hover:underline">
+                                {comment.user?.name || "Unknown"}
+                              </h1>
+                            </Link>
+                            <span className="text-xs text-gray-500">
+                              {new Date(comment.createdAt).toLocaleDateString()}{" "}
+                              {new Date(comment.createdAt).toLocaleTimeString(
+                                [],
+                                {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                }
+                              )}
+                            </span>
+                          </div>
+                          <p className="text-sm">{comment.content}</p>
                         </div>
-                        <p className="text-sm">{comment.content}</p>
                       </div>
                     </div>
-                  </div>
-                ))
-              ) : (
-                <p>No comments yet. Be the first to comment!</p>
-              )}
-            </div>
-
-            <DropdownMenuSeparator />
-
-            {/* Add new comment */}
-            <div className="flex flex-col gap-3">
-              <Textarea
-                placeholder="Add a comment..."
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                className="min-h-[150px] max-h-[300px]"
-              />
-              <Button
-                onClick={handleCommentSubmit}
-                disabled={loading || !newComment.trim()}
-                className="w-1/4 p-6 flex items-center"
-              >
-                {loading ? (
-                  "Submitting..."
+                  ))
                 ) : (
-                  <div className="flex items-center gap-1">
-                    <FiSend className="h-6 w-6" /> Post Comment
-                  </div>
+                  <p>No comments yet. Be the first to comment!</p>
                 )}
-              </Button>
+              </div>
+
+              <DropdownMenuSeparator />
+
+              {/* Add new comment */}
+              <div className="flex flex-col gap-3">
+                <Textarea
+                  placeholder="Add a comment..."
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  className="min-h-[150px] max-h-[300px]"
+                />
+                <Button
+                  onClick={handleCommentSubmit}
+                  disabled={loading || !newComment.trim()}
+                  className="w-1/4 p-6 flex items-center"
+                >
+                  {loading ? (
+                    "Submitting..."
+                  ) : (
+                    <div className="flex items-center gap-1">
+                      <FiSend className="h-6 w-6" /> Post Comment
+                    </div>
+                  )}
+                </Button>
+              </div>
             </div>
           </div>
+
+          <Contributors contributors={contributors} />
         </div>
       </div>
     </div>
