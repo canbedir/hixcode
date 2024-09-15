@@ -13,6 +13,7 @@ interface Notification {
   createdAt: string;
   read: boolean;
   projectId: string;
+  userImage: string | null;
 }
 
 const NotificationPopover = () => {
@@ -80,22 +81,33 @@ const NotificationPopover = () => {
           )}
         </div>
       </PopoverTrigger>
-      <PopoverContent className="w-80 mx-20 my-3">
+      <PopoverContent className="w-[650px] mx-20 my-3">
         <div className="max-h-96 overflow-y-auto">
-          <h3 className="font-semibold mb-2">Notifications</h3>
+          <h3 className="font-semibold text-2xl mb-4">Notifications</h3>
           {notifications.length > 0 ? (
             notifications.map((notification) => (
               <div
                 key={notification.id}
-                className={`mb-2 p-2 cursor-pointer ${
-                  notification.read ? "border-b" : "border-b border-red-600"
+                className={`mb-2 p-2 cursor-pointer border-b mx-3 ${
+                  notification.read ? "" : " border-red-600"
                 }`}
                 onClick={() => handleNotificationClick(notification)}
               >
-                <p dangerouslySetInnerHTML={{ __html: notification.content }} />
-                <small>
-                  {new Date(notification.createdAt).toLocaleString()}
-                </small>
+                <div className="flex items-start gap-2">
+                  <img
+                    src={notification.userImage || "/avatar-placeholder.png"}
+                    alt="User"
+                    className="w-8 h-8 rounded-full"
+                  />
+                  <div>
+                    <p
+                      dangerouslySetInnerHTML={{ __html: notification.content }}
+                    />
+                    <small>
+                      {new Date(notification.createdAt).toLocaleString()}
+                    </small>
+                  </div>
+                </div>
               </div>
             ))
           ) : (

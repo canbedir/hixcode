@@ -60,9 +60,10 @@ export async function POST(
     await prisma.notification.create({
       data: {
         userId: comment.project.userId,
-        content: `<b>${user.name}</b> commented on your project "<b>${comment.project.title}</b>"`,
+        content: `<b>${user.name}</b> commented on your project <b>${comment.project.title}</b>`,
         type: "comment",
         projectId: projectId,
+        userImage: user.image || null,
       },
     });
   }

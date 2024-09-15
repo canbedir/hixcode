@@ -76,9 +76,10 @@ export async function POST(
       await prisma.notification.create({
         data: {
           userId: project.userId,
-          content: `<b>${user.name}</b> liked your project "<b>${project.title}</b>"`,
+          content: `<b>${user.name}</b> liked your project <b>${project.title}</b>`,
           type: "like",
           projectId: projectId,
+          userImage: user.image || null,
         },
       });
     }
