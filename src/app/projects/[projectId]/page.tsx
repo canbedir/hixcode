@@ -478,15 +478,17 @@ const ProjectDetailPage = () => {
           </div>
         </div>
 
+        <Contributors contributors={contributors} />
+
         <div className="flex gap-6">
-          <div className="w-2/3 p-10 border rounded-xl">
+          <div className="w-full p-10 border rounded-xl">
             <div className="flex flex-col gap-10">
               <h1 className="text-2xl font-semibold flex items-center gap-2">
                 <FiMessageSquare className="h-6 w-6" /> Comments
               </h1>
 
               {/* Display comments */}
-              <div className="flex flex-col gap-6">
+              <div className="flex flex-col gap-6 h-[400px] overflow-y-auto">
                 {comments.length > 0 ? (
                   comments.map((comment) => (
                     <div key={comment.id} className="flex items-start gap-2">
@@ -555,7 +557,6 @@ const ProjectDetailPage = () => {
             </div>
           </div>
 
-          <Contributors contributors={contributors} />
         </div>
       </div>
     </div>

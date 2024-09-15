@@ -16,21 +16,23 @@ interface ContributorsProps {
 const Contributors: React.FC<ContributorsProps> = ({ contributors }) => {
   if (!contributors || contributors.length === 0) {
     return (
-      <div className="w-1/3 p-6 border rounded-xl">
-        <h2 className="text-2xl font-semibold">Contributors</h2>
+      <div className="w-full h-[250px] overflow-y-auto border rounded-xl">
+        <h2 className="text-2xl px-10 pt-10 pb-4 font-semibold mb-6">
+          Contributors
+        </h2>
         <p>No contributors found for this project.</p>
       </div>
     );
   }
 
   return (
-    <div className="w-1/3 border rounded-xl">
-      <h2 className="text-2xl px-10 pt-10 pb-4 font-semibold mb-6">
+    <div className="w-full h-[250px] p-10 border rounded-xl">
+      <h2 className="text-2xl font-semibold mb-6">
         Contributors
       </h2>
-      <div className="grid grid-cols-2 max-h-[300px] overflow-y-auto">
+      <div className="grid grid-cols-8 overflow-y-auto">
         {contributors.map((contributor) => (
-          <div key={contributor.id} className="flex mx-auto items-center gap-3">
+          <div key={contributor.id} className="flex items-center gap-3">
             <Image
               src={contributor.image || "/default-avatar.png"}
               alt={contributor.name}
