@@ -47,8 +47,25 @@ export async function POST(
           username: true,
         },
       },
+      project: {
+        select: {
+          userId: true,
+          title: true,
+        },
+      },
     },
   });
+
+  if (comment.project.userId !== user.id) {
+    await prisma.notification.create({
+      data: {
+        userId: comment.project.userId,
+        content: `<b>${user.name}</b> commented on your project "<b>${comment.project.title}</b>"`,
+        type: "comment",
+        projectId: projectId,
+      },
+    });
+  }
 
   return NextResponse.json(comment, { status: 201 });
 }

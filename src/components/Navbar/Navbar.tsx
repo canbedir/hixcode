@@ -3,7 +3,9 @@ import React from "react";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSession } from "next-auth/react";
-import NavbarMenu from "./NavbarMenu";
+import dynamic from 'next/dynamic';
+
+const NavbarMenu = dynamic(() => import("./NavbarMenu"), { ssr: false });
 
 const Navbar = () => {
   const { status } = useSession();

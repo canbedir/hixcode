@@ -35,45 +35,46 @@ model Session {
 }
 
 model User {
-  id          String       @id @default(cuid())
-  name        String?
-  username    String       @unique @map("username_lowercase")
-  email       String?      @unique
-  bio         String?      @unique
-  githubId    String?      @unique
-  image       String?
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  accounts    Account[]
-  sessions    Session[]
-  projects    Project[]
-  badges      Badge[]
-  supports    Support[]
-  discussions Discussion[]
-  followers   Follow[]     @relation("followers")
-  following   Follow[]     @relation("following")
-  comments    Comment[]
+  id            String         @id @default(cuid())
+  name          String?
+  username      String         @unique @map("username_lowercase")
+  email         String?        @unique
+  bio           String?        @unique
+  githubId      String?        @unique
+  image         String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  accounts      Account[]
+  sessions      Session[]
+  projects      Project[]
+  badges        Badge[]
+  supports      Support[]
+  discussions   Discussion[]
+  followers     Follow[]       @relation("followers")
+  following     Follow[]       @relation("following")
+  comments      Comment[]
+  notifications Notification[]
 
   totalLikes   Int @default(0)
   commentCount Int @default(0)
 }
 
 model Project {
-  id                  String        @id @default(cuid())
+  id                  String         @id @default(cuid())
   title               String
   description         String?
   githubUrl           String
-  likes               Int           @default(0)
-  dislikes            Int           @default(0)
+  likes               Int            @default(0)
+  dislikes            Int            @default(0)
   mostPopularLanguage String
   lastUpdated         DateTime
   image               String?
-  stars               Int           @default(0)
-  views               Int           @default(0)
-  createdAt           DateTime      @default(now())
-  updatedAt           DateTime      @updatedAt
+  stars               Int            @default(0)
+  views               Int            @default(0)
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
   userId              String
-  user                User          @relation(fields: [userId], references: [id])
+  user                User           @relation(fields: [userId], references: [id])
   supports            Support[]
   discussions         Discussion[]
   comments            Comment[]
@@ -81,8 +82,9 @@ model Project {
   technicalDetails    String?
   liveUrl             String?
   badges              Badge[]
-  isPinned            Boolean       @default(false)
+  isPinned            Boolean        @default(false)
   technologies        String[]
+  notifications       Notification[]
 }
 
 model Contributor {
@@ -146,4 +148,16 @@ model Follow {
   following User @relation("following", fields: [followingId], references: [id])
 
   @@unique([followerId, followingId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  content   String
+  createdAt DateTime @default(now())
+  read      Boolean  @default(false)
+  type      String
+  projectId String
+  user      User     @relation(fields: [userId], references: [id])
+  project   Project  @relation(fields: [projectId], references: [id])
 }

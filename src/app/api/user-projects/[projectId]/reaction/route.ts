@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
-import { checkAndAssignBadges } from '@/lib/badgeUtils';
+import { checkAndAssignBadges } from "@/lib/badgeUtils";
 
 export async function POST(
   req: Request,
@@ -65,9 +65,24 @@ export async function POST(
         type,
       },
     });
+
+    // Send notification to the project owner
+    const project = await prisma.project.findUnique({
+      where: { id: projectId },
+      include: { user: true },
+    });
+
+    if (project && project.userId !== user.id) {
+      await prisma.notification.create({
+        data: {
+          userId: project.userId,
+          content: `<b>${user.name}</b> liked your project "<b>${project.title}</b>"`,
+          type: "like",
+          projectId: projectId,
+        },
+      });
+    }
   }
-  console.log(user, "userrrrr");
-  console.log("User's current badges:", user.badges || []);
 
   const updatedProject = await prisma.project.findUnique({
     where: { id: projectId },
@@ -92,7 +107,7 @@ export async function POST(
 
   const totalLikes = await prisma.project.aggregate({
     where: { userId: user.id },
-    _sum: { likes: true }
+    _sum: { likes: true },
   });
 
   await prisma.user.update({

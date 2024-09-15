@@ -1,33 +1,38 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import AnimatedBackground from "../animated-background";
 import { PiMailboxBold } from "react-icons/pi";
 import { TbUpload } from "react-icons/tb";
 import SignInButton from "../Navbar/SignInButton";
 import { Input } from "../ui/input";
 import { Search } from "lucide-react";
-import { useState } from "react";
 import UploadProjectsModal from "../UploadProjectsModal";
 import { useSession } from "next-auth/react";
-import Link from "next/link";
 import { IoCodeSlash } from "react-icons/io5";
 import { useRouter } from "next/navigation";
+
+const NotificationPopover = dynamic(
+  () => import("@/components/NotificationPopover/notificationpopover"),
+  { ssr: false }
+);
 
 const NavbarMenu = () => {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const { data: session } = useSession();
   const router = useRouter();
+
   const TABS = [
     {
-      icon: <IoCodeSlash />,
+      icon: <IoCodeSlash className="h-6 w-6" />,
       onClick: () => router.push("/projects?sort=stars"),
     },
     {
-      icon: <TbUpload />,
+      icon: <TbUpload className="h-6 w-6" />,
       onClick: () => setIsUploadModalOpen(true),
     },
     {
-      icon: <PiMailboxBold />,
+      icon: <NotificationPopover />,
     },
   ];
 
