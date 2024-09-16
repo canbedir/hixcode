@@ -11,6 +11,7 @@ import UploadProjectsModal from "../UploadProjectsModal";
 import { useSession } from "next-auth/react";
 import { IoCodeSlash } from "react-icons/io5";
 import { useRouter } from "next/navigation";
+import SearchComponent from "../SearchComponent/search-component";
 
 const NotificationPopover = dynamic(
   () => import("@/components/NotificationPopover/notificationpopover"),
@@ -39,8 +40,7 @@ const NavbarMenu = () => {
   return (
     <div className="flex items-center gap-3">
       <div>
-        <Input className="hidden sm:flex" placeholder="Search..." />
-        <Search className="flex sm:hidden" />
+        <SearchComponent />
       </div>
       <div>
         <AnimatedBackground
