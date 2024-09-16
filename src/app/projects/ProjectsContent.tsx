@@ -11,6 +11,15 @@ import Link from "next/link";
 import { ClipLoader } from "react-spinners";
 import { useSession } from "next-auth/react";
 import FilterProjects from "@/components/FilterProjects/filter-projects";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 interface Project {
   id: string;
@@ -34,6 +43,8 @@ export default function ProjectsContent() {
   const initialSortBy =
     (searchParams.get("sort") as "lastUpdated" | "stars") || "stars";
   const [sortBy, setSortBy] = useState<"lastUpdated" | "stars">(initialSortBy);
+  const [currentPage, setCurrentPage] = useState(1);
+  const projectsPerPage = 9;
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [filters, setFilters] = useState({
@@ -120,6 +131,13 @@ export default function ProjectsContent() {
     );
   }
 
+  const indexOfLastProject = currentPage * projectsPerPage;
+  const indexOfFirstProject = indexOfLastProject - projectsPerPage;
+  const currentProjects = projects.slice(
+    indexOfFirstProject,
+    indexOfLastProject
+  );
+
   return (
     <div className="mt-10 py-4">
       <div className="mb-6 border-b">
@@ -144,7 +162,7 @@ export default function ProjectsContent() {
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {projects.map((project) => (
+        {currentProjects.map((project) => (
           <Link key={project.id} href={`/projects/${project.id}`}>
             <Card>
               <CardContent className="flex flex-col h-[300px] p-6 justify-between">
@@ -195,6 +213,47 @@ export default function ProjectsContent() {
           </Link>
         ))}
       </div>
+      <Pagination className="mt-10">
+        <PaginationContent>
+          <PaginationItem>
+            <PaginationPrevious
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              className={
+                currentPage === 1 ? "pointer-events-none opacity-50" : ""
+              }
+            />
+          </PaginationItem>
+          {Array.from({
+            length: Math.ceil(projects.length / projectsPerPage),
+          }).map((_, index) => (
+            <PaginationItem key={index}>
+              <PaginationLink
+                onClick={() => setCurrentPage(index + 1)}
+                isActive={currentPage === index + 1}
+              >
+                {index + 1}
+              </PaginationLink>
+            </PaginationItem>
+          ))}
+          <PaginationItem>
+            <PaginationNext
+              onClick={() =>
+                setCurrentPage((prev) =>
+                  Math.min(
+                    prev + 1,
+                    Math.ceil(projects.length / projectsPerPage)
+                  )
+                )
+              }
+              className={
+                currentPage === Math.ceil(projects.length / projectsPerPage)
+                  ? "pointer-events-none opacity-50"
+                  : ""
+              }
+            />
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
     </div>
   );
 }
