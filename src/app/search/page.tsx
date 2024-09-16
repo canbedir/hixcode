@@ -7,6 +7,7 @@ import { FaRegDotCircle } from "react-icons/fa";
 import { Star } from "lucide-react";
 import Image from "next/image";
 import { ClipLoader } from "react-spinners";
+import { Suspense } from "react";
 
 interface SearchResult {
   id: string;
@@ -116,6 +117,27 @@ const ResultCard = ({ result }: { result: SearchResult }) => (
 );
 
 export default function SearchPage() {
+  return (
+    <Suspense fallback={<LoadingSpinner />}>
+      <SearchContent />
+    </Suspense>
+  );
+}
+
+function LoadingSpinner() {
+  return (
+    <div className="relative h-screen">
+      <div
+        className="flex justify-center items-center"
+        style={{ height: "calc(100% - 160px)" }}
+      >
+        <ClipLoader color="#b5b5b5" size={100} />
+      </div>
+    </div>
+  );
+}
+
+function SearchContent() {
   const searchParams = useSearchParams();
   const query = searchParams.get("q");
   const [projectResults, setProjectResults] = useState<SearchResult[]>([]);
