@@ -21,13 +21,17 @@ const ThemeSettings = () => {
     },
   ];
 
+  const handleThemeChange = (themeName: string) => {
+    setTheme(themeName);
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
       {themes.map((t) => (
         <Card
           key={t.name}
-          onClick={() => setTheme(t.name)}
-          className={`cursor-pointer ${
+          onClick={() => handleThemeChange(t.name)}
+          className={`cursor-pointer transition-all duration-300 ${
             theme === t.name ? "border-2 border-primary" : ""
           }`}
         >
@@ -35,7 +39,13 @@ const ThemeSettings = () => {
             <CardTitle>{t.title}</CardTitle>
           </CardHeader>
           <CardContent>
-            <Image className="border-4" src={t.imageSrc} alt={t.title} height={200} width={400} />
+            <Image
+              className="border-4 transition-opacity duration-300"
+              src={t.imageSrc}
+              alt={t.title}
+              height={200}
+              width={400}
+            />
           </CardContent>
         </Card>
       ))}
