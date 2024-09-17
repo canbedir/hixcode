@@ -7,10 +7,11 @@ import { TbUpload } from "react-icons/tb";
 import UploadProjectsModal from "../UploadProjectsModal";
 import { useSession } from "next-auth/react";
 import { useTheme } from "next-themes";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Hero = () => {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const { theme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -18,8 +19,12 @@ const Hero = () => {
     setMounted(true);
   }, []);
 
-  if (!mounted) {
-    return null;
+  if (!mounted || status === "loading") {
+    return (
+      <div className="w-full py-20 md:py-32">
+        <Skeleton className="w-full h-[200px] rounded-xl" />
+      </div>
+    );
   }
 
   const currentTheme = theme === "system" ? resolvedTheme : theme;

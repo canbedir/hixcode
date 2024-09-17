@@ -15,6 +15,7 @@ import { useSession } from "next-auth/react";
 import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Skeleton } from "../ui/skeleton";
 
 interface Project {
   id: string;
@@ -33,6 +34,7 @@ interface Project {
 
 const RecentProjects = () => {
   const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showAll, setShowAll] = useState(false);
   const { data: session } = useSession();
   const router = useRouter();
@@ -60,11 +62,26 @@ const RecentProjects = () => {
         }
       } catch (error) {
         console.error("Error fetching recent projects:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchRecentProjects();
   }, []);
+
+  if (loading) {
+    return (
+      <div className="w-full">
+        <Skeleton className="w-full h-8 mb-4" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {[...Array(4)].map((_, index) => (
+            <Skeleton key={index} className="h-[300px] w-full rounded-xl" />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   const handleViewAll = () => {
     router.push("/projects?sort=lastUpdated");
