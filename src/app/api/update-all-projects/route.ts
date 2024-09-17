@@ -31,7 +31,6 @@ export async function POST(request: Request) {
       await prisma.project.update({
         where: { id: project.id },
         data: {
-          description: data.description,
           stars: data.stargazers_count,
           lastUpdated: data.updated_at,
         },
