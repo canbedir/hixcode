@@ -87,6 +87,10 @@ export async function POST(request: Request) {
       const mostPopularLanguage = getMostPopularLanguage(languages);
       const repoDetails = await fetchRepoDetails(repo.url, accessToken);
 
+      const validContributors = Array.isArray(repo.contributors) ? repo.contributors.filter(
+        (contributor: any) => contributor.name && contributor.githubUrl && contributor.image
+      ) : [];
+
       await prisma.project.create({
         data: {
           title: repo.name,
@@ -101,10 +105,10 @@ export async function POST(request: Request) {
           lastUpdated: repoDetails.lastUpdated,
           technologies: repo.technologies,
           contributors: {
-            create: repo.contributors.map((contributor: any) => ({
-              name: contributor.login,
-              githubUrl: contributor.html_url,
-              image: contributor.avatar_url,
+            create: validContributors.map((contributor: any) => ({
+              name: contributor.name,
+              githubUrl: contributor.githubUrl,
+              image: contributor.image,
             })),
           },
         },
