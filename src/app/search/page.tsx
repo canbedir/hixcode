@@ -8,6 +8,12 @@ import { Star } from "lucide-react";
 import Image from "next/image";
 import { ClipLoader } from "react-spinners";
 import { Suspense } from "react";
+import {
+  HoverCard,
+  HoverCardTrigger,
+  HoverCardContent,
+} from "@/components/ui/hover-card";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 interface SearchResult {
   id: string;
@@ -22,8 +28,10 @@ interface SearchResult {
   type: "project" | "user";
   bio?: string;
   badges?: {
-    name?: string;
-    icon?: string;
+    id: string;
+    name: string;
+    description: string;
+    icon: string;
   }[];
   user?: {
     name?: string;
@@ -31,8 +39,10 @@ interface SearchResult {
     username?: string;
     bio?: string;
     badges?: {
-      name?: string;
-      icon?: string;
+      id: string;
+      name: string;
+      description: string;
+      icon: string;
     }[];
   };
 }
@@ -66,18 +76,43 @@ const ResultCard = ({ result }: { result: SearchResult }) => (
                 )}
                 <div className="flex items-center gap-2">
                   <span className="font-semibold text-lg">
-                    {result.user?.username || result.user?.name || "Anonymous User"}
+                    {result.user?.username ||
+                      result.user?.name ||
+                      "Anonymous User"}
                   </span>
                   <div className="flex items-center gap-2 border rounded-md p-0.5">
                     {result.user?.badges?.map((badge) => (
-                      <Image
-                        key={badge.name}
-                        alt={badge.name ?? ""}
-                        src={badge.icon ?? ""}
-                        width={16}
-                        height={16}
-                        className="text-muted-foreground"
-                      />
+                      <HoverCard key={badge.name}>
+                        <HoverCardTrigger asChild>
+                          <div className="relative cursor-pointer">
+                            <Image
+                              src={badge.icon}
+                              alt={badge.name}
+                              width={16}
+                              height={16}
+                              className="text-muted-foreground"
+                            />
+                          </div>
+                        </HoverCardTrigger>
+                        <HoverCardContent className="w-64" side="top">
+                          <div className="flex items-center space-x-2">
+                            <Avatar className="h-10 w-10">
+                              <AvatarImage src={badge.icon} />
+                              <AvatarFallback>
+                                {badge.name.charAt(0)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <h4 className="text-sm font-semibold">
+                                {badge.name}
+                              </h4>
+                              <p className="text-xs text-muted-foreground">
+                                {badge.description}
+                              </p>
+                            </div>
+                          </div>
+                        </HoverCardContent>
+                      </HoverCard>
                     ))}
                   </div>
                 </div>
@@ -99,14 +134,37 @@ const ResultCard = ({ result }: { result: SearchResult }) => (
                   </span>
                   <div className="flex items-center gap-2 border rounded-md p-0.5">
                     {result.badges?.map((badge) => (
-                      <Image
-                        key={badge.name}
-                        alt={badge.name ?? ""}
-                        src={badge.icon ?? ""}
-                        width={16}
-                        height={16}
-                        className="text-muted-foreground"
-                      />
+                      <HoverCard key={badge.name}>
+                        <HoverCardTrigger asChild>
+                          <div className="relative cursor-pointer">
+                            <Image
+                              src={badge.icon}
+                              alt={badge.name}
+                              width={16}
+                              height={16}
+                              className="text-muted-foreground"
+                            />
+                          </div>
+                        </HoverCardTrigger>
+                        <HoverCardContent className="w-64" side="top">
+                          <div className="flex items-center space-x-2">
+                            <Avatar className="h-10 w-10">
+                              <AvatarImage src={badge.icon} />
+                              <AvatarFallback>
+                                {badge.name.charAt(0)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <h4 className="text-sm font-semibold">
+                                {badge.name}
+                              </h4>
+                              <p className="text-xs text-muted-foreground">
+                                {badge.description}
+                              </p>
+                            </div>
+                          </div>
+                        </HoverCardContent>
+                      </HoverCard>
                     ))}
                   </div>
                 </div>
@@ -146,7 +204,6 @@ const ResultCard = ({ result }: { result: SearchResult }) => (
             </div>
           </div>
         )}
-        <div></div>
       </CardContent>
     </Card>
   </Link>
