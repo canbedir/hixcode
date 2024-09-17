@@ -109,7 +109,18 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
       if (!response.ok) {
         throw new Error("Failed to fetch contributors");
       }
-      const contributors = await response.json();
+      const contributorsData = await response.json();
+      const contributors = await Promise.all(
+        contributorsData.map(async (contributor: any) => {
+          const userResponse = await fetch(contributor.url);
+          const userData = await userResponse.json();
+          return {
+            name: userData.name || userData.login,
+            githubUrl: userData.html_url,
+            image: userData.avatar_url,
+          };
+        })
+      );
       setSelectedRepo({ ...repo, contributors });
     } catch (error) {
       console.error("Error fetching contributors:", error);

@@ -11,6 +11,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "./ui/label";
 import { useSession } from "next-auth/react";
 import { useToast } from "@/components/ui/use-toast";
+import Image from "next/image";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 
 interface ProjectDetailsModalProps {
   isOpen: boolean;
@@ -243,22 +249,49 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
               placeholder="Add technologies (press space to add)"
             />
           </div>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-1">
             <Label>Contributors</Label>
-            <div className="flex flex-wrap gap-2">
-              {contributors.map((contributor, index) => (
-                <div
-                  key={index}
-                  className="flex items-center gap-2 bg-gray-100 dark:bg-gray-700 p-2 rounded-full"
-                >
-                  <img
-                    src={contributor.image}
-                    alt={contributor.name}
-                    className="w-6 h-6 rounded-full"
-                  />
-                  <span>{contributor.name}</span>
-                </div>
+            <div className="flex flex-wrap gap-1">
+              {contributors.slice(0, 6).map((contributor, index) => (
+                <HoverCard key={index}>
+                  <HoverCardTrigger>
+                    <div className="flex items-center p-1 rounded-full cursor-pointer">
+                      <Image
+                        src={contributor.image || "/default-avatar.png"}
+                        alt={contributor.name || "Unknown"}
+                        width={32}
+                        height={32}
+                        className="rounded-full"
+                      />
+                    </div>
+                  </HoverCardTrigger>
+                  <HoverCardContent
+                    className="w-auto"
+                    side="top"
+                    align="center"
+                  >
+                    <div className="flex flex-col items-center">
+                      <Image
+                        src={contributor.image || "/default-avatar.png"}
+                        alt={contributor.name || "Unknown"}
+                        width={48}
+                        height={48}
+                        className="rounded-full mb-2"
+                      />
+                      <span className="font-medium">
+                        {contributor.name || "Unknown"}
+                      </span>
+                    </div>
+                  </HoverCardContent>
+                </HoverCard>
               ))}
+              {contributors.length > 6 && (
+                <div className="flex items-center justify-center w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-full">
+                  <span className="text-sm font-medium">
+                    +{contributors.length - 6}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         </div>
