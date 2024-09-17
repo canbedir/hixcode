@@ -13,7 +13,7 @@ export default function SignIn() {
         <ProfileButton />
       ) : (
         <Button
-          onClick={() => signIn(undefined, { callbackUrl: "/" })}
+          onClick={() => signIn("github", { callbackUrl: "/" })}
         >
           <span className="gap-2 hidden md:flex">
             <Github size={22} /> Login with GitHub
