@@ -20,10 +20,20 @@ interface SearchResult {
   lastUpdated?: string;
   image?: string;
   type: "project" | "user";
+  bio?: string;
+  badges?: {
+    name?: string;
+    icon?: string;
+  }[];
   user?: {
     name?: string;
     image?: string;
     username?: string;
+    bio?: string;
+    badges?: {
+      name?: string;
+      icon?: string;
+    }[];
   };
 }
 
@@ -36,7 +46,11 @@ const ResultCard = ({ result }: { result: SearchResult }) => (
     }
   >
     <Card>
-      <CardContent className="flex flex-col h-[300px] p-6 justify-between">
+      <CardContent
+        className={`flex flex-col p-6 justify-between ${
+          result.type === "user" ? "h-[150px]" : "h-[300px]"
+        }`}
+      >
         <div className="flex items-center mb-2">
           <div className="flex items-center w-full">
             {result.type === "project" ? (
@@ -50,67 +64,89 @@ const ResultCard = ({ result }: { result: SearchResult }) => (
                     className="rounded-full mr-2"
                   />
                 )}
-                <span className="font-semibold text-lg">
-                  {result.user?.name ||
-                    result.user?.username ||
-                    "Anonymous User"}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold text-lg">
+                    {result.user?.username || result.user?.name || "Anonymous User"}
+                  </span>
+                  <div className="flex items-center gap-2 border rounded-md p-0.5">
+                    {result.user?.badges?.map((badge) => (
+                      <Image
+                        key={badge.name}
+                        alt={badge.name ?? ""}
+                        src={badge.icon ?? ""}
+                        width={16}
+                        height={16}
+                        className="text-muted-foreground"
+                      />
+                    ))}
+                  </div>
+                </div>
               </>
             ) : (
               <>
                 {result.image && (
                   <Image
                     src={result.image}
-                    alt={result.name || result.username || "User"}
+                    alt={result.username || result.name || "User"}
                     width={24}
                     height={24}
                     className="rounded-full mr-2"
                   />
                 )}
-                <span className="font-semibold text-lg">
-                  {result.name || result.username || "Anonymous User"}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold text-lg">
+                    {result.username || result.name || "Anonymous User"}
+                  </span>
+                  <div className="flex items-center gap-2 border rounded-md p-0.5">
+                    {result.badges?.map((badge) => (
+                      <Image
+                        key={badge.name}
+                        alt={badge.name ?? ""}
+                        src={badge.icon ?? ""}
+                        width={16}
+                        height={16}
+                        className="text-muted-foreground"
+                      />
+                    ))}
+                  </div>
+                </div>
               </>
             )}
           </div>
         </div>
         <div className="flex flex-col gap-2">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold">{result.title}</h2>
-            {result.type === "project" && (
+          {result.type === "project" && (
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold">{result.title}</h2>
               <div className="flex items-center gap-2 text-lg">
                 <Star size={16} /> {result.stars}
               </div>
-            )}
-          </div>
-          <p className="text-white/80 line-clamp-2">
-            {result.description || "No description available"}
+            </div>
+          )}
+          <p className="text-muted-foreground line-clamp-2">
+            {result.type === "project"
+              ? result.description
+              : result.bio || "No bio available"}
           </p>
         </div>
-        <div className="flex justify-between items-center text-sm text-muted-foreground mt-auto">
-          {result.type === "project" && (
-            <>
-              <div className="flex items-center">
-                {result.mostPopularLanguage && (
-                  <>
-                    <FaRegDotCircle className="mr-1" />
-                    <span className="text-sm">
-                      {result.mostPopularLanguage}
-                    </span>
-                  </>
-                )}
-              </div>
-              <div className="text-sm text-muted-foreground">
-                Updated{" "}
-                {result.lastUpdated &&
-                  new Date(result.lastUpdated).toLocaleDateString()}
-              </div>
-            </>
-          )}
-          {result.type === "user" && (
-            <div className="text-sm text-muted-foreground">User</div>
-          )}
-        </div>
+        {result.type === "project" && (
+          <div className="flex justify-between items-center text-sm text-muted-foreground mt-auto">
+            <div className="flex items-center">
+              {result.mostPopularLanguage && (
+                <>
+                  <FaRegDotCircle className="mr-1" />
+                  <span className="text-sm">{result.mostPopularLanguage}</span>
+                </>
+              )}
+            </div>
+            <div className="text-sm text-muted-foreground">
+              Updated{" "}
+              {result.lastUpdated &&
+                new Date(result.lastUpdated).toLocaleDateString()}
+            </div>
+          </div>
+        )}
+        <div></div>
       </CardContent>
     </Card>
   </Link>

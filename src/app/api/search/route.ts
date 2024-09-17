@@ -33,6 +33,8 @@ export async function GET(request: Request) {
             name: true,
             image: true,
             username: true,
+            bio: true,
+            badges: true,
           },
         },
       },
@@ -48,6 +50,8 @@ export async function GET(request: Request) {
         OR: [
           { name: { contains: query, mode: "insensitive" } },
           { username: { contains: query, mode: "insensitive" } },
+          { bio: { contains: query, mode: "insensitive" } },
+          { badges: { some: { name: { contains: query, mode: "insensitive" } } } },
         ],
       },
       take: 10,
@@ -56,6 +60,8 @@ export async function GET(request: Request) {
         name: true,
         username: true,
         image: true,
+        bio: true,
+        badges: true,
       },
     });
 
