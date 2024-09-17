@@ -13,10 +13,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    const { githubUrl } = await request.json();
+    const { projectId } = await request.json();
 
-    if (!githubUrl) {
-      return NextResponse.json({ message: 'Invalid data', error: 'GitHub URL is missing' }, { status: 400 });
+    if (!projectId) {
+      return NextResponse.json({ message: 'Invalid data', error: 'Project ID is missing' }, { status: 400 });
     }
 
     const user = await prisma.user.findUnique({
@@ -27,16 +27,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'User not found', error: 'Invalid user' }, { status: 404 });
     }
 
-    const deletedProject = await prisma.project.deleteMany({
-      where: {
-        userId: user.id,
-        githubUrl: githubUrl,
-      },
-    });
-
-    if (deletedProject.count === 0) {
-      return NextResponse.json({ message: 'Project not found', error: 'Project does not exist or does not belong to the user' }, { status: 404 });
-    }
+    await prisma.$transaction([
+      prisma.support.deleteMany({ where: { projectId } }),
+      prisma.comment.deleteMany({ where: { projectId } }),
+      prisma.contributor.deleteMany({ where: { projectId } }),
+      prisma.notification.deleteMany({ where: { projectId } }),
+      prisma.project.delete({ where: { id: projectId, userId: user.id } })
+    ]);
 
     return NextResponse.json({ success: true, message: 'Project has been successfully removed' });
   } catch (error) {

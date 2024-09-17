@@ -72,7 +72,7 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
   useEffect(() => {
     async function fetchExistingProjects() {
       try {
-        const response = await fetch("/api/user-projects?limit=all");
+        const response = await fetch("/api/user-projects?limit=all&onlyUserProjects=true");
 
         if (!response.ok) {
           throw new Error("Mevcut projeler alınamadı.");
@@ -208,7 +208,7 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ githubUrl: project.githubUrl }),
+        body: JSON.stringify({ projectId: project.id }),
       });
 
       const data = await response.json();
