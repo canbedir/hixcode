@@ -16,22 +16,26 @@ import {
 } from "../ui/dialog";
 import axios from "axios";
 import { useToast } from "../ui/use-toast";
+import { useRouter } from "next/navigation";
 
 const ProfileSettings: React.FC = () => {
-  const { data: session, status } = useSession();
+  const { data: session, status, update } = useSession();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [bio, setBio] = useState("");
+  const [user, setUser] = useState(session?.user);
   const { toast } = useToast();
+  const router = useRouter();
 
   useEffect(() => {
     if (session) {
+      setUser(session.user);
       axios
         .get("/api/profile")
         .then((response) => {
           setBio(response.data.bio || "");
         })
         .catch((error) => {
-          console.error("Failed to profile settings updated:", error);
+          console.error("Failed to fetch profile settings:", error);
         });
     }
   }, [session]);
@@ -54,7 +58,32 @@ const ProfileSettings: React.FC = () => {
     }
   };
 
-  if (status === "loading" || !session) {
+  const handleUpdateProfile = async () => {
+    try {
+      const response = await fetch('/api/update-profile', { method: 'POST' });
+      if (response.ok) {
+        const updatedUser = await response.json();
+        setUser(updatedUser);
+        await update({ ...session, user: updatedUser });
+        toast({
+          title: "Profile updated successfully",
+          variant: "success",
+          duration: 3000,
+        });
+      } else {
+        throw new Error('Failed to update profile');
+      }
+    } catch (error) {
+      console.error("Failed to update profile:", error);
+      toast({
+        title: "Failed to update profile",
+        variant: "destructive",
+        duration: 3000,
+      });
+    }
+  };
+
+  if (status === "loading") {
     return (
       <div className="relative h-screen">
         <div
@@ -67,6 +96,11 @@ const ProfileSettings: React.FC = () => {
     );
   }
 
+  if (!session) {
+    router.push('/');
+    return null;
+  }
+
   return (
     <div className="flex flex-col gap-5">
       <div className="flex items-center justify-between">
@@ -77,7 +111,7 @@ const ProfileSettings: React.FC = () => {
               type="text"
               id="name"
               disabled
-              placeholder={session?.user?.name || "profile name"}
+              placeholder={user?.name || "profile name"}
             />
           </div>
           <div>
@@ -86,7 +120,7 @@ const ProfileSettings: React.FC = () => {
               type="email"
               id="email"
               disabled
-              placeholder={session?.user?.email || "profile email"}
+              placeholder={user?.email || "profile email"}
             />
           </div>
         </div>
@@ -95,8 +129,8 @@ const ProfileSettings: React.FC = () => {
           <DialogTrigger asChild>
             <div className="cursor-pointer">
               <Image
-                src={session?.user?.image || "profile img"}
-                alt={session?.user?.name || "profile name"}
+                src={user?.image || "profile img"}
+                alt={user?.name || "profile name"}
                 width={170}
                 height={150}
                 className="rounded-full"
@@ -120,8 +154,11 @@ const ProfileSettings: React.FC = () => {
         />
       </div>
 
-      <div>
+      <div className="flex justify-between items-center w-2/3">
         <Button onClick={handleSave}>Save Profile</Button>
+        <Button variant={"outline"} onClick={handleUpdateProfile}>
+          Update Profile
+        </Button>
       </div>
     </div>
   );
