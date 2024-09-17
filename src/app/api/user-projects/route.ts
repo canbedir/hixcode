@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "../auth/[...nextauth]/options";
 
 const prisma = new PrismaClient();
 
@@ -10,11 +12,18 @@ export async function GET(request: Request) {
   const language = searchParams.get("language");
   const topic = searchParams.get("topic");
   const minStars = parseInt(searchParams.get("minStars") || "0");
+  const onlyUserProjects = searchParams.get("onlyUserProjects") === "true";
+
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user || !session.user.email) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
   try {
     const projects = await prisma.project.findMany({
       where: {
         AND: [
+          onlyUserProjects ? { user: { email: session.user.email } } : {},
           language && language !== "all"
             ? { mostPopularLanguage: { equals: language, mode: "insensitive" } }
             : {},
@@ -32,6 +41,7 @@ export async function GET(request: Request) {
           select: {
             name: true,
             image: true,
+            email: true,
           },
         },
       },
