@@ -488,7 +488,7 @@ const ProjectDetailPage = () => {
               </h1>
 
               {/* Display comments */}
-              <div className="flex flex-col gap-6 h-[400px] overflow-y-auto">
+              <div className="flex flex-col gap-6 max-h-[400px] overflow-y-auto">
                 {comments.length > 0 ? (
                   comments.map((comment) => (
                     <div key={comment.id} className="flex items-start gap-2">
