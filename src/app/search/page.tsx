@@ -186,7 +186,7 @@ function SearchContent() {
         <button
           className={`mr-4 ${
             activeTab === "projects"
-              ? "text-white font-medium"
+              ? "dark:text-white text-black font-medium"
               : "text-muted-foreground"
           }`}
           onClick={() => setActiveTab("projects")}
@@ -196,7 +196,7 @@ function SearchContent() {
         <button
           className={
             activeTab === "users"
-              ? "text-white font-medium"
+              ? "dark:text-white text-black font-medium"
               : "text-muted-foreground"
           }
           onClick={() => setActiveTab("users")}
