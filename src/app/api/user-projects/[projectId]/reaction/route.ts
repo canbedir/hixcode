@@ -120,7 +120,6 @@ export async function POST(
     where: { username: user.username },
     include: { badges: true },
   });
-  console.log("Updated user badges after assignment:", updatedUser?.badges);
 
   return NextResponse.json({
     likes,

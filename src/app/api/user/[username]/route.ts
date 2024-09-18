@@ -20,7 +20,6 @@ export async function GET(
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
-    console.log("User badges:", user.badges);
 
     return NextResponse.json(user);
   } catch (error) {

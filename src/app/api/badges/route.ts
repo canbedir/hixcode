@@ -33,7 +33,6 @@ export async function PUT(req: Request) {
 
 export async function GET() {
   const badges = await prisma.badge.findMany();
-  console.log("All badges:", badges);
 
   if (badges.length === 0) {
     const defaultBadges = [
@@ -47,7 +46,6 @@ export async function GET() {
     }
 
     const createdBadges = await prisma.badge.findMany();
-    console.log("Created default badges:", createdBadges);
     return NextResponse.json(createdBadges);
   }
 

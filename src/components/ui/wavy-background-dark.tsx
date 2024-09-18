@@ -39,7 +39,6 @@ export const WavyBackground = ({
 
   useEffect(() => {
     const newBackgroundFill = theme === "dark" ? "#09090B" : "#ffffff";
-    console.log("Theme changed:", theme, "New background:", newBackgroundFill);
     setBackgroundFill(newBackgroundFill);
     if (canvasRef.current) {
       ctx = canvasRef.current.getContext("2d");
