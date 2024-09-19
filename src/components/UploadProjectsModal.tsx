@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProjectDetailsModal from "./ProjectDetailsModal";
+import { Transition } from "@headlessui/react";
 
 interface UploadProjectsModalProps {
   isOpen: boolean;
@@ -29,6 +30,7 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
   const [selectedRepo, setSelectedRepo] = useState<any | null>(null);
   const [isProjectDetailsModalOpen, setIsProjectDetailsModalOpen] =
     useState(false);
+  const [activeTab, setActiveTab] = useState("available");
 
   useEffect(() => {
     if (!session?.accessToken) return;
@@ -255,63 +257,88 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
             <DialogTitle>Manage Your Repositories</DialogTitle>
           </DialogHeader>
           <Tabs
-            defaultValue="available"
+            value={activeTab}
+            onValueChange={setActiveTab}
             className="w-full flex-grow flex flex-col"
           >
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="available">Available</TabsTrigger>
               <TabsTrigger value="uploaded">Uploaded</TabsTrigger>
             </TabsList>
-            <div className="flex-grow overflow-hidden mt-5">
-              <TabsContent value="available" className="h-full">
-                <div className="mt-4 h-full flex flex-col">
-                  <h3 className="text-lg font-semibold mb-2">
-                    Available Repositories
-                  </h3>
-                  <ul className="space-y-2 flex-grow overflow-y-auto p-3">
-                    {repos.map((repo) => (
-                      <li
-                        key={repo.id}
-                        className="flex items-center justify-between space-x-2"
-                      >
-                        <span className="text-sm">{repo.name}</span>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="bg-green-600 hover:bg-green-700 text-white hover:text-white"
-                          onClick={() => handleSelectRepo(repo)}
-                        >
-                          Select
-                        </Button>
-                      </li>
-                    ))}
-                  </ul>
+            <div className="flex-grow overflow-hidden mt-5 relative">
+              <Transition
+                show={activeTab === "available"}
+                enter="transition-opacity duration-300"
+                enterFrom="opacity-0"
+                enterTo="opacity-100"
+                leave="transition-opacity duration-300"
+                leaveFrom="opacity-100"
+                leaveTo="opacity-0"
+              >
+                <div className="absolute inset-0">
+                  <TabsContent value="available" className="h-full">
+                    <div className="mt-4 h-full flex flex-col">
+                      <h3 className="text-lg font-semibold mb-2">
+                        Available Repositories
+                      </h3>
+                      <ul className="space-y-2 flex-grow overflow-y-auto p-3">
+                        {repos.map((repo) => (
+                          <li
+                            key={repo.id}
+                            className="flex items-center justify-between space-x-2"
+                          >
+                            <span className="text-sm">{repo.name}</span>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="bg-green-600 hover:bg-green-700 text-white hover:text-white"
+                              onClick={() => handleSelectRepo(repo)}
+                            >
+                              Select
+                            </Button>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </TabsContent>
                 </div>
-              </TabsContent>
-              <TabsContent value="uploaded" className="h-full">
-                <div className="mt-4 h-full flex flex-col">
-                  <h3 className="text-lg font-semibold mb-2">
-                    Uploaded Repositories
-                  </h3>
-                  <ul className="space-y-2 flex-grow overflow-y-auto p-3">
-                    {existingProjects.map((project) => (
-                      <li
-                        key={project.id}
-                        className="flex items-center justify-between space-x-2"
-                      >
-                        <span className="text-sm">{project.title}</span>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => handleRemoveProject(project)}
-                        >
-                          Remove
-                        </Button>
-                      </li>
-                    ))}
-                  </ul>
+              </Transition>
+              <Transition
+                show={activeTab === "uploaded"}
+                enter="transition-opacity duration-300"
+                enterFrom="opacity-0"
+                enterTo="opacity-100"
+                leave="transition-opacity duration-300"
+                leaveFrom="opacity-100"
+                leaveTo="opacity-0"
+              >
+                <div className="absolute inset-0">
+                  <TabsContent value="uploaded" className="h-full">
+                    <div className="mt-4 h-full flex flex-col">
+                      <h3 className="text-lg font-semibold mb-2">
+                        Uploaded Repositories
+                      </h3>
+                      <ul className="space-y-2 flex-grow overflow-y-auto p-3">
+                        {existingProjects.map((project) => (
+                          <li
+                            key={project.id}
+                            className="flex items-center justify-between space-x-2"
+                          >
+                            <span className="text-sm">{project.title}</span>
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => handleRemoveProject(project)}
+                            >
+                              Remove
+                            </Button>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </TabsContent>
                 </div>
-              </TabsContent>
+              </Transition>
             </div>
           </Tabs>
         </DialogContent>
