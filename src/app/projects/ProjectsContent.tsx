@@ -213,7 +213,7 @@ export default function ProjectsContent() {
           </Link>
         ))}
       </div>
-      <Pagination className="mt-10">
+      <Pagination className="mt-32">
         <PaginationContent>
           <PaginationItem>
             <PaginationPrevious
