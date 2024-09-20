@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { cn } from "@/lib/utils";
 import SessionProviderWrapper from "@/components/session-provider-wrapper";
 import { Toaster } from "@/components/ui/toaster";
+import Footer from "@/components/Footer/footer";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -32,8 +33,13 @@ export default function RootLayout({
       >
         <ThemeProvider>
           <SessionProviderWrapper>
-            <Navbar />
-            <main className="container mx-auto">{children}</main>
+            <div className="flex flex-col min-h-screen">
+              <Navbar />
+              <main className="flex-grow container mx-auto px-4 py-8">
+                {children}
+              </main>
+              <Footer />
+            </div>
             <Toaster />
           </SessionProviderWrapper>
         </ThemeProvider>
