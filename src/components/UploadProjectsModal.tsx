@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { Plus, Check, Trash } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -31,6 +32,9 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
   const [isProjectDetailsModalOpen, setIsProjectDetailsModalOpen] =
     useState(false);
   const [activeTab, setActiveTab] = useState("available");
+  const [loadingRepos, setLoadingRepos] = useState<{ [key: string]: boolean }>(
+    {}
+  );
 
   useEffect(() => {
     if (!session?.accessToken) return;
@@ -74,7 +78,9 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
   useEffect(() => {
     async function fetchExistingProjects() {
       try {
-        const response = await fetch("/api/user-projects?limit=all&onlyUserProjects=true");
+        const response = await fetch(
+          "/api/user-projects?limit=all&onlyUserProjects=true"
+        );
 
         if (!response.ok) {
           throw new Error("Mevcut projeler alınamadı.");
@@ -88,7 +94,10 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
 
         setExistingProjects(data);
       } catch (error: any) {
-        console.error("An error occurred while fetching existing projects:", error);
+        console.error(
+          "An error occurred while fetching existing projects:",
+          error
+        );
         toast({
           title: "Error",
           description: `Failed to fetch existing projects: ${error.message}`,
@@ -101,6 +110,7 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
   }, [toast]);
 
   const handleSelectRepo = async (repo: any) => {
+    setLoadingRepos({ ...loadingRepos, [repo.id]: true });
     setSelectedRepo(repo);
 
     // Fetch contributors
@@ -133,6 +143,7 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
       });
     }
 
+    setLoadingRepos({ ...loadingRepos, [repo.id]: false });
     setIsOpen(false);
     setTimeout(() => {
       setIsProjectDetailsModalOpen(true);
@@ -253,8 +264,10 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
     <>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent className="sm:max-w-[425px] h-[500px] flex flex-col overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Manage Your Repositories</DialogTitle>
+          <DialogHeader className="h-[30px]">
+            <DialogTitle className="text-2xl font-bold flex items-center h-full">
+              Manage Your Repositories
+            </DialogTitle>
           </DialogHeader>
           <Tabs
             value={activeTab}
@@ -265,7 +278,7 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
               <TabsTrigger value="available">Available</TabsTrigger>
               <TabsTrigger value="uploaded">Uploaded</TabsTrigger>
             </TabsList>
-            <div className="flex-grow overflow-hidden mt-5 relative">
+            <div className="flex-grow overflow-hidden relative">
               <Transition
                 show={activeTab === "available"}
                 enter="transition-opacity duration-300"
@@ -277,24 +290,26 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
               >
                 <div className="absolute inset-0">
                   <TabsContent value="available" className="h-full">
-                    <div className="mt-4 h-full flex flex-col">
-                      <h3 className="text-lg font-semibold mb-2">
-                        Available Repositories
-                      </h3>
-                      <ul className="space-y-2 flex-grow overflow-y-auto p-3">
+                    <div className="h-full flex flex-col">
+                      <ul className="flex-grow overflow-y-auto">
                         {repos.map((repo) => (
                           <li
                             key={repo.id}
-                            className="flex items-center justify-between space-x-2"
+                            className="flex items-center p-3 mx-2 border-b justify-between space-x-2"
                           >
                             <span className="text-sm">{repo.name}</span>
                             <Button
                               variant="outline"
                               size="sm"
-                              className="bg-green-600 hover:bg-green-700 text-white hover:text-white"
+                              className="bg-slate-300 hover:bg-green-500 duration-300 dark:bg-slate-700 h-7 w-7 dark:hover:bg-white dark:hover:text-black border-none text-black/50   dark:text-white hover:text-white rounded-full p-0"
                               onClick={() => handleSelectRepo(repo)}
+                              disabled={loadingRepos[repo.id]}
                             >
-                              Select
+                              {loadingRepos[repo.id] ? (
+                                <Check className="h-4 w-4" />
+                              ) : (
+                                <Plus className="h-4 w-4" />
+                              )}
                             </Button>
                           </li>
                         ))}
@@ -314,24 +329,18 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
               >
                 <div className="absolute inset-0">
                   <TabsContent value="uploaded" className="h-full">
-                    <div className="mt-4 h-full flex flex-col">
-                      <h3 className="text-lg font-semibold mb-2">
-                        Uploaded Repositories
-                      </h3>
-                      <ul className="space-y-2 flex-grow overflow-y-auto p-3">
+                    <div className="h-full flex flex-col">
+                      <ul className="flex-grow overflow-y-auto">
                         {existingProjects.map((project) => (
                           <li
                             key={project.id}
-                            className="flex items-center justify-between space-x-2"
+                            className="flex items-center p-3 mx-2 border-b justify-between space-x-2"
                           >
                             <span className="text-sm">{project.title}</span>
-                            <Button
-                              variant="destructive"
-                              size="sm"
+                            <Trash
                               onClick={() => handleRemoveProject(project)}
-                            >
-                              Remove
-                            </Button>
+                              className="h-6 w-6 text-red-600 hover:text-red-900 duration-300 cursor-pointer"
+                            />
                           </li>
                         ))}
                       </ul>

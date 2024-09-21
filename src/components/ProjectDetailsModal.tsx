@@ -17,6 +17,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
+import { Loader2 } from "lucide-react";
 
 interface ProjectDetailsModalProps {
   isOpen: boolean;
@@ -68,6 +69,7 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
     useState<{ name: string; githubUrl: string; image: string }[]>(
       initialContributors
     );
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -130,16 +132,17 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
 
   const handleSave = async () => {
     if (title.trim() && description.trim() && technicalDetails.trim()) {
-      onSave(
-        title,
-        description,
-        technicalDetails,
-        liveUrl,
-        technologies,
-        contributors
-      );
-
+      setIsUploading(true);
       try {
+        await onSave(
+          title,
+          description,
+          technicalDetails,
+          liveUrl,
+          technologies,
+          contributors
+        );
+
         const badgeResponse = await fetch("/api/check-badges", {
           method: "POST",
           headers: {
@@ -152,13 +155,15 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
 
         if (badgeData.newBadges && badgeData.newBadges.length > 0) {
           toast({
-            title: "New Badge Earned!",
-            description: `You've earned the ${badgeData.newBadges[0].name} badge!`,
+            title: "Yeni Rozet Kazanıldı!",
+            description: `${badgeData.newBadges[0].name} rozetini kazandınız!`,
             variant: "default",
           });
         }
       } catch (error) {
-        console.error("Error checking badges:", error);
+        console.error("Rozetleri kontrol ederken hata:", error);
+      } finally {
+        setIsUploading(false);
       }
     }
   };
@@ -300,13 +305,22 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
             Cancel
           </Button>
           <Button
-            className="w-2/3"
+            className="w-2/5"
             onClick={handleSave}
             disabled={
-              !title.trim() || !description.trim() || !technicalDetails.trim()
+              !title.trim() ||
+              !description.trim() ||
+              !technicalDetails.trim() ||
+              isUploading
             }
           >
-            Save Project
+            {isUploading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              </>
+            ) : (
+              "Upload Project"
+            )}
           </Button>
         </div>
       </DialogContent>
