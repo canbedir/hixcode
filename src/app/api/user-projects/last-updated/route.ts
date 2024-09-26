@@ -1,50 +1,32 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "../../auth/[...nextauth]/options";
 
 const prisma = new PrismaClient();
 
-export const dynamic = "force-dynamic";
-
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const limit = searchParams.get('limit');
+  const limit = Number(searchParams.get("limit")) || 5;
 
   try {
-    let projects;
-    if (limit === 'all') {
-      projects = await prisma.project.findMany({
-        orderBy: { lastUpdated: "desc" },
-        include: {
-          user: {
-            select: {
-              name: true,
-              image: true,
-            },
+    const projects = await prisma.project.findMany({
+      orderBy: { lastUpdated: "desc" },
+      take: limit,
+      include: {
+        user: {
+          select: {
+            name: true,
+            image: true,
+            username: true,
           },
         },
-      });
-    } else {
-      projects = await prisma.project.findMany({
-        orderBy: { lastUpdated: "desc" },
-        take: 6,
-        include: {
-          user: {
-            select: {
-              name: true,
-              image: true,
-            },
-          },
-        },
-      });
-    }
+      },
+    });
 
     return NextResponse.json(projects);
   } catch (error) {
-    console.error("Error fetching user projects:", error);
+    console.error("Error fetching projects:", error);
     return NextResponse.json(
-      { message: "Failed to fetch user projects" },
+      { error: "Failed to fetch projects" },
       { status: 500 }
     );
   }

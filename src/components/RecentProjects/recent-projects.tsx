@@ -29,6 +29,7 @@ interface Project {
   user: {
     name: string | null;
     image: string | null;
+    username: string | null;
   };
 }
 
@@ -114,9 +115,14 @@ const RecentProjects = () => {
                                   className="rounded-full mr-2"
                                 />
                               )}
-                              <span className="text-sm font-medium">
-                                {project.user.name || "Anonymous User"}
-                              </span>
+                              <div className="flex items-center gap-1">
+                                <span className="font-medium hover:underline">
+                                  {project.user.name || "Anonymous User"}
+                                </span>
+                                <span className="text-xs text-muted-foreground">
+                                  @{project.user.username || "Anonymous User"}
+                                </span>
+                              </div>
                             </div>
                             <div className="flex items-center gap-2 text-lg">
                               <Star size={16} /> {project.stars}

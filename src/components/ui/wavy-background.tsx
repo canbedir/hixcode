@@ -17,9 +17,24 @@ interface WavyBackgroundProps {
 }
 
 // WavyBackground for Dark mode
-const DarkWavyBackground: React.FC<WavyBackgroundProps> = ({ children, className, containerClassName, colors, waveWidth, blur = 10, speed = "fast", waveOpacity = 0.5, ...props }) => {
+const DarkWavyBackground: React.FC<WavyBackgroundProps> = ({
+  children,
+  className,
+  containerClassName,
+  colors,
+  waveWidth,
+  blur = 10,
+  speed = "fast",
+  waveOpacity = 0.5,
+  ...props
+}) => {
   const noise: NoiseFunction3D = createNoise3D();
-  let w: number, h: number, nt: number, i: number, x: number, ctx: CanvasRenderingContext2D | null;
+  let w: number,
+    h: number,
+    nt: number,
+    i: number,
+    x: number,
+    ctx: CanvasRenderingContext2D | null;
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -79,7 +94,7 @@ const DarkWavyBackground: React.FC<WavyBackgroundProps> = ({ children, className
   return (
     <div
       className={cn("relative w-full overflow-hidden", containerClassName)}
-      style={{ backgroundColor: "#09090B" }}
+      style={{ backgroundColor: "transparent" }}
       {...props}
     >
       <canvas
@@ -97,9 +112,24 @@ const DarkWavyBackground: React.FC<WavyBackgroundProps> = ({ children, className
 };
 
 // WavyBackground for Light mode
-const LightWavyBackground: React.FC<WavyBackgroundProps> = ({ children, className, containerClassName, colors, waveWidth, blur = 10, speed = "fast", waveOpacity = 0.5, ...props }) => {
+const LightWavyBackground: React.FC<WavyBackgroundProps> = ({
+  children,
+  className,
+  containerClassName,
+  colors,
+  waveWidth,
+  blur = 10,
+  speed = "fast",
+  waveOpacity = 0.5,
+  ...props
+}) => {
   const noise: NoiseFunction3D = createNoise3D();
-  let w: number, h: number, nt: number, i: number, x: number, ctx: CanvasRenderingContext2D | null;
+  let w: number,
+    h: number,
+    nt: number,
+    i: number,
+    x: number,
+    ctx: CanvasRenderingContext2D | null;
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -176,7 +206,9 @@ const LightWavyBackground: React.FC<WavyBackgroundProps> = ({ children, classNam
   );
 };
 // Component that selects the appropriate WavyBackground based on the theme
-export const ThemeAwareWavyBackground: React.FC<WavyBackgroundProps> = (props) => {
+export const ThemeAwareWavyBackground: React.FC<WavyBackgroundProps> = (
+  props
+) => {
   const { theme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -185,10 +217,10 @@ export const ThemeAwareWavyBackground: React.FC<WavyBackgroundProps> = (props) =
   }, []);
 
   if (!mounted) {
-    return <div style={{ height: '100vh' }} />; // Show an empty div during loading
+    return <div style={{ height: "100vh" }} />; // Show an empty div during loading
   }
 
-  const currentTheme = theme === 'system' ? resolvedTheme : theme;
+  const currentTheme = theme === "system" ? resolvedTheme : theme;
 
   if (currentTheme === "dark") {
     return <DarkWavyBackground {...props} />;

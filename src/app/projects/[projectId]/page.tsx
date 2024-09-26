@@ -251,7 +251,6 @@ const ProjectDetailPage = () => {
       setUserReaction(data.userReaction);
       setHasLiked(data.userReaction === "like");
       setHasDisliked(data.userReaction === "dislike");
-
     } catch (error) {
       console.error("Error updating reaction:", error);
       setUserReaction(previousReaction);
@@ -300,9 +299,14 @@ const ProjectDetailPage = () => {
                 <div className="flex flex-col">
                   <div className="flex items-center gap-2">
                     <Link href={`/${project.user?.username}`}>
-                      <h1 className="font-semibold hover:underline">
-                        {project?.user?.name || "Unknown"}
-                      </h1>
+                      <div className="flex items-center gap-1">
+                        <h1 className="font-semibold hover:underline">
+                          {project?.user?.name || "Unknown"}
+                        </h1>
+                        <h1 className="text-xs text-white/70 dark:text-slate-600 ">
+                          @{project?.user?.username || "Unknown"}
+                        </h1>
+                      </div>
                     </Link>
                     {project.user?.badges && (
                       <div className="h-5 border rounded-sm flex items-center p-0.5">
@@ -505,9 +509,14 @@ const ProjectDetailPage = () => {
                         <div className="flex flex-col">
                           <div className="flex items-center gap-3">
                             <Link href={`/${comment.user?.username || "#"}`}>
-                              <h1 className="font-semibold hover:underline">
-                                {comment.user?.name || "Unknown"}
-                              </h1>
+                              <div className="flex items-center gap-1">
+                                <h1 className="font-semibold hover:underline">
+                                  {comment.user?.name || "Unknown"}
+                                </h1>
+                                <h1 className="text-xs text-slate-600 dark:text-white/70">
+                                  @{comment.user?.username || "Unknown"}
+                                </h1>
+                              </div>
                             </Link>
                             <span className="text-xs text-gray-500">
                               {new Date(comment.createdAt).toLocaleDateString()}{" "}
@@ -556,7 +565,6 @@ const ProjectDetailPage = () => {
               </div>
             </div>
           </div>
-
         </div>
       </div>
     </div>

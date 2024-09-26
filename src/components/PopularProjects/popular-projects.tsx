@@ -27,6 +27,7 @@ interface Project {
   user: {
     name: string | null;
     image: string | null;
+    username: string | null;
   };
 }
 
@@ -38,10 +39,10 @@ const PopularProjects = () => {
   useEffect(() => {
     const fetchPopularProjects = async () => {
       try {
-        const response = await fetch("/api/user-projects?sort=stars&limit=5");
+        const response = await fetch("/api/user-projects/last-updated?limit=5");
         const data = await response.json();
-
         if (response.ok) {
+          console.log("Fetched projects:", data);
           setProjects(data);
         } else {
           console.error("Error fetching popular projects:", data.message);
@@ -92,9 +93,14 @@ const PopularProjects = () => {
                                 className="rounded-full mr-2"
                               />
                             )}
-                            <span className="text-sm font-medium">
-                              {project?.user?.name || "unknown name"}
-                            </span>
+                            <div className="flex items-center gap-1">
+                              <span className="font-medium hover:underline">
+                                {project?.user?.name || "Unknown"}
+                              </span>
+                              <span className="text-xs text-muted-foreground">
+                                @{project?.user?.username || "unknown"}
+                              </span>
+                            </div>
                           </div>
                           <div className="flex items-center gap-2 text-lg">
                             <Star size={16} /> {project.stars}

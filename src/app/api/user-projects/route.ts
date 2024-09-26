@@ -42,6 +42,7 @@ export async function GET(request: Request) {
             name: true,
             image: true,
             email: true,
+            username: true,
           },
         },
       },

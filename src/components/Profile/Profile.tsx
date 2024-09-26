@@ -21,6 +21,7 @@ interface UserData {
   id: string;
   name: string | null;
   email: string | null;
+  username: string | null;
   image: string | null;
   bio: string | null;
   projects: Project[];
@@ -69,10 +70,18 @@ const Profile = ({ username }: { username: string }) => {
           }));
           setFormattedBadges(formatted);
 
-          const pinned = userData.projects.filter(project => project.isPinned);
+          const pinned = userData.projects.filter(
+            (project) => project.isPinned
+          );
           setPinnedProjects(pinned);
 
-          setDisplayedProjects(showAllProjects ? userData.projects : (pinned.length > 0 ? pinned.slice(0, 4) : userData.projects.slice(-4).reverse()));
+          setDisplayedProjects(
+            showAllProjects
+              ? userData.projects
+              : pinned.length > 0
+              ? pinned.slice(0, 4)
+              : userData.projects.slice(-4).reverse()
+          );
         } else {
           console.error("Failed to fetch user data");
         }
@@ -86,7 +95,13 @@ const Profile = ({ username }: { username: string }) => {
 
   useEffect(() => {
     if (user) {
-      setDisplayedProjects(showAllProjects ? user.projects : (pinnedProjects.length > 0 ? pinnedProjects.slice(0, 4) : user.projects.slice(-4).reverse()));
+      setDisplayedProjects(
+        showAllProjects
+          ? user.projects
+          : pinnedProjects.length > 0
+          ? pinnedProjects.slice(0, 4)
+          : user.projects.slice(-4).reverse()
+      );
     }
   }, [showAllProjects, user, pinnedProjects]);
 
@@ -133,31 +148,35 @@ const Profile = ({ username }: { username: string }) => {
   const handlePinProject = async (projectId: string) => {
     try {
       const response = await fetch(`/api/projects/${projectId}/pin`, {
-        method: 'POST',
+        method: "POST",
       });
       if (response.ok) {
         const data = await response.json();
-        
+
         setUser((prevUser) => {
           if (!prevUser) return null;
-          const updatedProjects = prevUser.projects.map(project => 
-            project.id === projectId ? {...project, isPinned: data.isPinned} : project
+          const updatedProjects = prevUser.projects.map((project) =>
+            project.id === projectId
+              ? { ...project, isPinned: data.isPinned }
+              : project
           );
-          const newUser = {...prevUser, projects: updatedProjects};
-          
-          const newPinnedProjects = newUser.projects.filter(project => project.isPinned);
+          const newUser = { ...prevUser, projects: updatedProjects };
+
+          const newPinnedProjects = newUser.projects.filter(
+            (project) => project.isPinned
+          );
           setPinnedProjects(newPinnedProjects);
-          
-          setDisplayedProjects(prev => {
+
+          setDisplayedProjects((prev) => {
             if (showAllProjects) {
               return updatedProjects;
             } else {
-              return newPinnedProjects.length > 0 
-                ? newPinnedProjects.slice(0, 4) 
+              return newPinnedProjects.length > 0
+                ? newPinnedProjects.slice(0, 4)
                 : updatedProjects.slice(-4).reverse();
             }
           });
-          
+
           return newUser;
         });
 
@@ -170,7 +189,7 @@ const Profile = ({ username }: { username: string }) => {
         throw new Error("Failed to pin/unpin project");
       }
     } catch (error) {
-      console.error('Error pinning/unpinning project:', error);
+      console.error("Error pinning/unpinning project:", error);
       toast({
         title: "Error",
         description: "Failed to pin/unpin project. Please try again.",
@@ -215,9 +234,14 @@ const Profile = ({ username }: { username: string }) => {
                   />
                 </div>
                 <div className="flex items-center gap-3">
-                  <h1 className="text-2xl font-semibold">
-                    {user.name || "Anonymous"}
-                  </h1>
+                  <div className="flex items-center gap-1">
+                    <h1 className="text-2xl font-semibold">
+                      {user.name || "Anonymous"}
+                    </h1>
+                    <h1 className="font-semibold text-muted-foreground">
+                      @{user.username || "Anonymous"}
+                    </h1>
+                  </div>
                   {formattedBadges ? (
                     <div className="flex items-center gap-2 max-w-full h-6 p-1 rounded-sm border">
                       {formattedBadges.map((badge) => (
@@ -281,7 +305,11 @@ const Profile = ({ username }: { username: string }) => {
             >
               Projects
               <span className="text-sm text-gray-500 ml-2">
-                ({showAllProjects ? user.projects.length : displayedProjects.length}/{user.projects.length})
+                (
+                {showAllProjects
+                  ? user.projects.length
+                  : displayedProjects.length}
+                /{user.projects.length})
               </span>
             </h2>
             {isOwnProfile && (
