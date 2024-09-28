@@ -13,6 +13,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProjectDetailsModal from "./ProjectDetailsModal";
 import { Transition } from "@headlessui/react";
+import { FiMinus } from "react-icons/fi";
 
 interface UploadProjectsModalProps {
   isOpen: boolean;
@@ -301,7 +302,7 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
                             <Button
                               variant="outline"
                               size="sm"
-                              className="bg-slate-300 hover:bg-green-500 duration-300 dark:bg-slate-700 h-7 w-7 dark:hover:bg-white dark:hover:text-black border-none text-black/50   dark:text-white hover:text-white rounded-full p-0"
+                              className="bg-slate-300 hover:bg-green-500 duration-300 dark:bg-slate-700 h-7 w-7 dark:hover:bg-green-600 dark:hover:text-white border-none text-black/50   dark:text-white hover:text-white rounded-full p-0"
                               onClick={() => handleSelectRepo(repo)}
                               disabled={loadingRepos[repo.id]}
                             >
@@ -337,10 +338,14 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
                             className="flex items-center p-3 mx-2 border-b justify-between space-x-2"
                           >
                             <span className="text-sm">{project.title}</span>
-                            <Trash
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="bg-slate-300 hover:bg-red-600 duration-300 dark:bg-slate-700 h-7 w-7 dark:hover:bg-red-600 dark:hover:text-white border-none text-black/50 dark:text-white hover:text-white rounded-full p-0"
                               onClick={() => handleRemoveProject(project)}
-                              className="h-6 w-6 text-red-600 hover:text-red-900 duration-300 cursor-pointer"
-                            />
+                            >
+                              <FiMinus />
+                            </Button>
                           </li>
                         ))}
                       </ul>
