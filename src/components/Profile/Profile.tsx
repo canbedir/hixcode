@@ -290,17 +290,25 @@ const Profile = ({ username }: { username: string }) => {
 
         <div className="w-full lg:w-2/3">
           <div className="flex flex-col lg:flex-row justify-between items-center mb-6">
-            <h2
+            <Button
+              variant={"link"}
               className="text-3xl font-bold cursor-pointer mb-4 lg:mb-0"
               onClick={() => setShowAllProjects(!showAllProjects)}
             >
               Projects
               <span className="text-sm text-gray-500 ml-2">
-                ({showAllProjects ? user.projects.length : displayedProjects.length}/{user.projects.length})
+                (
+                {showAllProjects
+                  ? user.projects.length
+                  : displayedProjects.length}
+                /{user.projects.length})
               </span>
-            </h2>
+            </Button>
             {isOwnProfile && (
-              <Button onClick={handleUpdateAllProjects} className="w-1/2 lg:w-auto">
+              <Button
+                onClick={handleUpdateAllProjects}
+                className="w-1/2 lg:w-auto"
+              >
                 Update All Projects
               </Button>
             )}
