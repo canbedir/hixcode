@@ -162,7 +162,7 @@ const ProjectDetailPage = () => {
 
   const handleCommentSubmit = async () => {
     if (!session) {
-      router.push('/api/auth/signin');
+      router.push("/api/auth/signin");
       return;
     }
 
@@ -223,7 +223,7 @@ const ProjectDetailPage = () => {
 
   const handleReaction = async (type: "like" | "dislike") => {
     if (!session) {
-      router.push('/api/auth/signin');
+      router.push("/api/auth/signin");
       return;
     }
 
@@ -382,18 +382,18 @@ const ProjectDetailPage = () => {
         </div>
 
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-10">
-          <div className="p-6 sm:p-10 w-full lg:w-2/3 h-[400px] rounded-xl border flex flex-col justify-center">
+          <div className="p-6 sm:p-10 w-full lg:w-2/3 h-[450px] md:h-[400px] rounded-xl border flex flex-col justify-center">
             <div className="flex flex-col gap-8">
               <div>
                 {project?.technicalDetails ||
                   "Technical details for this project have not been provided."}
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 {project?.technologies && project.technologies.length > 0 ? (
                   project.technologies.map((tech, index) => (
                     <span
                       key={index}
-                      className="py-2 px-3 text-xs rounded-full bg-gray-200 dark:text-black font-semibold"
+                      className="py-2 px-3 text-xs rounded-full bg-gray-200 dark:text-black font-semibold mb-2"
                     >
                       {tech}
                     </span>
