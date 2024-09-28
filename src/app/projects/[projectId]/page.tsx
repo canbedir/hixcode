@@ -123,15 +123,15 @@ const ProjectDetailPage = () => {
     try {
       const response = await fetch(`/api/user-projects/${projectId}`);
       if (!response.ok) {
-        throw new Error("Failed to fetch project");
+        throw new Error(`Failed to fetch project: ${response.statusText}`);
       }
       const data = await response.json();
       setProject(data);
       setLikes(data.likes);
       setDislikes(data.dislikes);
-      setUserReaction(data.userReaction);
-      setHasLiked(data.userReaction === "like");
-      setHasDisliked(data.userReaction === "dislike");
+      setUserReaction(null);
+      setHasLiked(false);
+      setHasDisliked(false);
     } catch (error) {
       console.error("Error fetching project:", error);
     } finally {
