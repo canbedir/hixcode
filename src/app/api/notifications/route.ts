@@ -5,9 +5,10 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/options';
 
 export async function GET(req: Request) {
   const session = await getServerSession(authOptions);
-
+  
   if (!session) {
-    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    // Oturum açmamış kullanıcılar için boş bir dizi döndürün
+    return NextResponse.json([]);
   }
 
   const userEmail = session.user?.email;

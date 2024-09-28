@@ -78,13 +78,17 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
 
   useEffect(() => {
     async function fetchExistingProjects() {
+      if (!session) {
+        return;
+      }
+
       try {
         const response = await fetch(
           "/api/user-projects?limit=all&onlyUserProjects=true"
         );
 
         if (!response.ok) {
-          throw new Error("Mevcut projeler alınamadı.");
+          throw new Error("Failed to fetch existing projects.");
         }
 
         const data = await response.json();
@@ -108,7 +112,7 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
     }
 
     fetchExistingProjects();
-  }, [toast]);
+  }, [session, toast]);
 
   const handleSelectRepo = async (repo: any) => {
     setLoadingRepos({ ...loadingRepos, [repo.id]: true });

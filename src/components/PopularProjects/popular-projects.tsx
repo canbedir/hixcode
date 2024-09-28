@@ -42,7 +42,6 @@ const PopularProjects = () => {
         const response = await fetch("/api/user-projects/last-updated?limit=5");
         const data = await response.json();
         if (response.ok) {
-          console.log("Fetched projects:", data);
           setProjects(data);
         } else {
           console.error("Error fetching popular projects:", data.message);

@@ -9,7 +9,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
 import { ClipLoader } from "react-spinners";
-import { useSession } from "next-auth/react";
 import FilterProjects from "@/components/FilterProjects/filter-projects";
 import {
   Pagination,
@@ -38,7 +37,6 @@ interface Project {
 }
 
 export default function ProjectsContent() {
-  const { data: session, status } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialSortBy =
@@ -83,13 +81,11 @@ export default function ProjectsContent() {
         const response = await fetch(
           `/api/user-projects?${searchParams.toString()}`
         );
-        const data = await response.json();
-
-        if (response.ok) {
-          setProjects(data);
-        } else {
-          console.error("Error fetching projects:", data.message);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
+        const data = await response.json();
+        setProjects(data);
       } catch (error) {
         console.error("Error fetching projects:", error);
       } finally {
@@ -119,7 +115,7 @@ export default function ProjectsContent() {
     router.push(`/projects?${searchParams.toString()}`, { scroll: false });
   };
 
-  if (status === "loading" || !session || loading) {
+  if (loading) {
     return (
       <div className="relative h-screen">
         <div

@@ -5,8 +5,18 @@ import { authOptions } from "../auth/[...nextauth]/options";
 
 const prisma = new PrismaClient();
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
+export async function GET(req: Request) {
+  const session = await getServerSession(authOptions);
+  const { searchParams } = new URL(req.url);
+  
+  // Oturum kontrolünü kaldırın veya isteğe bağlı hale getirin
+  // if (!session) {
+  //   return new Response(JSON.stringify({ error: "Unauthorized" }), {
+  //     status: 401,
+  //     headers: { "Content-Type": "application/json" },
+  //   });
+  // }
+
   const sort = searchParams.get("sort") || "stars";
   const limit = parseInt(searchParams.get("limit") || "0");
   const language = searchParams.get("language");
@@ -14,16 +24,11 @@ export async function GET(request: Request) {
   const minStars = parseInt(searchParams.get("minStars") || "0");
   const onlyUserProjects = searchParams.get("onlyUserProjects") === "true";
 
-  const session = await getServerSession(authOptions);
-  if (!session || !session.user || !session.user.email) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   try {
     const projects = await prisma.project.findMany({
       where: {
         AND: [
-          onlyUserProjects ? { user: { email: session.user.email } } : {},
+          onlyUserProjects ? { user: { email: session?.user?.email } } : {},
           language && language !== "all"
             ? { mostPopularLanguage: { equals: language, mode: "insensitive" } }
             : {},

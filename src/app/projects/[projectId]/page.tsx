@@ -10,9 +10,9 @@ import { GoClock } from "react-icons/go";
 import { LuShare2 } from "react-icons/lu";
 import Link from "next/link";
 import { ClipLoader } from "react-spinners";
-import { FiMessageSquare, FiSend } from "react-icons/fi";
+import { FiLoader, FiMessageSquare, FiSend } from "react-icons/fi";
 import { Textarea } from "@/components/ui/textarea";
-import { useSession } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { GoArrowUpRight } from "react-icons/go";
 import {
   HoverCard,
@@ -22,6 +22,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
 import Contributors from "@/components/Contributors/contributors";
+import { useRouter } from "next/navigation";
 
 interface Project {
   id: string;
@@ -91,6 +92,7 @@ const ProjectDetailPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isEarlyAdopterProject, setIsEarlyAdopterProject] = useState(false);
   const [contributors, setContributors] = useState<Contributor[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
     if (projectId) {
@@ -120,6 +122,9 @@ const ProjectDetailPage = () => {
     setIsLoading(true);
     try {
       const response = await fetch(`/api/user-projects/${projectId}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch project");
+      }
       const data = await response.json();
       setProject(data);
       setLikes(data.likes);
@@ -156,6 +161,11 @@ const ProjectDetailPage = () => {
   };
 
   const handleCommentSubmit = async () => {
+    if (!session) {
+      router.push('/api/auth/signin');
+      return;
+    }
+
     if (!newComment.trim()) return;
     setLoading(true);
 
@@ -212,6 +222,11 @@ const ProjectDetailPage = () => {
   }, [projectId, session?.user?.email]);
 
   const handleReaction = async (type: "like" | "dislike") => {
+    if (!session) {
+      router.push('/api/auth/signin');
+      return;
+    }
+
     const newReaction = userReaction === type ? null : type;
 
     const previousReaction = userReaction;
@@ -389,35 +404,47 @@ const ProjectDetailPage = () => {
               </div>
               <div className="flex items-start md:items-center flex-col md:flex-row gap-10 md:gap-0 md:justify-between">
                 <div className="flex items-center gap-4">
-                  <Button
-                    onClick={() => handleReaction("like")}
-                    variant="outline"
-                    className={`like-button h-12 w-28 ${
-                      hasLiked
-                        ? "bg-blue-600 text-white hover:bg-blue-700 hover:text-white"
-                        : ""
-                    } border transition-colors duration-300`}
-                  >
-                    <span className="flex items-center gap-2">
-                      <BiLike className="h-6 w-6" />
-                      <span>{likes}</span>
-                    </span>
-                  </Button>
+                  {session ? (
+                    <>
+                      <Button
+                        onClick={() => handleReaction("like")}
+                        variant="outline"
+                        className={`like-button h-12 w-28 ${
+                          hasLiked
+                            ? "bg-blue-600 text-white hover:bg-blue-700 hover:text-white"
+                            : ""
+                        } border transition-colors duration-300`}
+                      >
+                        <span className="flex items-center gap-2">
+                          <BiLike className="h-6 w-6" />
+                          <span>{likes}</span>
+                        </span>
+                      </Button>
 
-                  <Button
-                    onClick={() => handleReaction("dislike")}
-                    variant="outline"
-                    className={`dislike-button h-12 w-28 ${
-                      hasDisliked
-                        ? "bg-red-600 text-white hover:bg-red-700 hover:text-white"
-                        : ""
-                    } border transition-colors duration-300`}
-                  >
-                    <span className="flex items-center gap-2">
-                      <BiDislike className="h-6 w-6" />
-                      <span>{dislikes}</span>
-                    </span>
-                  </Button>
+                      <Button
+                        onClick={() => handleReaction("dislike")}
+                        variant="outline"
+                        className={`dislike-button h-12 w-28 ${
+                          hasDisliked
+                            ? "bg-red-600 text-white hover:bg-red-700 hover:text-white"
+                            : ""
+                        } border transition-colors duration-300`}
+                      >
+                        <span className="flex items-center gap-2">
+                          <BiDislike className="h-6 w-6" />
+                          <span>{dislikes}</span>
+                        </span>
+                      </Button>
+                    </>
+                  ) : (
+                    <Button
+                      onClick={() => signIn("github", { callbackUrl: "/" })}
+                      variant="outline"
+                      className="h-12"
+                    >
+                      Sign in to like this project
+                    </Button>
+                  )}
                 </div>
 
                 {isEarlyAdopterProject && (
@@ -543,25 +570,38 @@ const ProjectDetailPage = () => {
 
               {/* Add new comment */}
               <div className="flex flex-col gap-3">
-                <Textarea
-                  placeholder="Add a comment..."
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  className="min-h-[150px] max-h-[300px]"
-                />
-                <Button
-                  onClick={handleCommentSubmit}
-                  disabled={loading || !newComment.trim()}
-                  className="w-1/2 md:w-1/4 p-6 flex items-center"
-                >
-                  {loading ? (
-                    "Submitting..."
-                  ) : (
-                    <div className="flex items-center gap-1">
-                      <FiSend className="h-6 w-6" /> Post Comment
-                    </div>
-                  )}
-                </Button>
+                {session ? (
+                  <div className="flex flex-col gap-4">
+                    <Textarea
+                      placeholder="Write your comment here..."
+                      value={newComment}
+                      onChange={(e) => setNewComment(e.target.value)}
+                    />
+                    <Button
+                      onClick={handleCommentSubmit}
+                      disabled={loading || !newComment.trim()}
+                      className="self-end"
+                    >
+                      {loading ? (
+                        <span className="flex items-center gap-2">
+                          <FiLoader className="animate-spin" /> Sending...
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-2">
+                          <FiSend /> Post
+                        </span>
+                      )}
+                    </Button>
+                  </div>
+                ) : (
+                  <Button
+                    onClick={() => signIn("github", { callbackUrl: "/" })}
+                    variant="outline"
+                    className="h-12"
+                  >
+                    Sign in to post a comment
+                  </Button>
+                )}
               </div>
             </div>
           </div>
