@@ -39,7 +39,7 @@ const PopularProjects = () => {
   useEffect(() => {
     const fetchPopularProjects = async () => {
       try {
-        const response = await fetch("/api/user-projects/last-updated?limit=5");
+        const response = await fetch("/api/user-projects?sort=stars&limit=5");
         const data = await response.json();
         if (response.ok) {
           setProjects(data);

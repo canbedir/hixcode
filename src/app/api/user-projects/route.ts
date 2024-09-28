@@ -6,40 +6,14 @@ import { authOptions } from "../auth/[...nextauth]/options";
 const prisma = new PrismaClient();
 
 export async function GET(req: Request) {
-  const session = await getServerSession(authOptions);
   const { searchParams } = new URL(req.url);
   
-  // Oturum kontrolünü kaldırın veya isteğe bağlı hale getirin
-  // if (!session) {
-  //   return new Response(JSON.stringify({ error: "Unauthorized" }), {
-  //     status: 401,
-  //     headers: { "Content-Type": "application/json" },
-  //   });
-  // }
-
   const sort = searchParams.get("sort") || "stars";
   const limit = parseInt(searchParams.get("limit") || "0");
-  const language = searchParams.get("language");
-  const topic = searchParams.get("topic");
-  const minStars = parseInt(searchParams.get("minStars") || "0");
-  const onlyUserProjects = searchParams.get("onlyUserProjects") === "true";
 
   try {
     const projects = await prisma.project.findMany({
-      where: {
-        AND: [
-          onlyUserProjects ? { user: { email: session?.user?.email } } : {},
-          language && language !== "all"
-            ? { mostPopularLanguage: { equals: language, mode: "insensitive" } }
-            : {},
-          topic && topic !== "all"
-            ? { technologies: { has: topic.toLowerCase() } }
-            : {},
-          { stars: { gte: minStars } },
-        ],
-      },
-      orderBy:
-        sort === "lastUpdated" ? { lastUpdated: "desc" } : { stars: "desc" },
+      orderBy: sort === "lastUpdated" ? { lastUpdated: "desc" } : { stars: "desc" },
       take: limit > 0 ? limit : undefined,
       include: {
         user: {
