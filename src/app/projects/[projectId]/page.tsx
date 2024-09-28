@@ -279,9 +279,9 @@ const ProjectDetailPage = () => {
   }
 
   return (
-    <div className="py-12">
+    <div className="py-12 px-4 sm:px-6 lg:px-8">
       <div className="flex flex-col gap-10">
-        <div className="p-10 w-full h-[400px] bg-gradient-to-b from-black/5 to-black dark:bg-gradient-to-b dark:from-white/5 dark:to-white/80 rounded-xl text-white dark:text-black">
+        <div className="p-6 sm:p-10 w-full h-[400px] bg-gradient-to-b from-black/5 to-black dark:bg-gradient-to-b dark:from-white/5 dark:to-white/80 rounded-xl text-white dark:text-black">
           <div className="h-full flex flex-col gap-4 justify-end">
             <h1 className="font-bold text-6xl">{project?.title}</h1>
             <h3 className="text-xl">
@@ -366,8 +366,8 @@ const ProjectDetailPage = () => {
           </div>
         </div>
 
-        <div className="flex justify-between items-center gap-10">
-          <div className="p-10 w-2/3 h-[400px] rounded-xl border flex flex-col justify-center">
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-10">
+          <div className="p-6 sm:p-10 w-full lg:w-2/3 h-[400px] rounded-xl border flex flex-col justify-center">
             <div className="flex flex-col gap-8">
               <div>
                 {project?.technicalDetails ||
@@ -387,7 +387,7 @@ const ProjectDetailPage = () => {
                   <span>No technologies specified</span>
                 )}
               </div>
-              <div className="flex items-center justify-between">
+              <div className="flex items-start md:items-center flex-col md:flex-row gap-10 md:gap-0 md:justify-between">
                 <div className="flex items-center gap-4">
                   <Button
                     onClick={() => handleReaction("like")}
@@ -446,8 +446,8 @@ const ProjectDetailPage = () => {
             </div>
           </div>
 
-          <div className="flex flex-col gap-5 w-1/3">
-            <div className="p-10 h-[400px] border rounded-xl">
+          <div className="flex flex-col gap-5 w-full lg:w-1/3">
+            <div className="p-6 sm:p-10 h-[400px] border rounded-xl">
               <div className="flex flex-col h-full items-center justify-around ">
                 <Link
                   className="w-full"
@@ -484,8 +484,8 @@ const ProjectDetailPage = () => {
 
         <Contributors contributors={contributors} />
 
-        <div className="flex gap-6">
-          <div className="w-full p-10 border rounded-xl">
+        <div className="flex flex-col gap-6">
+          <div className="w-full p-6 sm:p-10 border rounded-xl">
             <div className="flex flex-col gap-10">
               <h1 className="text-2xl font-semibold flex items-center gap-2">
                 <FiMessageSquare className="h-6 w-6" /> Comments
@@ -552,7 +552,7 @@ const ProjectDetailPage = () => {
                 <Button
                   onClick={handleCommentSubmit}
                   disabled={loading || !newComment.trim()}
-                  className="w-1/4 p-6 flex items-center"
+                  className="w-1/2 md:w-1/4 p-6 flex items-center"
                 >
                   {loading ? (
                     "Submitting..."

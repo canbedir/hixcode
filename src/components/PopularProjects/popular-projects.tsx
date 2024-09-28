@@ -71,16 +71,16 @@ const PopularProjects = () => {
   }
 
   return (
-    <div>
+    <div className="relative">
       <h1 className="text-2xl font-bold mb-4 px-2">Top 5 Projects</h1>
-      <Carousel className="">
+      <Carousel className="w-full">
         <CarouselContent>
           {projects.map((project) => (
-            <CarouselItem key={project.id}>
+            <CarouselItem key={project.id} className="">
               <div className="p-1">
                 <Link key={project.id} href={`/projects/${project.id}`}>
                   <Card>
-                    <CardContent className="flex flex-col h-[300px] p-6 justify-between">
+                    <CardContent className="flex flex-col h-[300px] p-4 sm:p-6 justify-between">
                       <div className="flex items-center mb-2">
                         <div className="flex items-center justify-between w-full">
                           <div className="flex items-center">
@@ -143,8 +143,10 @@ const PopularProjects = () => {
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious />
-        <CarouselNext />
+        <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0">
+          <CarouselPrevious className="left-0 -translate-x-1/2" />
+          <CarouselNext className="right-0 translate-x-1/2" />
+        </div>
       </Carousel>
     </div>
   );

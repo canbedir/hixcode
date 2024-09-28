@@ -264,7 +264,7 @@ const UploadProjectsModal: React.FC<UploadProjectsModalProps> = ({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="sm:max-w-[425px] h-[500px] flex flex-col overflow-y-auto">
+        <DialogContent className="max-w-[425px] h-[500px] flex flex-col overflow-y-auto">
           <DialogHeader className="h-[30px]">
             <DialogTitle className="text-2xl font-bold flex items-center h-full">
               Manage Your Repositories

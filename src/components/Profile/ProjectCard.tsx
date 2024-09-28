@@ -21,10 +21,10 @@ interface ProjectCardProps {
 const ProjectCard: React.FC<ProjectCardProps> = ({ project, onPin, isPinDisabled }) => {
   return (
     <Card className="flex flex-col h-full">
-      <CardContent className="flex flex-col min-h-[350px] max-h-[400px] justify-between h-full p-6">
+      <CardContent className="flex flex-col min-h-[300px] md:min-h-[350px] max-h-[400px] justify-between h-full p-4 md:p-6">
         <div className="flex flex-col">
           <div className="flex justify-between items-center mb-2">
-            <h3 className="text-2xl font-semibold">{project.title}</h3>
+            <h3 className="text-xl md:text-2xl font-semibold">{project.title}</h3>
             <Button 
               size="sm" 
               variant="ghost"
@@ -47,7 +47,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onPin, isPinDisabled
           </span>
         </div>
 
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center mt-4">
           <span className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
             <Star className="h-4 w-4" />
             {project.stars}

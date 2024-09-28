@@ -89,7 +89,7 @@ const RecentProjects = () => {
   };
 
   return (
-    <div>
+    <div className="relative">
       <div className="flex items-center justify-between px-2 mb-4">
         <h1 className="text-2xl font-bold">Recently Updated Projects</h1>
         {!showAll && <Button onClick={handleViewAll}>View All</Button>}
@@ -98,11 +98,11 @@ const RecentProjects = () => {
         <CarouselContent className="-ml-2 md:-ml-4">
           {chunkProjects(projects, 2).map((group, index) => (
             <CarouselItem key={index} className="pl-2 md:pl-4 md:basis-full">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {group.map((project) => (
                   <Link key={project.id} href={`/projects/${project.id}`}>
                     <Card>
-                      <CardContent className="flex flex-col h-[300px] p-6 justify-between">
+                      <CardContent className="flex flex-col h-[300px] p-4 sm:p-6 justify-between">
                         <div className="flex items-center mb-2">
                           <div className="flex items-center justify-between w-full">
                             <div className="flex items-center">
@@ -164,8 +164,10 @@ const RecentProjects = () => {
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious />
-        <CarouselNext />
+        <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0">
+          <CarouselPrevious className="left-0 -translate-x-1/2" />
+          <CarouselNext className="right-0 translate-x-1/2" />
+        </div>
       </Carousel>
     </div>
   );

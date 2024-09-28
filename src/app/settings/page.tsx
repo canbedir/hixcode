@@ -5,6 +5,8 @@ import ThemeSettings from "@/components/Settings/theme-settings";
 import { useSession } from "next-auth/react";
 import React, { useState } from "react";
 import { ClipLoader } from "react-spinners";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Menu } from "lucide-react";
 
 const SettingsPage = () => {
   const { data: session, status } = useSession();
@@ -29,18 +31,32 @@ const SettingsPage = () => {
         return <ProfileSettings />;
       case "Theme":
         return <ThemeSettings />;
-
       default:
         return <ProfileSettings />;
     }
   };
 
   return (
-    <div className="flex m-20 gap-10">
-      <div className="w-1/4">
+    <div className="flex flex-col lg:flex-row m-4 lg:m-20 gap-10 relative">
+      <Sheet>
+        <SheetTrigger asChild>
+          <button className="lg:hidden absolute -top-10 -left-5 m-4 text-2xl">
+            <Menu />
+          </button>
+        </SheetTrigger>
+        <SheetContent side="left" className="w-[250px] sm:w-[300px]">
+          <SettingsSidebar
+            setSelectedTab={setSelectedTab}
+            selectedTab={selectedTab}
+            isMobile={true}
+          />
+        </SheetContent>
+      </Sheet>
+      <div className="hidden lg:block lg:w-1/4">
         <SettingsSidebar
           setSelectedTab={setSelectedTab}
           selectedTab={selectedTab}
+          isMobile={false}
         />
       </div>
       <div className="flex-1 p-5">{renderContent()}</div>

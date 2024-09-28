@@ -8,9 +8,11 @@ import { IoMdPerson } from "react-icons/io";
 const SettingsSidebar = ({
   setSelectedTab,
   selectedTab,
+  isMobile,
 }: {
   setSelectedTab: (tab: string) => void;
   selectedTab: string;
+  isMobile: boolean;
 }) => {
   const { data: session } = useSession();
 
@@ -26,19 +28,21 @@ const SettingsSidebar = ({
   ];
 
   return (
-    <div>
+    <div className={`bg-background p-4 rounded-lg shadow-md ${isMobile ? 'w-full' : 'w-full lg:w-64'}`}>
       <div className="flex flex-col">
-        <div className="flex items-center gap-2">
-          <Image
-            src={session?.user?.image as string}
-            alt={session?.user?.name as string}
-            width={45}
-            height={45}
-            className="rounded-full cursor-pointer"
-          />
-          <span>{session?.user?.name as string}</span>
-        </div>
-        <div className="grid grid-cols-1 mt-5 gap-1">
+        {!isMobile && (
+          <div className="flex items-center gap-2 mb-6">
+            <Image
+              src={session?.user?.image as string}
+              alt={session?.user?.name as string}
+              width={45}
+              height={45}
+              className="rounded-full cursor-pointer"
+            />
+            <span className="font-semibold">{session?.user?.name as string}</span>
+          </div>
+        )}
+        <div className="grid grid-cols-1 gap-2">
           <AnimatedBackground
             defaultValue={TABS[0].label}
             className="rounded-md bg-zinc-100 dark:bg-primary-foreground"

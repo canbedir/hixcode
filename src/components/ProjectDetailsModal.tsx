@@ -170,7 +170,7 @@ const ProjectDetailsModal: React.FC<ProjectDetailsModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="max-w-[425px] sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Project Details</DialogTitle>
         </DialogHeader>

@@ -81,15 +81,15 @@ const NotificationPopover = () => {
           )}
         </div>
       </PopoverTrigger>
-      <PopoverContent className="w-[650px] mx-20 my-3">
-        <div className="max-h-96 overflow-y-auto">
-          <h3 className="font-semibold text-2xl mb-4">Notifications</h3>
+      <PopoverContent className="w-[90vw] sm:w-[450px] md:w-[550px] lg:w-[650px] max-w-[90vw] mx-5 my-3">
+        <div className="max-h-[70vh] overflow-y-auto">
+          <h3 className="font-semibold text-xl sm:text-2xl mb-4">Notifications</h3>
           {notifications.length > 0 ? (
             notifications.map((notification) => (
               <div
                 key={notification.id}
-                className={`mb-2 p-2 cursor-pointer border-b mx-3 ${
-                  notification.read ? "" : " border-red-600"
+                className={`mb-2 p-2 cursor-pointer border-b mx-1 sm:mx-3 ${
+                  notification.read ? "" : "border-red-600"
                 }`}
                 onClick={() => handleNotificationClick(notification)}
               >
@@ -97,13 +97,14 @@ const NotificationPopover = () => {
                   <img
                     src={notification.userImage || "/avatar-placeholder.png"}
                     alt="User"
-                    className="w-8 h-8 rounded-full"
+                    className="w-6 h-6 sm:w-8 sm:h-8 rounded-full"
                   />
                   <div>
                     <p
+                      className="text-sm sm:text-base"
                       dangerouslySetInnerHTML={{ __html: notification.content }}
                     />
-                    <small>
+                    <small className="text-xs sm:text-sm">
                       {new Date(notification.createdAt).toLocaleString()}
                     </small>
                   </div>

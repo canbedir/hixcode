@@ -102,8 +102,8 @@ const ProfileSettings: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col gap-5">
-      <div className="flex items-center justify-between">
+    <div className="flex flex-col gap-5 p-4 max-w-4xl mx-auto">
+      <div className="flex flex-col md:flex-row items-center justify-between gap-5">
         <div className="grid w-full max-w-sm items-center gap-5">
           <div>
             <Label htmlFor="name">Name</Label>
@@ -127,7 +127,7 @@ const ProfileSettings: React.FC = () => {
 
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <div className="cursor-pointer">
+            <div className="cursor-pointer mt-4 md:mt-0">
               <Image
                 src={user?.image || "profile img"}
                 alt={user?.name || "profile name"}
@@ -145,7 +145,7 @@ const ProfileSettings: React.FC = () => {
         </Dialog>
       </div>
 
-      <div className="w-2/3">
+      <div className="w-full md:w-2/3">
         <Label htmlFor="Bio">Bio</Label>
         <Textarea
           placeholder={bio || "Tell us about yourself"}
@@ -154,9 +154,9 @@ const ProfileSettings: React.FC = () => {
         />
       </div>
 
-      <div className="flex justify-between items-center w-2/3">
-        <Button onClick={handleSave}>Save Profile</Button>
-        <Button variant={"outline"} onClick={handleUpdateProfile}>
+      <div className="flex flex-col sm:flex-row justify-between items-center w-full md:w-2/3 gap-3">
+        <Button onClick={handleSave} className="w-full sm:w-auto">Save Profile</Button>
+        <Button variant={"outline"} onClick={handleUpdateProfile} className="w-full sm:w-auto">
           Update Profile
         </Button>
       </div>

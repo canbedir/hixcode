@@ -47,7 +47,7 @@ const SignOutConfirmationModal: React.FC<SignOutConfirmationModalProps> = ({
       </AlertDialogHeader>
       <AlertDialogFooter>
         <AlertDialogCancel onClick={onClose}>Cancel</AlertDialogCancel>
-        <AlertDialogAction className="bg-red-600 hover:bg-red-700" onClick={onConfirm}>Sign out</AlertDialogAction>
+        <AlertDialogAction className="bg-red-600 hover:bg-red-700 text-white" onClick={onConfirm}>Sign out</AlertDialogAction>
       </AlertDialogFooter>
     </AlertDialogContent>
   </AlertDialog>

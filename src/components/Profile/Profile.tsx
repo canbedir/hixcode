@@ -216,104 +216,91 @@ const Profile = ({ username }: { username: string }) => {
   return (
     <div className="container mt-10 p-4">
       <div
-        className={`flex ${
-          showAllProjects ? "flex-col" : "flex-row"
-        } justify-between space-y-8 md:space-y-0 md:space-x-32`}
+        className={`flex flex-col lg:flex-row justify-between space-y-8 lg:space-y-0 lg:space-x-8 xl:space-x-32`}
       >
-        {!showAllProjects && (
-          <div className="md:w-1/5">
-            <div>
-              <div className="flex flex-col">
-                <div className="flex items-center justify-center">
-                  <Image
-                    src={user.image || "/default-profile-image.jpg"}
-                    alt="profile"
-                    width={300}
-                    height={300}
-                    className="rounded-full mb-4 hover:scale-105 transition-all duration-300"
-                  />
+        <div className="w-full lg:w-1/3 xl:w-1/4">
+          <div>
+            <div className="flex flex-col items-center lg:items-start">
+              <Image
+                src={user.image || "/default-profile-image.jpg"}
+                alt="profile"
+                width={256}
+                height={256}
+                className="rounded-full mb-4 hover:scale-105 transition-all duration-300"
+              />
+              <div className="flex items-center gap-3">
+                <div className="flex flex-row items-center gap-1">
+                  <h1 className="text-2xl font-semibold text-center lg:text-left">
+                    {user.name || "Anonymous"}
+                  </h1>
+                  <h1 className="font-semibold text-muted-foreground">
+                    @{user.username || "Anonymous"}
+                  </h1>
                 </div>
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-1">
-                    <h1 className="text-2xl font-semibold">
-                      {user.name || "Anonymous"}
-                    </h1>
-                    <h1 className="font-semibold text-muted-foreground">
-                      @{user.username || "Anonymous"}
-                    </h1>
+                {formattedBadges ? (
+                  <div className="flex items-center gap-2 max-w-full h-6 p-1 rounded-sm border">
+                    {formattedBadges.map((badge) => (
+                      <HoverCard key={badge.id}>
+                        <HoverCardTrigger asChild>
+                          <div className="relative cursor-pointer">
+                            <Image
+                              src={badge.image}
+                              alt={badge.name}
+                              width={20}
+                              height={24}
+                            />
+                          </div>
+                        </HoverCardTrigger>
+                        <HoverCardContent className="w-64" side="top">
+                          <div className="flex items-center space-x-2">
+                            <Avatar className="h-10 w-10">
+                              <AvatarImage src={badge.image} />
+                              <AvatarFallback>
+                                {badge.name.charAt(0)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <h4 className="text-sm font-semibold">
+                                {badge.name}
+                              </h4>
+                              <p className="text-xs text-muted-foreground">
+                                {badge.designation}
+                              </p>
+                            </div>
+                          </div>
+                        </HoverCardContent>
+                      </HoverCard>
+                    ))}
                   </div>
-                  {formattedBadges ? (
-                    <div className="flex items-center gap-2 max-w-full h-6 p-1 rounded-sm border">
-                      {formattedBadges.map((badge) => (
-                        <HoverCard key={badge.id}>
-                          <HoverCardTrigger asChild>
-                            <div className="relative cursor-pointer">
-                              <Image
-                                src={badge.image}
-                                alt={badge.name}
-                                width={20}
-                                height={24}
-                              />
-                            </div>
-                          </HoverCardTrigger>
-                          <HoverCardContent className="w-64" side="top">
-                            <div className="flex items-center space-x-2">
-                              <Avatar className="h-10 w-10">
-                                <AvatarImage src={badge.image} />
-                                <AvatarFallback>
-                                  {badge.name.charAt(0)}
-                                </AvatarFallback>
-                              </Avatar>
-                              <div>
-                                <h4 className="text-sm font-semibold">
-                                  {badge.name}
-                                </h4>
-                                <p className="text-xs text-muted-foreground">
-                                  {badge.designation}
-                                </p>
-                              </div>
-                            </div>
-                          </HoverCardContent>
-                        </HoverCard>
-                      ))}
-                    </div>
-                  ) : (
-                    ""
-                  )}
-                </div>
-                <p className="text-gray-600 dark:text-gray-400 text-sm">
-                  {user.email || "No email provided"}
-                </p>
-                <p className="text-gray-700 dark:text-gray-300 mt-4">
-                  {user.bio || ""}
-                </p>
-                {isOwnProfile && (
-                  <Link href="/settings" className="mt-6 w-full">
-                    <Button className="w-full">Edit Profile</Button>
-                  </Link>
+                ) : (
+                  ""
                 )}
               </div>
+              <p className="text-gray-700 dark:text-gray-300 mt-4 text-center lg:text-left">
+                {user.bio || ""}
+              </p>
+              {isOwnProfile && (
+                <Link href="/settings" className="mt-6 w-1/2 lg:w-full">
+                  <Button className="w-full">Edit Profile</Button>
+                </Link>
+              )}
             </div>
           </div>
-        )}
+        </div>
 
-        <div className={showAllProjects ? "w-full" : "md:w-2/3"}>
-          <div className="flex justify-between items-center">
+        <div className="w-full lg:w-2/3">
+          <div className="flex flex-col lg:flex-row justify-between items-center mb-6">
             <h2
-              className="text-3xl font-bold mb-6 cursor-pointer"
+              className="text-3xl font-bold cursor-pointer mb-4 lg:mb-0"
               onClick={() => setShowAllProjects(!showAllProjects)}
             >
               Projects
               <span className="text-sm text-gray-500 ml-2">
-                (
-                {showAllProjects
-                  ? user.projects.length
-                  : displayedProjects.length}
-                /{user.projects.length})
+                ({showAllProjects ? user.projects.length : displayedProjects.length}/{user.projects.length})
               </span>
             </h2>
             {isOwnProfile && (
-              <Button onClick={handleUpdateAllProjects} className="mb-4">
+              <Button onClick={handleUpdateAllProjects} className="w-1/2 lg:w-auto">
                 Update All Projects
               </Button>
             )}
