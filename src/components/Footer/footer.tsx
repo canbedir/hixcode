@@ -31,7 +31,7 @@ export default function Footer() {
             &copy; {new Date().getFullYear()} hixCode
           </p>
           <div className="flex items-center gap-3">
-            <h1>Developed by hix</h1>
+            <h1>Developed by Hix</h1>
             <div className="flex gap-2">
               <Link
                 href="https://github.com/canbedir"
