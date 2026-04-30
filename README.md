@@ -1,36 +1,104 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+<div align="center">
+
+# hixCode
+
+**Showcase your GitHub projects — beautifully.**
+
+hixCode is an open-source portfolio platform that lets developers present their GitHub repositories in a clean, structured, and visually appealing way. No more sending recruiters to a raw GitHub profile — give your work the presentation it deserves.
+
+[**Live Demo →**](https://hixcode.vercel.app)
+
+</div>
+
+---
+
+## What is hixCode?
+
+GitHub profiles are great for collaborating — but they're not built for showcasing. hixCode bridges that gap by pulling your repositories via the GitHub API and presenting them as a polished, browsable portfolio.
+
+Whether you're a junior developer applying for your first job or an open-source maintainer wanting more visibility, hixCode gives your projects a proper stage.
+
+## Features
+
+- **GitHub API integration** — automatically syncs your repositories
+- **Clean portfolio UI** — projects displayed in a modern, structured layout
+- **Tech stack tagging** — highlights languages and tools used in each project
+- **Fast & responsive** — built with Next.js 14 and deployed on Vercel
+- **Open source** — fork it, customize it, make it yours
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Framework | Next.js 14 (App Router) |
+| Language | TypeScript |
+| Styling | Tailwind CSS |
+| Database | Prisma |
+| Deployment | Vercel |
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+
+- A GitHub account (for API access)
+
+### Installation
 
 ```bash
+# Clone the repository
+git clone https://github.com/canbedir/hixcode.git
+cd hixcode
+
+# Install dependencies
+npm install
+
+# Set up environment variables
+cp .env.example .env.local
+# Fill in your GitHub API token and database URL
+
+# Run database migrations
+npx prisma migrate dev
+
+# Start the development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to see the app.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment Variables
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+```env
+GITHUB_TOKEN=your_github_personal_access_token
+DATABASE_URL=your_database_connection_string
+NEXTAUTH_SECRET=your_nextauth_secret
+NEXTAUTH_URL=http://localhost:3000
+```
 
-## Learn More
+## Roadmap
 
-To learn more about Next.js, take a look at the following resources:
+- [ ] AI-powered project summaries from README and commit history
+- [ ] Smart tagging and auto-categorization of repositories
+- [ ] Custom themes and layout options
+- [ ] Analytics dashboard (views, clicks per project)
+- [ ] Public profile sharing with custom URLs
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Contributing
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+Contributions are welcome! Feel free to open an issue or submit a pull request.
 
-## Deploy on Vercel
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## License
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+This project is open source and available under the [MIT License](LICENSE).
+
+---
+
+<div align="center">
+Built by <a href="https://github.com/canbedir">canbedir</a> · <a href="https://hixcode.vercel.app">hixcode.vercel.app</a>
+</div>
