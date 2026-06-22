@@ -123,7 +123,7 @@ const ProfileButton = () => {
                 height={35}
                 className="rounded-full"
               />
-              <h1 className="text-sm">{session?.user?.name}</h1>
+              <span className="text-sm">{session?.user?.name}</span>
             </SheetTitle>
           </SheetHeader>
           <div className="grid grid-cols-1">

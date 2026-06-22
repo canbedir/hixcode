@@ -4,10 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import { checkAndAssignBadges } from "@/lib/badgeUtils";
 
-export async function POST(
-  req: Request,
-  { params }: { params: { projectId: string } }
-) {
+export async function POST(req: Request, props: { params: Promise<{ projectId: string }> }) {
+  const params = await props.params;
   const { projectId } = params;
   const session = await getServerSession(authOptions);
 

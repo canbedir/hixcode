@@ -5,10 +5,8 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/options';
 
 const prisma = new PrismaClient();
 
-export async function POST(
-  req: Request,
-  { params }: { params: { projectId: string } }
-) {
+export async function POST(req: Request, props: { params: Promise<{ projectId: string }> }) {
+  const params = await props.params;
   try {
     const session = await getServerSession(authOptions);
 

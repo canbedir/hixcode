@@ -1,7 +1,7 @@
 "use client"
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Github, Linkedin } from "lucide-react";
+import { FaGithub, FaLinkedin } from "react-icons/fa";
 
 export default function Footer() {
   const [showFooter, setShowFooter] = useState(false);
@@ -39,7 +39,7 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 className="hover:text-black dark:hover:text-white transition-colors"
               >
-                <Github size={20} />
+                <FaGithub size={20} />
                 <span className="sr-only">GitHub</span>
               </Link>
               <Link
@@ -48,7 +48,7 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 className="hover:text-black dark:hover:text-white transition-colors"
               >
-                <Linkedin size={20} />
+                <FaLinkedin size={20} />
                 <span className="sr-only">LinkedIn</span>
               </Link>
             </div>

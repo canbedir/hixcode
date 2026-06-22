@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { BiLike, BiDislike } from "react-icons/bi";
-import { Github, Star } from "lucide-react";
+import { Star } from "lucide-react";
+import { FaGithub } from "react-icons/fa";
 import { DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { LuEye } from "react-icons/lu";
 import { GoClock } from "react-icons/go";
@@ -482,7 +483,7 @@ const ProjectDetailPage = () => {
                   target="_blank"
                 >
                   <Button className="w-full flex items-center gap-2 h-12 btn-github">
-                    <Github className="h-6 w-6" /> View on GitHub
+                    <FaGithub className="h-6 w-6" /> View on GitHub
                   </Button>
                 </Link>
                 <Link

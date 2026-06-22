@@ -7,7 +7,8 @@ import { authOptions } from '../../auth/[...nextauth]/options';
 const prisma = new PrismaClient();
 const octokit = new Octokit({ auth: process.env.GITHUB_ACCESS_TOKEN });
 
-export async function POST(request: Request, { params }: { params: { projectId: string } }) {
+export async function POST(request: Request, props: { params: Promise<{ projectId: string }> }) {
+  const params = await props.params;
   try {
     const session = await getServerSession(authOptions);
 

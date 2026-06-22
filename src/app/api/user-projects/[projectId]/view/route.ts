@@ -3,10 +3,8 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 
-export async function POST(
-  req: Request,
-  { params }: { params: { projectId: string } }
-) {
+export async function POST(req: Request, props: { params: Promise<{ projectId: string }> }) {
+  const params = await props.params;
   const { projectId } = params;
 
   const session = await getServerSession(authOptions);

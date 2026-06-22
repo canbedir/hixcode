@@ -5,10 +5,8 @@ import { getServerSession } from 'next-auth';
 
 const prisma = new PrismaClient();
 
-export async function GET(
-  req: Request,
-  { params }: { params: { projectId: string } }
-) {
+export async function GET(req: Request, props: { params: Promise<{ projectId: string }> }) {
+  const params = await props.params;
   const { projectId } = params;
 
   try {

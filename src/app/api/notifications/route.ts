@@ -28,17 +28,14 @@ export async function GET(req: Request) {
   return NextResponse.json(notifications);
 }
 
-export async function POST(
-  req: Request,
-  { params }: { params: { notificationId: string } }
-) {
+export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
 
   if (!session) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
 
-  const { notificationId } = params;
+  const { notificationId } = await req.json();
 
   const notification = await prisma.notification.update({
     where: { id: notificationId },
