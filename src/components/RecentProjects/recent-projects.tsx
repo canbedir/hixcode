@@ -98,7 +98,7 @@ const RecentProjects = () => {
         {!showAll && <Button onClick={handleViewAll}>View All</Button>}
       </div>
       <Carousel className="w-full">
-        <CarouselContent className="-ml-2 md:-ml-4">
+        <CarouselContent className="-ml-2 md:-ml-4 py-2">
           {chunkProjects(projects, 2).map((group, index) => (
             <CarouselItem key={index} className="pl-2 md:pl-4 md:basis-full">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

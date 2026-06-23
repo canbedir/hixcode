@@ -54,11 +54,11 @@ const DarkWavyBackground: React.FC<WavyBackgroundProps> = ({
     nt = 0;
 
     const waveColors = colors ?? [
-      "rgba(76, 29, 149, 0.1)",
-      "rgba(124, 58, 237, 0.2)",
-      "rgba(167, 139, 250, 0.3)",
-      "rgba(196, 181, 253, 0.4)",
-      "rgba(233, 213, 255, 0.5)",
+      "rgba(30, 58, 138, 0.1)",
+      "rgba(37, 99, 235, 0.2)",
+      "rgba(59, 130, 246, 0.3)",
+      "rgba(96, 165, 250, 0.4)",
+      "rgba(147, 197, 253, 0.5)",
     ];
 
     const drawWave = (n: number) => {

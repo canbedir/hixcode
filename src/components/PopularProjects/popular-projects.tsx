@@ -70,7 +70,7 @@ const PopularProjects = () => {
     <div className="relative">
       <h1 className="text-2xl font-bold mb-4 px-2">Top 5 Projects</h1>
       <Carousel className="w-full">
-        <CarouselContent>
+        <CarouselContent className="py-2">
           {projects.map((project) => (
             <CarouselItem key={project.id} className="">
               <div className="p-1">
