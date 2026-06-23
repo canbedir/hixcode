@@ -11,15 +11,18 @@ const Navbar = () => {
   const { status } = useSession();
 
   return (
-    <div className="w-full h-[80px] dark:shadow-black shadow-md">
-      <div className="flex items-center justify-between h-full text-2xl px-5 md:px-10">
+    <div className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-lg supports-backdrop-filter:bg-background/60">
+      <div className="flex items-center justify-between h-18 text-2xl px-5 md:px-10">
         <div>
           {status === "loading" ? (
             <Skeleton className="w-28 h-10 rounded-md" />
           ) : (
-            <Link href={"/"} className="font-semibold">
+            <Link
+              href={"/"}
+              className="font-bold tracking-tight transition-opacity hover:opacity-80"
+            >
               <span>hix</span>
-              <span>Code</span>
+              <span className="text-primary">Code</span>
             </Link>
           )}
         </div>

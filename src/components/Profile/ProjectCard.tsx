@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Star, Pin, PinOff } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import LanguageBadge from "@/components/LanguageBadge";
 
 interface ProjectCardProps {
   project: {
@@ -20,7 +21,7 @@ interface ProjectCardProps {
 
 const ProjectCard: React.FC<ProjectCardProps> = ({ project, onPin, isPinDisabled }) => {
   return (
-    <Card className="flex flex-col h-full">
+    <Card className="flex flex-col h-full transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/10">
       <CardContent className="flex flex-col min-h-[300px] md:min-h-[350px] max-h-[400px] justify-between h-full p-4 md:p-6">
         <div className="flex flex-col">
           <div className="flex justify-between items-center mb-2">
@@ -39,9 +40,10 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onPin, isPinDisabled
           </p>
         </div>
         <div className="flex flex-col gap-1">
-          <span className="bg-black dark:bg-white dark:text-black text-white px-2 py-1 rounded-full text-xs w-fit">
-            {project.mostPopularLanguage}
-          </span>
+          <LanguageBadge
+            language={project.mostPopularLanguage}
+            className="text-xs"
+          />
           <span className="text-gray-600 dark:text-gray-400 text-sm">
             {project.technicalDetails}
           </span>

@@ -2,8 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { FaRegDotCircle } from "react-icons/fa";
 import { Star } from "lucide-react";
+import LanguageBadge from "@/components/LanguageBadge";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
@@ -161,7 +161,7 @@ export default function ProjectsContent() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {currentProjects.map((project) => (
           <Link key={project.id} href={`/projects/${project.id}`}>
-            <Card>
+            <Card className="h-full transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/10">
               <CardContent className="flex flex-col h-[300px] p-6 justify-between">
                 <div className="flex items-center mb-2">
                   <div className="flex items-center justify-between w-full">
@@ -195,17 +195,8 @@ export default function ProjectsContent() {
                     {project.description || `${project.title} description`}
                   </p>
                 </div>
-                <div className="flex justify-between items-center text-sm text-black mt-auto">
-                  <div className="flex items-center">
-                    {project.mostPopularLanguage && (
-                      <>
-                        <FaRegDotCircle className="mr-1" />
-                        <span className="text-sm">
-                          {project.mostPopularLanguage}
-                        </span>
-                      </>
-                    )}
-                  </div>
+                <div className="flex justify-between items-center text-sm mt-auto">
+                  <LanguageBadge language={project.mostPopularLanguage} />
                   <div className="text-sm text-gray-400">
                     Updated {new Date(project.lastUpdated).toLocaleDateString()}
                   </div>

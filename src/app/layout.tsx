@@ -10,12 +10,34 @@ import Footer from "@/components/Footer/footer";
 
 const poppins = Poppins({
   subsets: ["latin"],
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+  variable: "--font-poppins",
 });
 
 export const metadata: Metadata = {
-  title: "hixCode",
-  description: "hixCode",
+  metadataBase: new URL("https://hixcode.vercel.app"),
+  title: {
+    default: "hixCode — Showcase your GitHub projects",
+    template: "%s · hixCode",
+  },
+  description:
+    "Present your GitHub repositories as a clean, structured, developer-friendly portfolio. Discover projects, connect with developers, and get inspired.",
+  keywords: ["GitHub", "portfolio", "developer", "projects", "open source"],
+  openGraph: {
+    title: "hixCode — Showcase your GitHub projects",
+    description:
+      "Present your GitHub repositories as a clean, structured, developer-friendly portfolio.",
+    url: "https://hixcode.vercel.app",
+    siteName: "hixCode",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "hixCode — Showcase your GitHub projects",
+    description:
+      "Present your GitHub repositories as a clean, structured, developer-friendly portfolio.",
+  },
 };
 
 export default function RootLayout({

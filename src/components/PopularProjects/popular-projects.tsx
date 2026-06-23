@@ -8,8 +8,8 @@ import {
   CarouselPrevious,
 } from "../ui/carousel";
 import { Card, CardContent } from "../ui/card";
-import { FaRegDotCircle } from "react-icons/fa";
 import { Star } from "lucide-react";
+import LanguageBadge from "@/components/LanguageBadge";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
@@ -78,7 +78,7 @@ const PopularProjects = () => {
             <CarouselItem key={project.id} className="">
               <div className="p-1">
                 <Link key={project.id} href={`/projects/${project.id}`}>
-                  <Card>
+                  <Card className="h-full transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/10">
                     <CardContent className="flex flex-col h-[300px] p-4 sm:p-6 justify-between">
                       <div className="flex items-center mb-2">
                         <div className="flex items-center justify-between w-full">
@@ -117,18 +117,9 @@ const PopularProjects = () => {
                       </div>
 
                       <div className="flex justify-between items-center text-sm mt-auto">
-                        <div className="flex items-center">
-                          {project.mostPopularLanguage ? (
-                            <>
-                              <FaRegDotCircle className="mr-1" />
-                              <span className="text-sm">
-                                {project.mostPopularLanguage}
-                              </span>
-                            </>
-                          ) : (
-                            " "
-                          )}
-                        </div>
+                        <LanguageBadge
+                          language={project.mostPopularLanguage}
+                        />
 
                         <div className="text-sm text-gray-400">
                           Updated{" "}

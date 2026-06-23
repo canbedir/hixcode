@@ -34,7 +34,7 @@ interface UserData {
 }
 
 interface FormattedBadge {
-  id: number;
+  id: string;
   name: string;
   designation: string;
   image: string;
@@ -61,7 +61,7 @@ const Profile = ({ username }: { username: string }) => {
           setUser(userData);
 
           const formatted = userData.badges.map((badge) => ({
-            id: parseInt(badge.id),
+            id: badge.id,
             name: badge.name,
             designation: badge.description,
             image: badge.icon.startsWith("/")

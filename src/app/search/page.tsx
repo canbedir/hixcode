@@ -3,8 +3,8 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
-import { FaRegDotCircle } from "react-icons/fa";
 import { Star } from "lucide-react";
+import LanguageBadge from "@/components/LanguageBadge";
 import Image from "next/image";
 import { ClipLoader } from "react-spinners";
 import { Suspense } from "react";
@@ -55,7 +55,7 @@ const ResultCard = ({ result }: { result: SearchResult }) => (
         : `/${result.username}`
     }
   >
-    <Card>
+    <Card className="transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/10">
       <CardContent
         className={`flex flex-col p-6 justify-between ${
           result.type === "user" ? "h-[150px]" : "h-[300px]"
@@ -189,14 +189,7 @@ const ResultCard = ({ result }: { result: SearchResult }) => (
         </div>
         {result.type === "project" && (
           <div className="flex justify-between items-center text-sm text-muted-foreground mt-auto">
-            <div className="flex items-center">
-              {result.mostPopularLanguage && (
-                <>
-                  <FaRegDotCircle className="mr-1" />
-                  <span className="text-sm">{result.mostPopularLanguage}</span>
-                </>
-              )}
-            </div>
+            <LanguageBadge language={result.mostPopularLanguage} />
             <div className="text-sm text-muted-foreground">
               Updated{" "}
               {result.lastUpdated &&
