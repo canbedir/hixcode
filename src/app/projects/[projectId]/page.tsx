@@ -10,7 +10,7 @@ import { LuEye } from "react-icons/lu";
 import { GoClock } from "react-icons/go";
 import { LuShare2 } from "react-icons/lu";
 import Link from "next/link";
-import { ClipLoader } from "react-spinners";
+import { Skeleton } from "@/components/ui/skeleton";
 import { FiLoader, FiMessageSquare, FiSend } from "react-icons/fi";
 import { Textarea } from "@/components/ui/textarea";
 import { signIn, useSession } from "next-auth/react";
@@ -279,12 +279,17 @@ const ProjectDetailPage = () => {
 
   if (isLoading) {
     return (
-      <div className="relative h-screen">
-        <div
-          className="flex justify-center items-center"
-          style={{ height: "calc(100% - 160px)" }}
-        >
-          <ClipLoader color="#b5b5b5" size={100} />
+      <div className="py-12 px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col gap-10">
+          <Skeleton className="w-full h-[400px] rounded-xl" />
+          <div className="flex flex-col gap-4">
+            <Skeleton className="h-8 w-48" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Skeleton className="h-24 w-full rounded-xl" />
+              <Skeleton className="h-24 w-full rounded-xl" />
+            </div>
+          </div>
+          <Skeleton className="h-64 w-full rounded-xl" />
         </div>
       </div>
     );

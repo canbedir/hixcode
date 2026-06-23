@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { useSession } from "next-auth/react";
-import { ClipLoader } from "react-spinners";
+import { Skeleton } from "@/components/ui/skeleton";
 import Image from "next/image";
 import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
@@ -23,6 +23,7 @@ const ProfileSettings: React.FC = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [bio, setBio] = useState("");
   const [user, setUser] = useState(session?.user);
+  const [isLoadingProfile, setIsLoadingProfile] = useState(true);
   const { toast } = useToast();
   const router = useRouter();
 
@@ -36,6 +37,9 @@ const ProfileSettings: React.FC = () => {
         })
         .catch((error) => {
           console.error("Failed to fetch profile settings:", error);
+        })
+        .finally(() => {
+          setIsLoadingProfile(false);
         });
     }
   }, [session]);
@@ -83,14 +87,31 @@ const ProfileSettings: React.FC = () => {
     }
   };
 
-  if (status === "loading") {
+  if (status === "loading" || isLoadingProfile) {
     return (
-      <div className="relative h-screen">
-        <div
-          className="flex justify-center items-center"
-          style={{ height: "calc(100% - 160px)" }}
-        >
-          <ClipLoader color="#b5b5b5" size={100} />
+      <div className="flex flex-col gap-5 p-4 max-w-4xl mx-auto">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-5">
+          <div className="grid w-full max-w-sm items-center gap-5">
+            <div className="flex flex-col gap-2">
+              <Skeleton className="h-4 w-16" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div className="flex flex-col gap-2">
+              <Skeleton className="h-4 w-16" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+          </div>
+          <Skeleton className="h-[170px] w-[170px] rounded-full" />
+        </div>
+
+        <div className="w-full md:w-2/3 flex flex-col gap-2">
+          <Skeleton className="h-4 w-12" />
+          <Skeleton className="h-20 w-full" />
+        </div>
+
+        <div className="flex flex-col sm:flex-row justify-between w-full md:w-2/3 gap-3">
+          <Skeleton className="h-10 w-full sm:w-32" />
+          <Skeleton className="h-10 w-full sm:w-32" />
         </div>
       </div>
     );

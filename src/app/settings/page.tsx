@@ -4,7 +4,7 @@ import SettingsSidebar from "@/components/Settings/settings-sidebar";
 import ThemeSettings from "@/components/Settings/theme-settings";
 import { useSession } from "next-auth/react";
 import React, { useState } from "react";
-import { ClipLoader } from "react-spinners";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
 
@@ -14,12 +14,18 @@ const SettingsPage = () => {
 
   if (status === "loading" || !session) {
     return (
-      <div className="relative h-screen">
-        <div
-          className="flex justify-center items-center"
-          style={{ height: "calc(100% - 160px)" }}
-        >
-          <ClipLoader color="#b5b5b5" size={100} />
+      <div className="flex flex-col lg:flex-row m-4 lg:m-20 gap-10">
+        <div className="hidden lg:flex lg:w-1/4 flex-col gap-3">
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-10 w-full" />
+        </div>
+        <div className="flex-1 p-5 flex flex-col gap-6">
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-12 w-full" />
+          <Skeleton className="h-12 w-full" />
+          <Skeleton className="h-12 w-2/3" />
+          <Skeleton className="h-10 w-32" />
         </div>
       </div>
     );

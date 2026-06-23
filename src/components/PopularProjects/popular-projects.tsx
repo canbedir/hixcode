@@ -14,6 +14,7 @@ import Image from "next/image";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { Skeleton } from "../ui/skeleton";
+import { ProjectGridSkeleton } from "@/components/skeletons/ProjectCardSkeleton";
 
 interface Project {
   id: string;
@@ -59,12 +60,8 @@ const PopularProjects = () => {
   if (loading) {
     return (
       <div className="w-full">
-        <Skeleton className="w-full h-8 mb-4" />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[...Array(5)].map((_, index) => (
-            <Skeleton key={index} className="h-[300px] w-full rounded-xl" />
-          ))}
-        </div>
+        <Skeleton className="h-8 w-44 mb-4 mx-2" />
+        <ProjectGridSkeleton count={3} />
       </div>
     );
   }

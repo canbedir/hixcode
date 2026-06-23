@@ -14,7 +14,8 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import ProjectCard from "./ProjectCard";
 import { useToast } from "../ui/use-toast";
-import { ClipLoader } from "react-spinners";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ProjectGridSkeleton } from "@/components/skeletons/ProjectCardSkeleton";
 import { Project } from "@prisma/client";
 
 interface UserData {
@@ -200,12 +201,24 @@ const Profile = ({ username }: { username: string }) => {
 
   if (!user) {
     return (
-      <div className="relative h-screen">
-        <div
-          className="flex justify-center items-center"
-          style={{ height: "calc(100% - 160px)" }}
-        >
-          <ClipLoader color="#b5b5b5" size={100} />
+      <div className="container mt-10 p-4">
+        <div className="flex flex-col lg:flex-row justify-between space-y-8 lg:space-y-0 lg:space-x-8 xl:space-x-32">
+          <div className="w-full lg:w-1/3 xl:w-1/4">
+            <div className="flex flex-col items-center lg:items-start">
+              <Skeleton className="h-40 w-40 rounded-full mb-4" />
+              <Skeleton className="h-7 w-48 mb-2" />
+              <Skeleton className="h-4 w-32 mb-4" />
+              <Skeleton className="h-16 w-full mb-4" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+          </div>
+          <div className="w-full lg:w-2/3">
+            <Skeleton className="h-8 w-40 mb-6" />
+            <ProjectGridSkeleton
+              count={4}
+              className="grid grid-cols-1 md:grid-cols-2 gap-6"
+            />
+          </div>
         </div>
       </div>
     );

@@ -6,7 +6,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Star } from "lucide-react";
 import LanguageBadge from "@/components/LanguageBadge";
 import Image from "next/image";
-import { ClipLoader } from "react-spinners";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ProjectGridSkeleton } from "@/components/skeletons/ProjectCardSkeleton";
 import { Suspense } from "react";
 import {
   HoverCard,
@@ -212,13 +213,9 @@ export default function SearchPage() {
 
 function LoadingSpinner() {
   return (
-    <div className="relative h-screen">
-      <div
-        className="flex justify-center items-center"
-        style={{ height: "calc(100% - 160px)" }}
-      >
-        <ClipLoader color="#b5b5b5" size={100} />
-      </div>
+    <div className="container mx-auto mt-8">
+      <Skeleton className="h-9 w-64 mb-6" />
+      <ProjectGridSkeleton count={6} />
     </div>
   );
 }
@@ -254,13 +251,13 @@ function SearchContent() {
 
   if (loading) {
     return (
-      <div className="relative h-screen">
-        <div
-          className="flex justify-center items-center"
-          style={{ height: "calc(100% - 160px)" }}
-        >
-          <ClipLoader color="#b5b5b5" size={100} />
+      <div className="container mx-auto mt-8">
+        <Skeleton className="h-9 w-64 mb-6" />
+        <div className="flex mb-4 items-end justify-end gap-4">
+          <Skeleton className="h-6 w-28" />
+          <Skeleton className="h-6 w-20" />
         </div>
+        <ProjectGridSkeleton count={6} />
       </div>
     );
   }

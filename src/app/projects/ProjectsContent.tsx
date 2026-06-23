@@ -8,7 +8,8 @@ import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
-import { ClipLoader } from "react-spinners";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ProjectGridSkeleton } from "@/components/skeletons/ProjectCardSkeleton";
 import FilterProjects from "@/components/FilterProjects/filter-projects";
 import {
   Pagination,
@@ -117,13 +118,15 @@ export default function ProjectsContent() {
 
   if (loading) {
     return (
-      <div className="relative h-screen">
-        <div
-          className="flex justify-center items-center"
-          style={{ height: "calc(100% - 160px)" }}
-        >
-          <ClipLoader color="#b5b5b5" size={100} />
+      <div className="mt-10 py-4">
+        <div className="mb-6 border-b pb-4">
+          <Skeleton className="h-10 w-full max-w-md" />
         </div>
+        <div className="flex justify-between items-center mb-6 mt-6">
+          <Skeleton className="h-9 w-48" />
+          <Skeleton className="h-9 w-40" />
+        </div>
+        <ProjectGridSkeleton count={9} />
       </div>
     );
   }

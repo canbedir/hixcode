@@ -16,6 +16,7 @@ import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Skeleton } from "../ui/skeleton";
+import { ProjectGridSkeleton } from "@/components/skeletons/ProjectCardSkeleton";
 
 interface Project {
   id: string;
@@ -74,12 +75,14 @@ const RecentProjects = () => {
   if (loading) {
     return (
       <div className="w-full">
-        <Skeleton className="w-full h-8 mb-4" />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {[...Array(4)].map((_, index) => (
-            <Skeleton key={index} className="h-[300px] w-full rounded-xl" />
-          ))}
+        <div className="flex items-center justify-between px-2 mb-4">
+          <Skeleton className="h-8 w-56" />
+          <Skeleton className="h-9 w-20" />
         </div>
+        <ProjectGridSkeleton
+          count={2}
+          className="grid grid-cols-1 sm:grid-cols-2 gap-4"
+        />
       </div>
     );
   }
