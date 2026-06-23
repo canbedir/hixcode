@@ -10,7 +10,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { useRouter } from "next/navigation";
-import AnimatedBackground from "@/components/animated-background";
+import { motion } from "framer-motion";
 import { RiUser3Line } from "react-icons/ri";
 import { MdExitToApp } from "react-icons/md";
 import { Settings } from "lucide-react";
@@ -59,6 +59,7 @@ const ProfileButton = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [isSignOutModalOpen, setIsSignOutModalOpen] = useState(false);
+  const [hoveredTab, setHoveredTab] = useState<string | null>(null);
 
   const handleSignOut = () => {
     signOut({ redirect: false, callbackUrl: "/" }).then(() => {
@@ -126,32 +127,34 @@ const ProfileButton = () => {
               <span className="text-sm">{session?.user?.name}</span>
             </SheetTitle>
           </SheetHeader>
-          <div className="grid grid-cols-1">
-            <AnimatedBackground
-              defaultValue={TABS[0].label}
-              className="rounded-lg bg-zinc-100 dark:bg-zinc-800"
-              transition={{
-                type: "spring",
-                bounce: 0.2,
-                duration: 0.3,
-              }}
-              enableHover
-            >
-              {TABS.map((tab, index) => (
+          <div
+            className="flex flex-col"
+            onMouseLeave={() => setHoveredTab(null)}
+          >
+            {TABS.map((tab) => {
+              const isActive = (hoveredTab ?? TABS[0].label) === tab.label;
+              return (
                 <button
-                  key={index}
-                  data-id={tab.label}
+                  key={tab.label}
                   type="button"
+                  onMouseEnter={() => setHoveredTab(tab.label)}
                   onClick={() => handleTabClick(tab.onClick)}
-                  className="p-2 text-zinc-600 transition-colors duration-300 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-50 flex items-center"
+                  className="relative flex w-full items-center p-2 text-zinc-600 transition-colors duration-300 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-50"
                 >
-                  <div className="flex items-center gap-2">
+                  {isActive && (
+                    <motion.div
+                      layoutId="profile-menu-highlight"
+                      className="absolute inset-0 rounded-lg bg-zinc-100 dark:bg-zinc-800"
+                      transition={{ type: "spring", bounce: 0.2, duration: 0.3 }}
+                    />
+                  )}
+                  <div className="relative z-10 flex items-center gap-2">
                     {tab.icon}
                     {tab.label}
                   </div>
                 </button>
-              ))}
-            </AnimatedBackground>
+              );
+            })}
           </div>
         </SheetContent>
       </Sheet>
