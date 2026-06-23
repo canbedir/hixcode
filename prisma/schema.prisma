@@ -85,6 +85,9 @@ model Project {
   isPinned            Boolean        @default(false)
   technologies        String[]
   notifications       Notification[]
+  coverImage          String?
+  headerStyle         String?
+  headerColor         String?
 }
 
 model Contributor {
