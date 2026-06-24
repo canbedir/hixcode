@@ -14,7 +14,6 @@ import { motion } from "framer-motion";
 import { RiUser3Line } from "react-icons/ri";
 import { MdExitToApp } from "react-icons/md";
 import { Settings } from "lucide-react";
-import UploadProjectsModal from "../UploadProjectsModal";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -57,7 +56,6 @@ const ProfileButton = () => {
   const { data: session } = useSession();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
-  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [isSignOutModalOpen, setIsSignOutModalOpen] = useState(false);
   const [hoveredTab, setHoveredTab] = useState<string | null>(null);
 
@@ -158,10 +156,6 @@ const ProfileButton = () => {
           </div>
         </SheetContent>
       </Sheet>
-      <UploadProjectsModal
-        isOpen={isUploadModalOpen}
-        setIsOpen={setIsUploadModalOpen}
-      />
       <SignOutConfirmationModal
         isOpen={isSignOutModalOpen}
         onClose={() => setIsSignOutModalOpen(false)}

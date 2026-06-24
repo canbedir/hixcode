@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React from "react";
 import dynamic from "next/dynamic";
 import AnimatedBackground from "../animated-background";
 import { PiMailboxBold } from "react-icons/pi";
@@ -7,7 +7,6 @@ import { TbUpload } from "react-icons/tb";
 import SignInButton from "../Navbar/SignInButton";
 import { Input } from "../ui/input";
 import { Search } from "lucide-react";
-import UploadProjectsModal from "../UploadProjectsModal";
 import { useSession } from "next-auth/react";
 import { IoCodeSlash } from "react-icons/io5";
 import { useRouter } from "next/navigation";
@@ -19,7 +18,6 @@ const NotificationPopover = dynamic(
 );
 
 const NavbarMenu = () => {
-  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const { data: session } = useSession();
   const router = useRouter();
 
@@ -30,7 +28,7 @@ const NavbarMenu = () => {
     },
     {
       icon: <TbUpload className="h-6 w-6" />,
-      onClick: () => setIsUploadModalOpen(true),
+      onClick: () => router.push("/upload"),
     },
     {
       icon: <NotificationPopover />,
@@ -68,10 +66,6 @@ const NavbarMenu = () => {
         </AnimatedBackground>
       </div>
       <SignInButton />
-      <UploadProjectsModal
-        isOpen={isUploadModalOpen}
-        setIsOpen={setIsUploadModalOpen}
-      />
     </div>
   );
 };

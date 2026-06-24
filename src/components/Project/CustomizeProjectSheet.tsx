@@ -13,13 +13,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
-import { Loader2, Check } from "lucide-react";
-import { cn } from "@/lib/utils";
-import {
-  HEADER_PRESETS,
-  DEFAULT_HEADER_STYLE,
-  getHeaderClasses,
-} from "@/lib/header-presets";
+import { Loader2 } from "lucide-react";
+import HeaderStylePicker from "@/components/Project/HeaderStylePicker";
+import { DEFAULT_HEADER_STYLE } from "@/lib/header-presets";
 
 export interface CustomizeInitial {
   title: string;
@@ -100,18 +96,6 @@ export default function CustomizeProjectSheet({
     }
   };
 
-  // Preview style for the small header thumbnail.
-  const previewStyle: React.CSSProperties =
-    headerStyle === "solid"
-      ? { backgroundColor: headerColor }
-      : headerStyle === "image" && coverImage
-      ? { backgroundImage: `url(${coverImage})`, backgroundSize: "cover", backgroundPosition: "center" }
-      : {};
-  const previewClass =
-    headerStyle === "solid" || headerStyle === "image"
-      ? ""
-      : getHeaderClasses(headerStyle);
-
   const handleSave = async () => {
     if (!title.trim()) {
       toast({ title: "Title is required", variant: "destructive" });
@@ -156,83 +140,15 @@ export default function CustomizeProjectSheet({
         </SheetHeader>
 
         <div className="flex flex-col gap-6 py-6">
-          {/* Live header preview */}
-          <div
-            className={cn(
-              "relative h-24 w-full overflow-hidden rounded-lg border",
-              previewClass
-            )}
-            style={previewStyle}
-          >
-            <div className="absolute inset-0 bg-black/20" />
-            <span className="absolute bottom-2 left-3 text-sm font-semibold text-white drop-shadow">
-              {title || "Project title"}
-            </span>
-          </div>
-
-          {/* Header style */}
-          <div className="flex flex-col gap-3">
-            <Label>Header style</Label>
-            <div className="flex flex-wrap gap-2">
-              {HEADER_PRESETS.map((preset) => (
-                <button
-                  key={preset.id}
-                  type="button"
-                  title={preset.label}
-                  onClick={() => setHeaderStyle(preset.id)}
-                  className={cn(
-                    "relative h-9 w-9 rounded-full border",
-                    preset.className,
-                    headerStyle === preset.id && "ring-2 ring-ring ring-offset-2 ring-offset-background"
-                  )}
-                >
-                  {headerStyle === preset.id && (
-                    <Check className="absolute inset-0 m-auto h-4 w-4 text-white" />
-                  )}
-                </button>
-              ))}
-              <button
-                type="button"
-                title="Solid color"
-                onClick={() => setHeaderStyle("solid")}
-                className={cn(
-                  "h-9 w-9 rounded-full border",
-                  headerStyle === "solid" && "ring-2 ring-ring ring-offset-2 ring-offset-background"
-                )}
-                style={{ backgroundColor: headerColor }}
-              />
-            </div>
-
-            {headerStyle === "solid" && (
-              <div className="flex items-center gap-3">
-                <input
-                  type="color"
-                  value={headerColor}
-                  onChange={(e) => setHeaderColor(e.target.value)}
-                  className="h-9 w-12 cursor-pointer rounded border bg-transparent"
-                />
-                <Input
-                  value={headerColor}
-                  onChange={(e) => setHeaderColor(e.target.value)}
-                  placeholder="#1e293b"
-                />
-              </div>
-            )}
-
-            <div className="flex flex-col gap-2">
-              <Label className="text-xs text-muted-foreground">
-                Cover image URL (overrides the gradient)
-              </Label>
-              <Input
-                value={coverImage}
-                onChange={(e) => {
-                  setCoverImage(e.target.value);
-                  setHeaderStyle(e.target.value ? "image" : DEFAULT_HEADER_STYLE);
-                }}
-                placeholder="https://…/cover.png"
-              />
-            </div>
-          </div>
+          <HeaderStylePicker
+            headerStyle={headerStyle}
+            setHeaderStyle={setHeaderStyle}
+            headerColor={headerColor}
+            setHeaderColor={setHeaderColor}
+            coverImage={coverImage}
+            setCoverImage={setCoverImage}
+            previewLabel={title}
+          />
 
           {/* Fields */}
           <div className="flex flex-col gap-1">

@@ -4,13 +4,11 @@ import { ThemeAwareWavyBackground } from "../ui/wavy-background";
 import { Button } from "../ui/button";
 import Link from "next/link";
 import { TbUpload } from "react-icons/tb";
-import UploadProjectsModal from "../UploadProjectsModal";
 import { useSession } from "next-auth/react";
 import { useTheme } from "next-themes";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const Hero = () => {
-  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const { data: session, status } = useSession();
   const { theme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
@@ -45,21 +43,15 @@ const Hero = () => {
             <Button size="lg">Browse Projects</Button>
           </Link>
           {session && (
-            <Button
-              size="lg"
-              variant={"outline"}
-              onClick={() => setIsUploadModalOpen(true)}
-            >
-              <TbUpload className="mr-2 h-5 w-5" />
-              Upload Project
-            </Button>
+            <Link href="/upload">
+              <Button size="lg" variant={"outline"}>
+                <TbUpload className="mr-2 h-5 w-5" />
+                Upload Project
+              </Button>
+            </Link>
           )}
         </div>
       </div>
-      <UploadProjectsModal
-        isOpen={isUploadModalOpen}
-        setIsOpen={setIsUploadModalOpen}
-      />
     </ThemeAwareWavyBackground>
   );
 };
